@@ -9,10 +9,10 @@ const rootPath = __dirname;
 const inputFile = path.resolve(rootPath, './src/index.ts');
 
 /**输入文件夹，当 compileType 为 all 时生效，不建议修改*/
-const inputDir = path.resolve(rootPath, './src/scripts');
+const inputDir = path.resolve(rootPath, './src/pages');
 
 /**输出文件夹，不建议修改*/
-const outputDir = path.resolve(rootPath, '../Scripts');
+const outputDir = path.resolve(rootPath, '../pages.ts');
 
 /**是否压缩代码*/
 const minify = process.env.NODE_ENV === 'production';

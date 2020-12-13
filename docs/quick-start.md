@@ -55,7 +55,7 @@
    ```tsx
    // 打包入口默认是 ./src/index.ts
    // 这样引入其他位置的脚本，就会打包进来
-   import './scripts/helloWorld.tsx'
+   import './pages/helloWorld.tsx'
    ```
 
 <br/>

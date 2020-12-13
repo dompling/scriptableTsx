@@ -69,7 +69,7 @@ const rootPath = path.resolve(__dirname, '../');
 const inputFile: string = path.resolve(rootPath, './src/index.ts');
 
 /**输入文件夹，当 compileType 为 all 时生效*/
-const inputDir: string = path.resolve(rootPath, './src/scripts');
+const inputDir: string = path.resolve(rootPath, './src/pages');
 
 /**输出文件夹*/
 const outputDir: string = path.resolve(rootPath, './dist');
