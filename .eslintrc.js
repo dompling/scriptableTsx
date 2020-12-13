@@ -33,4 +33,4 @@ module.exports = /** @type { import('eslint').Linter.Config } */ ({
       tsx: true,
     },
   },
-})
+});

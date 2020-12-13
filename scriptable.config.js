@@ -1,34 +1,34 @@
 // @ts-check
 
-const path = require('path')
+const path = require('path');
 
 /**项目根目录，不建议修改*/
-const rootPath = __dirname
+const rootPath = __dirname;
 
 /**输入文件，当 compileType 为 one 时生效，不建议修改*/
-const inputFile = path.resolve(rootPath, './src/index.ts')
+const inputFile = path.resolve(rootPath, './src/index.ts');
 
 /**输入文件夹，当 compileType 为 all 时生效，不建议修改*/
-const inputDir = path.resolve(rootPath, './src/scripts')
+const inputDir = path.resolve(rootPath, './src/scripts');
 
 /**输出文件夹，不建议修改*/
-const outputDir = path.resolve(rootPath, './dist')
+const outputDir = path.resolve(rootPath, '../Scripts');
 
 /**是否压缩代码*/
-const minify = process.env.NODE_ENV === 'production'
+const minify = process.env.NODE_ENV === 'production';
 
 /**是否加密代码*/
-const encrypt = process.env.NODE_ENV === 'production'
+const encrypt = false;
 
 /**往编译后的代码头部插入的代码*/
 const header = `
 /**
- * 作者: 小明
+ * 作者: 2Ya
  * 版本: 1.0.0
  * 更新时间：${new Date().toLocaleDateString()}
- * github: https://github.com/2214962083/ios-scriptable-tsx
+ * github: https://github.com/dompling/Scriptable
  */
-`
+`;
 
 module.exports = /** @type { import ('./src/lib/compile').CompileOptions }  */ ({
   rootPath,
@@ -50,4 +50,4 @@ module.exports = /** @type { import ('./src/lib/compile').CompileOptions }  */ (
    * see: https://github.com/javascript-obfuscator/javascript-obfuscator
    */
   encryptOptions: {},
-})
+});

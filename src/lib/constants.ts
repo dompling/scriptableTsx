@@ -5,4 +5,4 @@ export enum URLSchemeFrom {
 }
 
 /**服务端口*/
-export const port = 9090
+export const port = 9090;

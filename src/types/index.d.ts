@@ -7,10 +7,10 @@
 /// <reference path="./JSX.d.ts" />
 
 interface Module {
-  filename: string
-  exports: unknown
+  filename: string;
+  exports: unknown;
 }
-declare const MODULE: Module
+declare const MODULE: Module;
 
 declare namespace Scriptable {
   class Widget {}

@@ -1,6 +1,6 @@
-import * as JSX from '../lib/jsx-runtime'
+import * as JSX from '../lib/jsx-runtime';
 
 declare global {
-  const h: typeof JSX.h
-  const Fragment: typeof JSX.Fragment
+  const h: typeof JSX.h;
+  const Fragment: typeof JSX.Fragment;
 }

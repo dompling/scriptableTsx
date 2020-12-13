@@ -2,7 +2,7 @@
 
 module.exports = /** @type { import ('prettier').RequiredOptions }  */ ({
   printWidth: 120,
-  semi: false,
+  semi: true,
   singleQuote: true,
   trailingComma: 'all',
   bracketSpacing: false,
@@ -11,4 +11,4 @@ module.exports = /** @type { import ('prettier').RequiredOptions }  */ ({
   tabWidth: 2,
   useTabs: false,
   endOfLine: 'auto',
-})
+});
