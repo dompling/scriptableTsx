@@ -33,8 +33,6 @@ const header = `// Variables used by Scriptable.
  */
 `;
 
-const footer = `await new Widget().init();`;
-
 module.exports = /** @type { import ('./src/lib/compile').CompileOptions }  */ ({
   rootPath,
   inputFile,
@@ -43,7 +41,6 @@ module.exports = /** @type { import ('./src/lib/compile').CompileOptions }  */ (
   minify,
   encrypt,
   header,
-  footer,
 
   /**
    * esbuild 自定义配置

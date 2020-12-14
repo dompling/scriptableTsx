@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="873d245c-7774-47b1-8ef2-e62e4f332c00" name="Default Changelist" comment="test">
-      <change afterPath="$PROJECT_DIR$/src/Base.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.eslintrc.js" beforeDir="false" afterPath="$PROJECT_DIR$/.eslintrc.js" afterDir="false" />
+    <list default="true" id="873d245c-7774-47b1-8ef2-e62e4f332c00" name="Default Changelist" comment="scripts">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prettier.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/prettier.config.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scriptable.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/scriptable.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/basic.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/basic.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/compile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/compile.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/help.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/help.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/static/基础包.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/static/基础包.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/Today.OilPrice.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Today.OilPrice.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/index.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/TodayOilPrice.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/TodayOilPrice.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Base.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Base.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,7 +67,7 @@
       <updated>1607830149276</updated>
       <workItem from="1607830152683" duration="1064000" />
       <workItem from="1607831299050" duration="404000" />
-      <workItem from="1607842863862" duration="39937000" />
+      <workItem from="1607842863862" duration="40658000" />
     </task>
     <task id="LOCAL-00001" summary="test">
       <created>1607831353725</created>
@@ -86,7 +76,21 @@
       <option name="project" value="LOCAL" />
       <updated>1607831353725</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="scripts">
+      <created>1607942800063</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1607942800063</updated>
+    </task>
+    <task id="LOCAL-00003" summary="scripts">
+      <created>1607942818491</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1607942818491</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -106,7 +110,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="test" />
-    <option name="LAST_COMMIT_MESSAGE" value="test" />
+    <MESSAGE value="scripts" />
+    <option name="LAST_COMMIT_MESSAGE" value="scripts" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

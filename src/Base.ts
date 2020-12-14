@@ -42,7 +42,6 @@ class Base {
     const opacityLight = (await getSetting<string>('opacityLight')) || this.opacity;
     const opacityDark = (await getSetting<string>('opacityDark')) || this.opacity;
     this.opacity = Device.isUsingDarkAppearance() ? opacityDark : opacityLight;
-    console.log(this.opacity);
     typeof this.componentWillMount === 'function' && (await this.componentWillMount());
   };
 
@@ -232,13 +231,14 @@ class Base {
   };
 
   setImage = async (img: Image | null, key: string, notify = true): Promise<void> => {
+    const path = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + key + '.jpg');
     if (!img) {
       // 移除背景
-      if (FILE_MGR_LOCAL.fileExists(key)) FILE_MGR_LOCAL.remove(key);
+      if (FILE_MGR_LOCAL.fileExists(path)) FILE_MGR_LOCAL.remove(path);
     } else {
       // 设置背景
       // 全部设置一遍，
-      FILE_MGR_LOCAL.writeImage(key, img);
+      FILE_MGR_LOCAL.writeImage(path, img);
     }
     if (notify) await showNotification({title: this.name, body: '设置生效，稍后刷新', sound: 'alert'});
   };
@@ -248,22 +248,25 @@ class Base {
     const light = `${this.backgroundKey}_light`;
     const dark = `${this.backgroundKey}_dark`;
     const isNight = Device.isUsingDarkAppearance();
-    if (!FILE_MGR_LOCAL.fileExists(this.backgroundKey)) {
+    const path1 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + light + '.jpg');
+    const path2 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + dark + '.jpg');
+    const path3 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + this.backgroundKey + '.jpg');
+    if (!FILE_MGR_LOCAL.fileExists(path3)) {
       if (isNight) {
-        if (FILE_MGR_LOCAL.fileExists(light)) {
-          result = Image.fromFile(light);
-        } else if (FILE_MGR_LOCAL.fileExists(dark)) {
-          result = Image.fromFile(dark);
+        if (FILE_MGR_LOCAL.fileExists(path1)) {
+          result = Image.fromFile(path1);
+        } else if (FILE_MGR_LOCAL.fileExists(path2)) {
+          result = Image.fromFile(path2);
         }
       } else {
-        if (FILE_MGR_LOCAL.fileExists(dark)) {
-          result = Image.fromFile(dark);
-        } else if (FILE_MGR_LOCAL.fileExists(light)) {
-          result = Image.fromFile(light);
+        if (FILE_MGR_LOCAL.fileExists(path2)) {
+          result = Image.fromFile(path2);
+        } else if (FILE_MGR_LOCAL.fileExists(path1)) {
+          result = Image.fromFile(path1);
         }
       }
     } else {
-      result = Image.fromFile(this.backgroundKey);
+      result = Image.fromFile(path3);
     }
     if (this.opacity && result) return this.shadowImage(result, '#000000', parseFloat(this.opacity));
     return result;
