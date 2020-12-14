@@ -81,6 +81,7 @@ class Widget extends Base {
     try {
       const location = await Location.current();
       const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
+      console.log(locationText);
       const {locality, administrativeArea} = locationText[0] as locationType;
       this.location = locationText[0] as locationType;
       return [administrativeArea, locality];
