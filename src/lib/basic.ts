@@ -38,6 +38,7 @@ class Basic {
   async init() {
     await this.showMenu();
   }
+
   /**获取本地脚本列表，name 是脚本名字，path 是脚本路径*/
   getLocalScripts(): Record<'name' | 'path', string>[] {
     const dirPath = MODULE.filename.split('/').slice(0, -1).join('/');
@@ -49,6 +50,7 @@ class Basic {
       path: FileManager.local().joinPath(dirPath, scriptName),
     }));
   }
+
   /**
    * 请求获取脚本内容
    * @param url 远程文件地址
@@ -66,6 +68,7 @@ class Basic {
       return '';
     }
   }
+
   /**显示菜单*/
   async showMenu() {
     const that = this;
@@ -103,6 +106,7 @@ class Basic {
         break;
     }
   }
+
   /**远程开发同步*/
   async developRemote(params: DevelopRemoteParams = {}): Promise<void> {
     const that = this;
@@ -239,6 +243,7 @@ class Basic {
       await sleep(that.syncInterval);
     }
   }
+
   /**
    * 执行远程代码
    * @param syncScriptName 脚本名称
@@ -246,7 +251,9 @@ class Basic {
    */
   async runCode(syncScriptName: string, scriptText: string) {
     try {
-      const runRemoteCode = new Function(`${scriptText}`);
+      const runRemoteCode = new Function(`(async () => {
+        ${scriptText}
+      })()`);
       // 执行远程代码
       runRemoteCode();
     } catch (err) {
@@ -259,6 +266,7 @@ class Basic {
       });
     }
   }
+
   /**
    * 获取重写 console 的方法
    * @param serverApi 远程链接api地址，如 http://192.168.2.4:9090

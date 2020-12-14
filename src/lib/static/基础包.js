@@ -1,12 +1,17 @@
 /**
  * 作者: 小明
  * 版本: 1.0.0
- * 更新时间：2020-12-11
- * github: https://github.com/2214962083/scriptable.git
+ * 更新时间：2020-12-14
+ * github: https://github.com/2214962083/ios-scriptable-tsx
  */
 
-// @编译时间 1607657751861
+// @编译时间 1607924203272
 const MODULE = module;
+let __topLevelAwait__ = () => Promise.resolve();
+
+function EndAwait(promiseFunc) {
+  __topLevelAwait__ = promiseFunc;
+}
 
 // src/lib/constants.ts
 var URLSchemeFrom;
@@ -19,6 +24,7 @@ var port = 9090;
 function fm() {
   return FileManager[MODULE.filename.includes('Documents/iCloud~') ? 'iCloud' : 'local']();
 }
+
 function setStorageDirectory(dirPath) {
   return {
     setStorage(key, value) {
@@ -59,12 +65,14 @@ function setStorageDirectory(dirPath) {
     },
   };
 }
+
 var setStorage = setStorageDirectory(fm().libraryDirectory()).setStorage;
 var getStorage = setStorageDirectory(FileManager.local().libraryDirectory()).getStorage;
 var removeStorage = setStorageDirectory(FileManager.local().libraryDirectory()).removeStorage;
 var setCache = setStorageDirectory(FileManager.local().temporaryDirectory()).setStorage;
 var getCache = setStorageDirectory(FileManager.local().temporaryDirectory()).getStorage;
 var removeCache = setStorageDirectory(FileManager.local().temporaryDirectory()).removeStorage;
+
 function useStorage(nameSpace) {
   const _nameSpace = nameSpace || `${MODULE.filename}`;
   return {
@@ -79,6 +87,7 @@ function useStorage(nameSpace) {
     },
   };
 }
+
 async function request(args2) {
   const {
     url,
@@ -125,6 +134,7 @@ async function request(args2) {
     return err;
   }
 }
+
 async function showActionSheet(args2) {
   const {title, desc, cancelText = '取消', itemList} = args2;
   const alert = new Alert();
@@ -151,6 +161,7 @@ async function showActionSheet(args2) {
   const tapIndex = await alert.presentSheet();
   return tapIndex;
 }
+
 async function showModal(args2) {
   const {title, content, showCancel = true, cancelText = '取消', confirmText = '确定', inputItems = []} = args2;
   const alert = new Alert();
@@ -180,6 +191,7 @@ async function showModal(args2) {
         texts,
       };
 }
+
 async function showNotification(args2) {
   const {title, subtitle = '', body = '', openURL, sound, ...others} = args2;
   let notification = new Notification();
@@ -187,10 +199,11 @@ async function showNotification(args2) {
   notification.subtitle = subtitle;
   notification.body = body;
   openURL && (notification.openURL = openURL);
-  sound && notification.sound;
+  sound && (notification.sound = sound);
   notification = Object.assign(notification, others);
   return await notification.schedule();
 }
+
 async function getImage(args2) {
   const {filepath, url, useCache = true} = args2;
   const generateDefaultImage = async () => {
@@ -222,6 +235,7 @@ async function getImage(args2) {
     return await generateDefaultImage();
   }
 }
+
 function hash(string) {
   let hash2 = 0,
     i,
@@ -233,6 +247,7 @@ function hash(string) {
   }
   return `hash_${hash2}`;
 }
+
 function getSciptableTopComment(path) {
   if (!fm().fileExists(path)) return '';
   const code = fm().readString(path);
@@ -241,6 +256,7 @@ function getSciptableTopComment(path) {
       [])[0] || ''
   );
 }
+
 function sleep(ms) {
   return new Promise(resolve => {
     const timer = Timer.schedule(ms, false, () => {
@@ -255,6 +271,7 @@ var GenrateView = class {
   static setListWidget(listWidget2) {
     this.listWidget = listWidget2;
   }
+
   static async wbox(props, ...children) {
     const {background, spacing, href, updateDate, padding, onClick} = props;
     try {
@@ -270,6 +287,7 @@ var GenrateView = class {
     }
     return this.listWidget;
   }
+
   static wstack(props, ...children) {
     return async parentInstance => {
       const widgetStack = parentInstance.addStack();
@@ -314,6 +332,7 @@ var GenrateView = class {
       await addChildren(widgetStack, children);
     };
   }
+
   static wimage(props) {
     return async parentInstance => {
       const {
@@ -364,6 +383,7 @@ var GenrateView = class {
       }
     };
   }
+
   static wspacer(props) {
     return async parentInstance => {
       const widgetSpacer = parentInstance.addSpacer();
@@ -375,6 +395,7 @@ var GenrateView = class {
       }
     };
   }
+
   static wtext(props, ...children) {
     return async parentInstance => {
       const widgetText = parentInstance.addText('');
@@ -416,6 +437,7 @@ var GenrateView = class {
       }
     };
   }
+
   static wdate(props) {
     return async parentInstance => {
       const widgetDate = parentInstance.addDate(new Date());
@@ -468,9 +490,11 @@ var GenrateView = class {
 };
 var listWidget = new ListWidget();
 GenrateView.setListWidget(listWidget);
+
 function getColor(color) {
   return typeof color === 'string' ? new Color(color, 1) : color;
 }
+
 async function getBackground(bg) {
   bg = (typeof bg === 'string' && !isUrl(bg)) || bg instanceof Color ? getColor(bg) : bg;
   if (typeof bg === 'string') {
@@ -478,6 +502,7 @@ async function getBackground(bg) {
   }
   return bg;
 }
+
 async function setBackground(widget, bg) {
   const _bg = await getBackground(bg);
   if (_bg instanceof Color) {
@@ -490,6 +515,7 @@ async function setBackground(widget, bg) {
     widget.backgroundGradient = _bg;
   }
 }
+
 async function addChildren(instance, children) {
   if (children && Array.isArray(children)) {
     for (const child of children) {
@@ -497,16 +523,19 @@ async function addChildren(instance, children) {
     }
   }
 }
+
 function isDefined(value) {
   if (typeof value === 'number' && !isNaN(value)) {
     return true;
   }
   return value !== void 0 && value !== null;
 }
+
 function isUrl(value) {
   const reg = /^(http|https)\:\/\/[\w\W]+/;
   return reg.test(value);
 }
+
 function runOnClick(instance, onClick) {
   const _eventId = hash(onClick.toString());
   instance.url = `${URLScheme.forRunningScript()}?eventId=${encodeURIComponent(_eventId)}&from=${URLSchemeFrom.WIDGET}`;
@@ -516,7 +545,7 @@ function runOnClick(instance, onClick) {
   }
 }
 
-// src/lib/baisc.ts
+// src/lib/basic.ts
 var {setStorage: setStorage2, getStorage: getStorage2} = useStorage('basic-storage');
 var runScriptDate = Date.now();
 setStorage2('runScriptDate', runScriptDate);
@@ -528,9 +557,11 @@ var Basic = class {
     this.requestFailTimes = 0;
     this.maxRequestFailTimes = 10;
   }
+
   async init() {
     await this.showMenu();
   }
+
   getLocalScripts() {
     const dirPath = MODULE.filename.split('/').slice(0, -1).join('/');
     let scriptNames = FileManager.local().listContents(dirPath) || [];
@@ -540,6 +571,7 @@ var Basic = class {
       path: FileManager.local().joinPath(dirPath, scriptName),
     }));
   }
+
   async getScriptText(url) {
     try {
       const req = new Request(url);
@@ -552,6 +584,7 @@ var Basic = class {
       return '';
     }
   }
+
   async showMenu() {
     const that = this;
     let itemList = ['远程开发'];
@@ -584,6 +617,7 @@ var Basic = class {
         break;
     }
   }
+
   async developRemote(params = {}) {
     const that = this;
     let _syncScriptPath = params.syncScriptPath;
@@ -676,9 +710,12 @@ ${scriptText}`;
       await sleep(that.syncInterval);
     }
   }
+
   async runCode(syncScriptName, scriptText) {
     try {
-      const runRemoteCode = new Function(`${scriptText}`);
+      const runRemoteCode = new Function(`(async () => {
+        ${scriptText}
+      })()`);
       runRemoteCode();
     } catch (err) {
       console.log('同步的代码执行失败');
@@ -690,6 +727,7 @@ ${scriptText}`;
       });
     }
   }
+
   getRewriteConsoleCode(serverApi) {
     return `
 // 保留日志原始打印方法
@@ -736,3 +774,5 @@ console.__rewrite__ = true;
   }
 };
 new Basic().init();
+
+await __topLevelAwait__();

@@ -24,6 +24,8 @@ module.exports = /** @type { import('eslint').Linter.Config } */ ({
     '@typescript-eslint/no-this-alias': 'off',
     '@typescript-eslint/triple-slash-reference': 'off',
     '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
   },
   parserOptions: {
     parser: '@typescript-eslint/parser',

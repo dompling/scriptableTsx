@@ -69,7 +69,7 @@ const rootPath = path.resolve(__dirname, '../');
 const inputFile: string = path.resolve(rootPath, './src/index.ts');
 
 /**输入文件夹，当 compileType 为 all 时生效*/
-const inputDir: string = path.resolve(rootPath, './src/pages');
+const inputDir: string = path.resolve(rootPath, './src/scripts');
 
 /**输出文件夹*/
 const outputDir: string = path.resolve(rootPath, './dist');
@@ -137,6 +137,7 @@ async function compile(options: CompileOptions) {
   // 深度获取某个文件夹里所有文件路径（包括子文件夹）
   const readdir = promisify(fs.readdir);
   const stat = promisify(fs.stat);
+
   async function getFilesFromDir(dir: string): Promise<string[]> {
     const subdirs = await readdir(dir);
     const files = await Promise.all(
@@ -165,7 +166,14 @@ async function compile(options: CompileOptions) {
       banner: `${header}
 // @编译时间 ${Date.now()}
 const MODULE = module;
+let __topLevelAwait__ = () => Promise.resolve();
+function EndAwait(promiseFunc) {
+  __topLevelAwait__ = promiseFunc
+};
     `,
+      footer: `
+await __topLevelAwait__();
+`,
       jsxFactory: 'h',
       jsxFragment: 'Fragment',
       define,

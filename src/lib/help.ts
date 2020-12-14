@@ -382,7 +382,7 @@ export function useSetting(settingFilename?: string) {
   };
 
   /**保存设置*/
-  const setSetting = async (key: string, value: unknown): Promise<Record<string, unknown> | void> => {
+  const setSetting = async (key: string, value: unknown, notify = true): Promise<Record<string, unknown> | void> => {
     const fileExists = await isFileExists();
     if (!fileExists) {
       await fileManager.writeString(
@@ -398,6 +398,7 @@ export function useSetting(settingFilename?: string) {
     const settings = JSON.parse(json) || {};
     settings[key] = value;
     await fileManager.writeString(settingsPath, JSON.stringify(settings));
+    if (notify) await showNotification({title: '缓存提示', body: '设置保存成功,稍后刷新组件'});
     return settings;
   };
 
@@ -583,15 +584,19 @@ export async function showModal(args: ShowModalParams): Promise<ShowModalRes> {
  * @param args 通知参数
  */
 export async function showNotification(args: ShowNotificationParams): Promise<void> {
-  const {title, subtitle = '', body = '', openURL, sound, ...others} = args;
-  let notification = new Notification();
-  notification.title = title;
-  notification.subtitle = subtitle;
-  notification.body = body;
-  openURL && (notification.openURL = openURL);
-  sound && (notification.sound = sound);
-  notification = Object.assign(notification, others);
-  return await notification.schedule();
+  try {
+    const {title, subtitle = '', body = '', openURL, sound, ...others} = args;
+    let notification = new Notification();
+    notification.title = title;
+    notification.subtitle = subtitle;
+    notification.body = body;
+    openURL && (notification.openURL = openURL);
+    sound && (notification.sound = sound);
+    notification = Object.assign(notification, others);
+    return await notification.schedule();
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 /**

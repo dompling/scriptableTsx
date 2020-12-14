@@ -12,16 +12,19 @@ const inputFile = path.resolve(rootPath, './src/index.ts');
 const inputDir = path.resolve(rootPath, './src/pages');
 
 /**输出文件夹，不建议修改*/
-const outputDir = path.resolve(rootPath, '../pages.ts');
+const outputDir = path.resolve(rootPath, './dist');
 
 /**是否压缩代码*/
-const minify = process.env.NODE_ENV === 'production';
+const minify = false;
 
 /**是否加密代码*/
 const encrypt = false;
 
 /**往编译后的代码头部插入的代码*/
-const header = `
+const header = `// Variables used by Scriptable.
+// These must be at the very top of the file. Do not edit.
+// icon-color: purple; icon-glyph: oil-can;
+
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
@@ -29,6 +32,8 @@ const header = `
  * github: https://github.com/dompling/Scriptable
  */
 `;
+
+const footer = `await new Widget().init();`;
 
 module.exports = /** @type { import ('./src/lib/compile').CompileOptions }  */ ({
   rootPath,
@@ -38,6 +43,7 @@ module.exports = /** @type { import ('./src/lib/compile').CompileOptions }  */ (
   minify,
   encrypt,
   header,
+  footer,
 
   /**
    * esbuild 自定义配置
