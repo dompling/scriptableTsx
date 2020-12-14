@@ -216,7 +216,15 @@ class Widget extends Base {
   //渲染组件
   render = async (): Promise<unknown> => {
     let gasStation: gasStationResponse[] = [];
-    if (config.widgetFamily === 'small') return;
+    if (config.widgetFamily === 'small') {
+      return (
+        <wbox>
+          <wspacer />
+          <wtext textAlign="center">暂不支持</wtext>
+          <wspacer />
+        </wbox>
+      );
+    }
     const locality = await this.getLocation();
     const data = await this.renderWebView(locality);
     const background = await this.getBackgroundImage();

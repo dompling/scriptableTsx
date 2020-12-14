@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1607951249431
+// @编译时间 1607955444936
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1828,7 +1828,21 @@ var Widget = class extends Base_default {
     };
     this.render = async () => {
       let gasStation = [];
-      if (config.widgetFamily === 'small') return;
+      if (config.widgetFamily === 'small') {
+        return /* @__PURE__ */ h(
+          'wbox',
+          null,
+          /* @__PURE__ */ h('wspacer', null),
+          /* @__PURE__ */ h(
+            'wtext',
+            {
+              textAlign: 'center',
+            },
+            '暂不支持',
+          ),
+          /* @__PURE__ */ h('wspacer', null),
+        );
+      }
       const locality = await this.getLocation();
       const data = await this.renderWebView(locality);
       const background = await this.getBackgroundImage();
