@@ -9,9 +9,10 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1607943476406
+// @编译时间 1607943796890
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
+
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc;
 }
@@ -26,6 +27,7 @@ var URLSchemeFrom;
 function fm() {
   return FileManager[MODULE.filename.includes('Documents/iCloud~') ? 'iCloud' : 'local']();
 }
+
 function setStorageDirectory(dirPath) {
   return {
     setStorage(key, value) {
@@ -66,12 +68,14 @@ function setStorageDirectory(dirPath) {
     },
   };
 }
+
 var setStorage = setStorageDirectory(fm().libraryDirectory()).setStorage;
 var getStorage = setStorageDirectory(FileManager.local().libraryDirectory()).getStorage;
 var removeStorage = setStorageDirectory(FileManager.local().libraryDirectory()).removeStorage;
 var setCache = setStorageDirectory(FileManager.local().temporaryDirectory()).setStorage;
 var getCache = setStorageDirectory(FileManager.local().temporaryDirectory()).getStorage;
 var removeCache = setStorageDirectory(FileManager.local().temporaryDirectory()).removeStorage;
+
 function useStorage(nameSpace) {
   const _nameSpace = nameSpace || `${MODULE.filename}`;
   return {
@@ -86,6 +90,7 @@ function useStorage(nameSpace) {
     },
   };
 }
+
 function useSetting(settingFilename) {
   const isUseICloud = () => {
     return MODULE.filename.includes('Documents/iCloud~');
@@ -136,6 +141,7 @@ function useSetting(settingFilename) {
   };
   return {getSetting, setSetting};
 }
+
 async function request(args2) {
   const {
     url,
@@ -182,6 +188,7 @@ async function request(args2) {
     return err;
   }
 }
+
 async function showActionSheet(args2) {
   const {title: title2, desc, cancelText = '取消', itemList} = args2;
   const alert = new Alert();
@@ -208,6 +215,7 @@ async function showActionSheet(args2) {
   const tapIndex = await alert.presentSheet();
   return tapIndex;
 }
+
 async function showModal(args2) {
   const {title: title2, content, showCancel = true, cancelText = '取消', confirmText = '确定', inputItems = []} = args2;
   const alert = new Alert();
@@ -237,6 +245,7 @@ async function showModal(args2) {
         texts,
       };
 }
+
 async function showNotification(args2) {
   try {
     const {title: title2, subtitle = '', body = '', openURL, sound, ...others} = args2;
@@ -252,6 +261,7 @@ async function showNotification(args2) {
     console.log(e);
   }
 }
+
 async function getImage(args2) {
   const {filepath, url, useCache = true} = args2;
   const generateDefaultImage = async () => {
@@ -283,6 +293,7 @@ async function getImage(args2) {
     return await generateDefaultImage();
   }
 }
+
 function hash(string) {
   let hash2 = 0,
     i,
@@ -294,6 +305,7 @@ function hash(string) {
   }
   return `hash_${hash2}`;
 }
+
 async function showPreviewOptions(render) {
   const selectIndex = await showActionSheet({
     title: '预览组件',
@@ -324,6 +336,7 @@ async function showPreviewOptions(render) {
   }
   return selectIndex;
 }
+
 async function setTransparentBackground(tips) {
   const phoneSizea = {
     2778: {
@@ -513,6 +526,7 @@ var GenrateView = class {
   static setListWidget(listWidget2) {
     this.listWidget = listWidget2;
   }
+
   static async wbox(props, ...children) {
     const {background, spacing, href, updateDate, padding, onClick} = props;
     try {
@@ -528,6 +542,7 @@ var GenrateView = class {
     }
     return this.listWidget;
   }
+
   static wstack(props, ...children) {
     return async parentInstance => {
       const widgetStack = parentInstance.addStack();
@@ -572,6 +587,7 @@ var GenrateView = class {
       await addChildren(widgetStack, children);
     };
   }
+
   static wimage(props) {
     return async parentInstance => {
       const {
@@ -622,6 +638,7 @@ var GenrateView = class {
       }
     };
   }
+
   static wspacer(props) {
     return async parentInstance => {
       const widgetSpacer = parentInstance.addSpacer();
@@ -633,6 +650,7 @@ var GenrateView = class {
       }
     };
   }
+
   static wtext(props, ...children) {
     return async parentInstance => {
       const widgetText = parentInstance.addText('');
@@ -674,6 +692,7 @@ var GenrateView = class {
       }
     };
   }
+
   static wdate(props) {
     return async parentInstance => {
       const widgetDate = parentInstance.addDate(new Date());
@@ -726,6 +745,7 @@ var GenrateView = class {
 };
 var listWidget = new ListWidget();
 GenrateView.setListWidget(listWidget);
+
 function h(type, props, ...children) {
   props = props || {};
   const _children = flatteningArr(children);
@@ -753,9 +773,11 @@ function h(type, props, ...children) {
       break;
   }
 }
+
 function Fragment({children}) {
   return children;
 }
+
 function flatteningArr(arr) {
   return [].concat(
     ...arr.map(item => {
@@ -763,9 +785,11 @@ function flatteningArr(arr) {
     }),
   );
 }
+
 function getColor(color) {
   return typeof color === 'string' ? new Color(color, 1) : color;
 }
+
 async function getBackground(bg) {
   bg = (typeof bg === 'string' && !isUrl(bg)) || bg instanceof Color ? getColor(bg) : bg;
   if (typeof bg === 'string') {
@@ -773,6 +797,7 @@ async function getBackground(bg) {
   }
   return bg;
 }
+
 async function setBackground(widget, bg) {
   const _bg = await getBackground(bg);
   if (_bg instanceof Color) {
@@ -785,6 +810,7 @@ async function setBackground(widget, bg) {
     widget.backgroundGradient = _bg;
   }
 }
+
 async function addChildren(instance, children) {
   if (children && Array.isArray(children)) {
     for (const child of children) {
@@ -792,16 +818,19 @@ async function addChildren(instance, children) {
     }
   }
 }
+
 function isDefined(value) {
   if (typeof value === 'number' && !isNaN(value)) {
     return true;
   }
   return value !== void 0 && value !== null;
 }
+
 function isUrl(value) {
   const reg = /^(http|https)\:\/\/[\w\W]+/;
   return reg.test(value);
 }
+
 function runOnClick(instance, onClick) {
   const _eventId = hash(onClick.toString());
   instance.url = `${URLScheme.forRunningScript()}?eventId=${encodeURIComponent(_eventId)}&from=${URLSchemeFrom.WIDGET}`;
@@ -1101,6 +1130,7 @@ var Base = class {
       return settings;
     };
   }
+
   async init() {
     await this.componentWillMountBefore();
     if (config.runsInApp) {
@@ -1111,6 +1141,7 @@ var Base = class {
       Script.complete();
     }
   }
+
   async generateAlert(message, options) {
     const alert = new Alert();
     alert.message = message;
@@ -1119,6 +1150,7 @@ var Base = class {
     }
     return await alert.presentAlert();
   }
+
   shadowImage(img, color = '#000000', opacity) {
     if (!img || !opacity) return;
     if (opacity === 0) return img;
@@ -1596,8 +1628,8 @@ var RowCenter = ({children, ...props}) => {
       ...props,
     },
     /* @__PURE__ */ h('wspacer', null),
-    children,
-    /* @__PURE__ */ h('wspacer', null),
+    children /* @__PURE__ */,
+    h('wspacer', null),
   );
 };
 var Widget = class extends Base_default {
@@ -1709,6 +1741,7 @@ var Widget = class extends Base_default {
     };
     this.stackGasStation = gasStation => {
       return gasStation.map(item => {
+        const href = `iosamap://navi?sourceApplication=applicationName&backScheme=applicationScheme&poiname=fangheng&poiid=BGVIS&lat=${item.location.lat}&lon=${item.location.lng}&dev=1&style=2`;
         return /* @__PURE__ */ h(
           Fragment,
           null,
@@ -1719,7 +1752,7 @@ var Widget = class extends Base_default {
               flexDirection: 'column',
               borderRadius: 4,
               padding: [2, 0, 2, 0],
-              href: `iosamap://path?sourceApplication=${item.title}&dlat=${item.location.lat}&dlon=${item.location.lng}&dname=${item.address}&dev=0&t=0`,
+              href,
             },
             /* @__PURE__ */ h(
               'wstack',
@@ -1748,8 +1781,8 @@ var Widget = class extends Base_default {
                 '(',
                 item._distance,
                 '米)',
-              ),
-              /* @__PURE__ */ h('wspacer', null),
+              ) /* @__PURE__ */,
+              h('wspacer', null),
             ),
             /* @__PURE__ */ h('wspacer', {
               length: 2,
@@ -1781,8 +1814,8 @@ var Widget = class extends Base_default {
                 item.tel,
               ),
               /* @__PURE__ */ h('wspacer', null),
-            ),
-            /* @__PURE__ */ h('wspacer', {
+            ) /* @__PURE__ */,
+            h('wspacer', {
               length: 2,
             }),
             /* @__PURE__ */ h(
@@ -1853,8 +1886,8 @@ var Widget = class extends Base_default {
             '今日油价',
           ),
         ),
-        /* @__PURE__ */ h('wspacer', null),
-        /* @__PURE__ */ h(
+        /* @__PURE__ */ h('wspacer', null) /* @__PURE__ */,
+        h(
           'wstack',
           null,
           data.map(item => {
@@ -1887,6 +1920,7 @@ var Widget = class extends Base_default {
     this.registerAction('腾讯Token', this.setMenuTokenInput);
     this.registerAction('代理缓存', this.setMenuTencentToken);
   }
+
   nowTime() {
     const date = new Date();
     return date.toLocaleTimeString('chinese', {hour12: false});

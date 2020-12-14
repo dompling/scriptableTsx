@@ -159,6 +159,7 @@ class Widget extends Base {
 
   stackGasStation = (gasStation: gasStationResponse[]) => {
     return gasStation.map(item => {
+      const href = `iosamap://navi?sourceApplication=applicationName&backScheme=applicationScheme&poiname=fangheng&poiid=BGVIS&lat=${item.location.lat}&lon=${item.location.lng}&dev=1&style=2`;
       return (
         <>
           <wstack
@@ -166,7 +167,7 @@ class Widget extends Base {
             flexDirection="column"
             borderRadius={4}
             padding={[2, 0, 2, 0]}
-            href={`iosamap://path?sourceApplication=${item.title}&dlat=${item.location.lat}&dlon=${item.location.lng}&dname=${item.address}&dev=0&t=0`}
+            href={href}
           >
             <wstack verticalAlign="center">
               <wspacer length={5} />
@@ -241,4 +242,5 @@ class Widget extends Base {
     );
   };
 }
+
 EndAwait(() => new Widget().init());
