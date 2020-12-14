@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1607950708060
+// @编译时间 1607951249431
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1620,10 +1620,12 @@ var Widget = class extends Base_default {
       try {
         const location = await Location.current();
         const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
+        console.log(locationText);
         const {locality, administrativeArea} = locationText[0];
         this.location = locationText[0];
         return [administrativeArea || '', locality];
       } catch (e) {
+        console.log('❌错误信息：' + e);
         return [];
       }
     };

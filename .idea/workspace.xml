@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="873d245c-7774-47b1-8ef2-e62e4f332c00" name="Default Changelist" comment="scripts">
+    <list default="true" id="873d245c-7774-47b1-8ef2-e62e4f332c00" name="Default Changelist" comment="fix：修复地址获取失败问题">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/TodayOilPrice.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/TodayOilPrice.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/Today.OilPrice.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Today.OilPrice.tsx" afterDir="false" />
@@ -68,7 +68,7 @@
       <workItem from="1607830152683" duration="1064000" />
       <workItem from="1607831299050" duration="404000" />
       <workItem from="1607842863862" duration="41875000" />
-      <workItem from="1607949517118" duration="1201000" />
+      <workItem from="1607949517118" duration="1745000" />
     </task>
     <task id="LOCAL-00001" summary="test">
       <created>1607831353725</created>
@@ -119,7 +119,14 @@
       <option name="project" value="LOCAL" />
       <updated>1607944593380</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="fix：修复地址获取失败问题">
+      <created>1607950738244</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1607950738244</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -140,7 +147,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="test" />
     <MESSAGE value="scripts" />
-    <option name="LAST_COMMIT_MESSAGE" value="scripts" />
+    <MESSAGE value="fix：修复地址获取失败问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix：修复地址获取失败问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
