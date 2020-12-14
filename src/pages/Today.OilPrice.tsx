@@ -81,10 +81,9 @@ class Widget extends Base {
     try {
       const location = await Location.current();
       const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
-      console.log(locationText);
       const {locality, administrativeArea} = locationText[0] as locationType;
       this.location = locationText[0] as locationType;
-      return [administrativeArea, locality];
+      return [administrativeArea || '', locality];
     } catch (e) {
       return [];
     }
@@ -102,14 +101,20 @@ class Widget extends Base {
     };
     const data = Object.keys(params).map((key: string) => `${key}=${params[key]}`);
     const url = 'https://apis.map.qq.com/ws/place/v1/search?' + encodeURIComponent(data.join('&'));
+    console.log(url);
     const res = (await request<{[key: string]: any; data: gasStationResponse[]}>({url, dataType: 'json'})).data?.data;
     return res?.splice(0, 4) as gasStationResponse[];
   };
 
   renderWebView = async (str: string[]): Promise<oilRes[]> => {
     const webView = new WebView();
-    const _area = [C2Pin.fullChar(str[0].replace('省', '')), C2Pin.fullChar(str[1])];
-    const url = `http://youjia.chemcp.com/${_area.join('/')}.html`;
+    let _area: string[] | string = [C2Pin.fullChar(str[0].replace('省', '')), C2Pin.fullChar(str[1])];
+    if (!_area[0]) {
+      _area = _area[1].replace('shi', '/');
+    } else {
+      _area = _area.join('/') + '.html';
+    }
+    const url = `http://youjia.chemcp.com/${_area}`;
     await webView.loadURL(url);
     const javascript = `
     const data = [];
@@ -184,8 +189,8 @@ class Widget extends Base {
               <wspacer length={5} />
               <wimage src="star.fill" width={10} height={10} />
               <wspacer length={5} />
-              <wtext href={'tel:' + item.tel} font={10} textColor={this.backgroundColor}>
-                电话：{item.tel}
+              <wtext font={10} textColor={this.backgroundColor}>
+                地址：{item.address}
               </wtext>
               <wspacer />
             </wstack>
@@ -194,8 +199,8 @@ class Widget extends Base {
               <wspacer length={5} />
               <wimage src="star.fill" width={10} height={10} />
               <wspacer length={5} />
-              <wtext font={10} textColor={this.backgroundColor}>
-                地址：{item.address}
+              <wtext href={'tel:' + item.tel} font={10} textColor={this.backgroundColor}>
+                电话：{item.tel || '-'}
               </wtext>
               <wspacer />
             </wstack>
@@ -213,7 +218,7 @@ class Widget extends Base {
     const locality = await this.getLocation();
     const data = await this.renderWebView(locality);
     const background = await this.getBackgroundImage();
-    if (config.widgetFamily === 'large') gasStation = await this.searchGasStation();
+    if (config.widgetFamily === 'large' && this.token) gasStation = (await this.searchGasStation()) || [];
     return (
       <wbox
         background={background || this.backgroundColor}
