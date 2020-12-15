@@ -334,7 +334,7 @@ class Widget extends Base {
                       <wspacer />
                       <wimage src={item.shortcut} width={40} height={30} borderRadius={4} />
                     </wstack>
-                    {(this.news && this.news?.length - 1) !== index && <wspacer />}
+                    {(this.news && this.news?.length - 1) !== index && <wspacer length={5} />}
                   </>
                 );
               })}
@@ -347,5 +347,4 @@ class Widget extends Base {
     );
   };
 }
-
 EndAwait(() => new Widget().init());

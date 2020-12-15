@@ -23,7 +23,7 @@ const encrypt = false;
 /**往编译后的代码头部插入的代码*/
 const header = `// Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: purple; icon-glyph: oil-can;
+// icon-color: purple; icon-glyph: bug;
 
 /**
  * 作者: 2Ya
