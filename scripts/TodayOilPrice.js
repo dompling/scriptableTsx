@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608011225984
+// @编译时间 1608011662825
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1085,12 +1085,12 @@ var Base = class {
     };
     this.showAlertCatchInput = async (title2, content, opt, useKey) => {
       const {getSetting, setSetting} = useSetting(this.en);
-      const catchValue = (await getSetting(useKey || this.BOX_CATCH_KEY)) || '';
+      const catchValue = (await getSetting(useKey || this.BOX_CATCH_KEY)) || {};
+      const settings = catchValue;
       const inputItems = Object.keys(opt).map(key => {
         return {placeholder: opt[key], text: catchValue[key]};
       });
       const {texts, confirm} = await showModal({title: title2, content, inputItems});
-      const settings = {};
       Object.keys(opt).map((key, index) => {
         settings[key] = texts[index];
       });
@@ -1611,15 +1611,8 @@ var Widget = class extends Base_default {
         {
           title: '颜色主题',
           func: async () => {
-            await this.showAlertCatchInput(
-              '颜色主题',
-              'hex 颜色',
-              {
-                headerColor: '顶部油价背景',
-                bodyColor: '加油站背景',
-              },
-              'oilBackground',
-            );
+            const inputValue = {headerColor: '顶部油价背景', bodyColor: '加油站背景'};
+            return this.showAlertCatchInput('颜色主题', 'hex 颜色', inputValue, 'oilBackground');
           },
         },
         ...this.baseActions.splice(-1, 1),

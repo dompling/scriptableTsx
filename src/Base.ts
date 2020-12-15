@@ -363,12 +363,12 @@ class Base {
     useKey?: string,
   ): Promise<void> => {
     const {getSetting, setSetting} = useSetting(this.en);
-    const catchValue = (await getSetting<any>(useKey || this.BOX_CATCH_KEY)) || '';
+    const catchValue = (await getSetting<any>(useKey || this.BOX_CATCH_KEY)) || {};
+    const settings: any = catchValue;
     const inputItems = Object.keys(opt).map(key => {
       return {placeholder: opt[key], text: catchValue[key]};
     });
     const {texts, confirm} = await showModal({title, content, inputItems});
-    const settings: any = {};
     Object.keys(opt).map((key, index: number) => {
       settings[key] = texts[index];
     });
