@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608011662825
+// @编译时间 1608012234887
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1859,6 +1859,12 @@ var Widget = class extends Base_default {
             '今日油价',
           ),
           /* @__PURE__ */ h('wspacer', null),
+          /* @__PURE__ */ h('wimage', {
+            src: 'arrow.clockwise',
+            width: 10,
+            height: 10,
+            opacity: 0.5,
+          }),
           /* @__PURE__ */ h(
             'wtext',
             {
@@ -1866,7 +1872,6 @@ var Widget = class extends Base_default {
               textAlign: 'right',
               opacity: 0.5,
             },
-            '更新于:',
             this.nowTime(),
           ),
         ),

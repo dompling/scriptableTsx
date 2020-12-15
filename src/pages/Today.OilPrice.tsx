@@ -248,8 +248,10 @@ class Widget extends Base {
             今日油价
           </wtext>
           <wspacer />
+          <wimage src="arrow.clockwise" width={10} height={10} opacity={0.5} />
+          <wspacer length={10} />
           <wtext font={12} textAlign="right" opacity={0.5}>
-            更新于:{this.nowTime()}
+            {this.nowTime()}
           </wtext>
         </wstack>
       </wbox>
