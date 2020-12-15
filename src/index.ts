@@ -1,1 +1,1 @@
-import './pages/Today.OilPrice';
+import './pages/COVID-19';
