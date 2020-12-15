@@ -9,22 +9,22 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608036185640
+// @编译时间 1608037328420
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
-  __topLevelAwait__ = promiseFunc
-};
-    
+  __topLevelAwait__ = promiseFunc;
+}
+
 // src/lib/constants.ts
 var URLSchemeFrom;
-(function(URLSchemeFrom2) {
-  URLSchemeFrom2["WIDGET"] = "widget";
+(function (URLSchemeFrom2) {
+  URLSchemeFrom2['WIDGET'] = 'widget';
 })(URLSchemeFrom || (URLSchemeFrom = {}));
 
 // src/lib/help.ts
 function fm() {
-  return FileManager[MODULE.filename.includes("Documents/iCloud~") ? "iCloud" : "local"]();
+  return FileManager[MODULE.filename.includes('Documents/iCloud~') ? 'iCloud' : 'local']();
 }
 function setStorageDirectory(dirPath) {
   return {
@@ -63,7 +63,7 @@ function setStorageDirectory(dirPath) {
       if (Keychain.contains(hashKey)) {
         Keychain.remove(hashKey);
       }
-    }
+    },
   };
 }
 var setStorage = setStorageDirectory(fm().libraryDirectory()).setStorage;
@@ -83,18 +83,18 @@ function useStorage(nameSpace) {
     },
     removeStorage(key) {
       removeStorage(`${_nameSpace}${key}`);
-    }
+    },
   };
 }
 function useSetting(settingFilename) {
   const isUseICloud = () => {
-    return MODULE.filename.includes("Documents/iCloud~");
+    return MODULE.filename.includes('Documents/iCloud~');
   };
   const generateSettingFileName = () => {
-    return MODULE.filename.match(/[^\/]+$/)?.[0].replace(".js", "") || hash(`settings:${MODULE.filename}`);
+    return MODULE.filename.match(/[^\/]+$/)?.[0].replace('.js', '') || hash(`settings:${MODULE.filename}`);
   };
   const fileManager = fm();
-  const settingsFolderPath = fileManager.joinPath(fileManager.documentsDirectory(), "/settings-json");
+  const settingsFolderPath = fileManager.joinPath(fileManager.documentsDirectory(), '/settings-json');
   const _settingFilename = `${settingFilename || generateSettingFileName()}.json`;
   const settingsPath = fileManager.joinPath(settingsFolderPath, _settingFilename);
   const isFileExists = async () => {
@@ -102,17 +102,15 @@ function useSetting(settingFilename) {
       fileManager.createDirectory(settingsFolderPath, true);
     }
     if (!fileManager.fileExists(settingsPath)) {
-      await fileManager.writeString(settingsPath, "{}");
+      await fileManager.writeString(settingsPath, '{}');
       return false;
     }
     return true;
   };
-  const getSetting = async (key) => {
+  const getSetting = async key => {
     const fileExists = await isFileExists();
-    if (!fileExists)
-      return null;
-    if (isUseICloud())
-      await fileManager.downloadFileFromiCloud(settingsPath);
+    if (!fileExists) return null;
+    if (isUseICloud()) await fileManager.downloadFileFromiCloud(settingsPath);
     const json = fileManager.readString(settingsPath);
     const settings = JSON.parse(json) || {};
     return settings[key];
@@ -120,19 +118,20 @@ function useSetting(settingFilename) {
   const setSetting = async (key, value, notify = true) => {
     const fileExists = await isFileExists();
     if (!fileExists) {
-      await fileManager.writeString(settingsPath, JSON.stringify({
-        [key]: value
-      }));
+      await fileManager.writeString(
+        settingsPath,
+        JSON.stringify({
+          [key]: value,
+        }),
+      );
       return;
     }
-    if (isUseICloud())
-      await fileManager.downloadFileFromiCloud(settingsPath);
+    if (isUseICloud()) await fileManager.downloadFileFromiCloud(settingsPath);
     const json = fileManager.readString(settingsPath);
     const settings = JSON.parse(json) || {};
     settings[key] = value;
     await fileManager.writeString(settingsPath, JSON.stringify(settings));
-    if (notify)
-      await showNotification({title: "缓存提示", body: "设置保存成功,稍后刷新组件"});
+    if (notify) await showNotification({title: '缓存提示', body: '设置保存成功,稍后刷新组件'});
     return settings;
   };
   return {getSetting, setSetting};
@@ -142,16 +141,15 @@ async function request(args2) {
     url,
     data,
     header,
-    dataType = "json",
-    method = "GET",
+    dataType = 'json',
+    method = 'GET',
     timeout = 60 * 1e3,
     useCache = false,
-    failReturnCache = true
+    failReturnCache = true,
   } = args2;
   const cacheKey = `url:${url}`;
   const cache = getStorage(cacheKey);
-  if (useCache && cache !== null)
-    return cache;
+  if (useCache && cache !== null) return cache;
   const req = new Request(url);
   req.method = method;
   header && (req.headers = header);
@@ -161,16 +159,16 @@ async function request(args2) {
   let res;
   try {
     switch (dataType) {
-      case "json":
+      case 'json':
         res = await req.loadJSON();
         break;
-      case "text":
+      case 'text':
         res = await req.loadString();
         break;
-      case "image":
+      case 'image':
         res = await req.loadImage();
         break;
-      case "data":
+      case 'data':
         res = await req.load();
         break;
       default:
@@ -180,25 +178,24 @@ async function request(args2) {
     setStorage(cacheKey, result);
     return result;
   } catch (err) {
-    if (cache !== null && failReturnCache)
-      return cache;
+    if (cache !== null && failReturnCache) return cache;
     return err;
   }
 }
 async function showActionSheet(args2) {
-  const {title, desc, cancelText = "取消", itemList} = args2;
+  const {title, desc, cancelText = '取消', itemList} = args2;
   const alert = new Alert();
   title && (alert.title = title);
   desc && (alert.message = desc);
   for (const item of itemList) {
-    if (typeof item === "string") {
+    if (typeof item === 'string') {
       alert.addAction(item);
     } else {
       switch (item.type) {
-        case "normal":
+        case 'normal':
           alert.addAction(item.text);
           break;
-        case "warn":
+        case 'warn':
           alert.addDestructiveAction(item.text);
           break;
         default:
@@ -212,15 +209,15 @@ async function showActionSheet(args2) {
   return tapIndex;
 }
 async function showModal(args2) {
-  const {title, content, showCancel = true, cancelText = "取消", confirmText = "确定", inputItems = []} = args2;
+  const {title, content, showCancel = true, cancelText = '取消', confirmText = '确定', inputItems = []} = args2;
   const alert = new Alert();
   title && (alert.title = title);
   content && (alert.message = content);
   showCancel && cancelText && alert.addCancelAction(cancelText);
   alert.addAction(confirmText);
   for (const input of inputItems) {
-    const {type = "text", text = "", placeholder = ""} = input;
-    if (type === "password") {
+    const {type = 'text', text = '', placeholder = ''} = input;
+    if (type === 'password') {
       alert.addSecureTextField(placeholder, text);
     } else {
       alert.addTextField(placeholder, text);
@@ -228,19 +225,21 @@ async function showModal(args2) {
   }
   const tapIndex = await alert.presentAlert();
   const texts = inputItems.map((item, index) => alert.textFieldValue(index));
-  return tapIndex === -1 ? {
-    cancel: true,
-    confirm: false,
-    texts
-  } : {
-    cancel: false,
-    confirm: true,
-    texts
-  };
+  return tapIndex === -1
+    ? {
+        cancel: true,
+        confirm: false,
+        texts,
+      }
+    : {
+        cancel: false,
+        confirm: true,
+        texts,
+      };
 }
 async function showNotification(args2) {
   try {
-    const {title, subtitle = "", body = "", openURL, sound, ...others} = args2;
+    const {title, subtitle = '', body = '', openURL, sound, ...others} = args2;
     let notification = new Notification();
     notification.title = title;
     notification.subtitle = subtitle;
@@ -264,10 +263,9 @@ async function getImage(args2) {
   };
   try {
     if (filepath) {
-      return Image.fromFile(filepath) || await generateDefaultImage();
+      return Image.fromFile(filepath) || (await generateDefaultImage());
     }
-    if (!url)
-      return await generateDefaultImage();
+    if (!url) return await generateDefaultImage();
     const cacheKey = `image:${url}`;
     if (useCache) {
       const cache = getCache(url);
@@ -277,16 +275,18 @@ async function getImage(args2) {
         removeCache(cacheKey);
       }
     }
-    const res = await request({url, dataType: "image"});
+    const res = await request({url, dataType: 'image'});
     const image = res && res.data;
     image && setCache(cacheKey, image);
-    return image || await generateDefaultImage();
+    return image || (await generateDefaultImage());
   } catch (err) {
     return await generateDefaultImage();
   }
 }
 function hash(string) {
-  let hash2 = 0, i, chr;
+  let hash2 = 0,
+    i,
+    chr;
   for (i = 0; i < string.length; i++) {
     chr = string.charCodeAt(i);
     hash2 = (hash2 << 5) - hash2 + chr;
@@ -296,29 +296,29 @@ function hash(string) {
 }
 async function showPreviewOptions(render) {
   const selectIndex = await showActionSheet({
-    title: "预览组件",
-    desc: "测试桌面组件在各种尺寸下的显示效果",
-    itemList: ["小尺寸", "中尺寸", "大尺寸", "全部尺寸"]
+    title: '预览组件',
+    desc: '测试桌面组件在各种尺寸下的显示效果',
+    itemList: ['小尺寸', '中尺寸', '大尺寸', '全部尺寸'],
   });
   switch (selectIndex) {
     case 0:
-      config.widgetFamily = "small";
+      config.widgetFamily = 'small';
       await (await render()).presentSmall();
       break;
     case 1:
-      config.widgetFamily = "medium";
+      config.widgetFamily = 'medium';
       await (await render()).presentMedium();
       break;
     case 2:
-      config.widgetFamily = "large";
+      config.widgetFamily = 'large';
       await (await render()).presentLarge();
       break;
     case 3:
-      config.widgetFamily = "small";
+      config.widgetFamily = 'small';
       await (await render()).presentSmall();
-      config.widgetFamily = "medium";
+      config.widgetFamily = 'medium';
       await (await render()).presentMedium();
-      config.widgetFamily = "large";
+      config.widgetFamily = 'large';
       await (await render()).presentLarge();
       break;
   }
@@ -326,7 +326,7 @@ async function showPreviewOptions(render) {
 }
 async function setTransparentBackground(tips) {
   const phoneSizea = {
-    "2778": {
+    2778: {
       small: 510,
       medium: 1092,
       large: 1146,
@@ -334,9 +334,9 @@ async function setTransparentBackground(tips) {
       right: 678,
       top: 246,
       middle: 882,
-      bottom: 1518
+      bottom: 1518,
     },
-    "2532": {
+    2532: {
       small: 474,
       medium: 1014,
       large: 1062,
@@ -344,9 +344,9 @@ async function setTransparentBackground(tips) {
       right: 618,
       top: 231,
       middle: 819,
-      bottom: 1407
+      bottom: 1407,
     },
-    "2688": {
+    2688: {
       small: 507,
       medium: 1080,
       large: 1137,
@@ -354,9 +354,9 @@ async function setTransparentBackground(tips) {
       right: 654,
       top: 228,
       middle: 858,
-      bottom: 1488
+      bottom: 1488,
     },
-    "1792": {
+    1792: {
       small: 338,
       medium: 720,
       large: 758,
@@ -364,9 +364,9 @@ async function setTransparentBackground(tips) {
       right: 436,
       top: 160,
       middle: 580,
-      bottom: 1e3
+      bottom: 1e3,
     },
-    "2436": {
+    2436: {
       small: 465,
       medium: 987,
       large: 1035,
@@ -374,9 +374,9 @@ async function setTransparentBackground(tips) {
       right: 591,
       top: 213,
       middle: 783,
-      bottom: 1353
+      bottom: 1353,
     },
-    "2208": {
+    2208: {
       small: 471,
       medium: 1044,
       large: 1071,
@@ -384,9 +384,9 @@ async function setTransparentBackground(tips) {
       right: 672,
       top: 114,
       middle: 696,
-      bottom: 1278
+      bottom: 1278,
     },
-    "1334": {
+    1334: {
       small: 296,
       medium: 642,
       large: 648,
@@ -394,9 +394,9 @@ async function setTransparentBackground(tips) {
       right: 400,
       top: 60,
       middle: 412,
-      bottom: 764
+      bottom: 764,
     },
-    "1136": {
+    1136: {
       small: 282,
       medium: 584,
       large: 622,
@@ -404,9 +404,9 @@ async function setTransparentBackground(tips) {
       right: 332,
       top: 59,
       middle: 399,
-      bottom: 399
+      bottom: 399,
     },
-    "1624": {
+    1624: {
       small: 310,
       medium: 658,
       large: 690,
@@ -414,9 +414,9 @@ async function setTransparentBackground(tips) {
       right: 394,
       top: 142,
       middle: 522,
-      bottom: 902
+      bottom: 902,
     },
-    "2001": {
+    2001: {
       small: 444,
       medium: 963,
       large: 972,
@@ -424,8 +424,8 @@ async function setTransparentBackground(tips) {
       right: 600,
       top: 90,
       middle: 618,
-      bottom: 1146
-    }
+      bottom: 1146,
+    },
   };
   const cropImage = (img2, rect) => {
     const draw = new DrawContext();
@@ -434,36 +434,38 @@ async function setTransparentBackground(tips) {
     return draw.getImage();
   };
   const shouldExit = await showModal({
-    content: tips || "开始之前，请先前往桌面,截取空白界面的截图。然后回来继续",
-    cancelText: "我已截图",
-    confirmText: "前去截图 >"
+    content: tips || '开始之前，请先前往桌面,截取空白界面的截图。然后回来继续',
+    cancelText: '我已截图',
+    confirmText: '前去截图 >',
   });
-  if (!shouldExit.cancel)
-    return;
+  if (!shouldExit.cancel) return;
   const img = await Photos.fromLibrary();
   const imgHeight = img.size.height;
   const phone = phoneSizea[imgHeight];
   if (!phone) {
     const help4 = await showModal({
-      content: "好像您选择的照片不是正确的截图，或者您的机型我们暂时不支持。点击确定前往社区讨论",
-      confirmText: "帮助",
-      cancelText: "取消"
+      content: '好像您选择的照片不是正确的截图，或者您的机型我们暂时不支持。点击确定前往社区讨论',
+      confirmText: '帮助',
+      cancelText: '取消',
     });
-    if (help4.confirm)
-      Safari.openInApp("https://support.qq.com/products/287371", false);
+    if (help4.confirm) Safari.openInApp('https://support.qq.com/products/287371', false);
     return;
   }
-  const sizes = ["小尺寸", "中尺寸", "大尺寸"];
+  const sizes = ['小尺寸', '中尺寸', '大尺寸'];
   const sizeIndex = await showActionSheet({
-    title: "你准备用哪个尺寸",
-    itemList: sizes
+    title: '你准备用哪个尺寸',
+    itemList: sizes,
   });
   const widgetSize = sizes[sizeIndex];
-  const selectLocation = (positions2) => showActionSheet({
-    title: "你准备把组件放桌面哪里？",
-    desc: imgHeight == 1136 ? " （备注：当前设备只支持两行小组件，所以下边选项中的「中间」和「底部」的选项是一致的）" : "",
-    itemList: positions2
-  });
+  const selectLocation = positions2 =>
+    showActionSheet({
+      title: '你准备把组件放桌面哪里？',
+      desc:
+        imgHeight == 1136
+          ? ' （备注：当前设备只支持两行小组件，所以下边选项中的「中间」和「底部」的选项是一致的）'
+          : '',
+      itemList: positions2,
+    });
   const crop = {w: 0, h: 0, x: 0, y: 0};
   let positions;
   let _positions;
@@ -471,32 +473,32 @@ async function setTransparentBackground(tips) {
   let keys;
   let key;
   switch (widgetSize) {
-    case "小尺寸":
+    case '小尺寸':
       crop.w = phone.small;
       crop.h = phone.small;
-      positions = ["左上角", "右上角", "中间左", "中间右", "左下角", "右下角"];
-      _positions = ["top left", "top right", "middle left", "middle right", "bottom left", "bottom right"];
+      positions = ['左上角', '右上角', '中间左', '中间右', '左下角', '右下角'];
+      _positions = ['top left', 'top right', 'middle left', 'middle right', 'bottom left', 'bottom right'];
       positionIndex = await selectLocation(positions);
-      keys = _positions[positionIndex].split(" ");
+      keys = _positions[positionIndex].split(' ');
       crop.y = phone[keys[0]];
       crop.x = phone[keys[1]];
       break;
-    case "中尺寸":
+    case '中尺寸':
       crop.w = phone.medium;
       crop.h = phone.small;
       crop.x = phone.left;
-      positions = ["顶部", "中间", "底部"];
-      _positions = ["top", "middle", "bottom"];
+      positions = ['顶部', '中间', '底部'];
+      _positions = ['top', 'middle', 'bottom'];
       positionIndex = await selectLocation(positions);
       key = _positions[positionIndex];
       crop.y = phone[key];
       break;
-    case "大尺寸":
+    case '大尺寸':
       crop.w = phone.medium;
       crop.h = phone.large;
       crop.x = phone.left;
-      positions = ["顶部", "底部"];
-      _positions = ["top", "middle"];
+      positions = ['顶部', '底部'];
+      _positions = ['top', 'middle'];
       positionIndex = await selectLocation(positions);
       key = _positions[positionIndex];
       crop.y = phone[key];
@@ -514,7 +516,7 @@ var GenrateView = class {
   static async wbox(props, ...children) {
     const {background, spacing, href, updateDate, padding, onClick} = props;
     try {
-      isDefined(background) && await setBackground(this.listWidget, background);
+      isDefined(background) && (await setBackground(this.listWidget, background));
       isDefined(spacing) && (this.listWidget.spacing = spacing);
       isDefined(href) && (this.listWidget.url = href);
       isDefined(updateDate) && (this.listWidget.refreshAfterDate = updateDate);
@@ -527,7 +529,7 @@ var GenrateView = class {
     return this.listWidget;
   }
   static wstack(props, ...children) {
-    return async (parentInstance) => {
+    return async parentInstance => {
       const widgetStack = parentInstance.addStack();
       const {
         background,
@@ -541,10 +543,10 @@ var GenrateView = class {
         href,
         verticalAlign,
         flexDirection,
-        onClick
+        onClick,
       } = props;
       try {
-        isDefined(background) && await setBackground(widgetStack, background);
+        isDefined(background) && (await setBackground(widgetStack, background));
         isDefined(spacing) && (widgetStack.spacing = spacing);
         isDefined(padding) && widgetStack.setPadding(...padding);
         isDefined(borderRadius) && (widgetStack.cornerRadius = borderRadius);
@@ -555,12 +557,12 @@ var GenrateView = class {
         const verticalAlignMap = {
           bottom: () => widgetStack.bottomAlignContent(),
           center: () => widgetStack.centerAlignContent(),
-          top: () => widgetStack.topAlignContent()
+          top: () => widgetStack.topAlignContent(),
         };
         isDefined(verticalAlign) && verticalAlignMap[verticalAlign]();
         const flexDirectionMap = {
           row: () => widgetStack.layoutHorizontally(),
-          column: () => widgetStack.layoutVertically()
+          column: () => widgetStack.layoutVertically(),
         };
         isDefined(flexDirection) && flexDirectionMap[flexDirection]();
         isDefined(onClick) && runOnClick(widgetStack, onClick);
@@ -571,7 +573,7 @@ var GenrateView = class {
     };
   }
   static wimage(props) {
-    return async (parentInstance) => {
+    return async parentInstance => {
       const {
         src,
         href,
@@ -586,11 +588,11 @@ var GenrateView = class {
         filter,
         imageAlign,
         mode,
-        onClick
+        onClick,
       } = props;
       let _image = src;
-      typeof src === "string" && isUrl(src) && (_image = await getImage({url: src}));
-      typeof src === "string" && !isUrl(src) && (_image = SFSymbol.named(src).image);
+      typeof src === 'string' && isUrl(src) && (_image = await getImage({url: src}));
+      typeof src === 'string' && !isUrl(src) && (_image = SFSymbol.named(src).image);
       const widgetImage = parentInstance.addImage(_image);
       widgetImage.image = _image;
       try {
@@ -606,12 +608,12 @@ var GenrateView = class {
         const imageAlignMap = {
           left: () => widgetImage.leftAlignImage(),
           center: () => widgetImage.centerAlignImage(),
-          right: () => widgetImage.rightAlignImage()
+          right: () => widgetImage.rightAlignImage(),
         };
         isDefined(imageAlign) && imageAlignMap[imageAlign]();
         const modeMap = {
           fit: () => widgetImage.applyFittingContentMode(),
-          fill: () => widgetImage.applyFillingContentMode()
+          fill: () => widgetImage.applyFillingContentMode(),
         };
         isDefined(mode) && modeMap[mode]();
         isDefined(onClick) && runOnClick(widgetImage, onClick);
@@ -621,7 +623,7 @@ var GenrateView = class {
     };
   }
   static wspacer(props) {
-    return async (parentInstance) => {
+    return async parentInstance => {
       const widgetSpacer = parentInstance.addSpacer();
       const {length} = props;
       try {
@@ -632,8 +634,8 @@ var GenrateView = class {
     };
   }
   static wtext(props, ...children) {
-    return async (parentInstance) => {
-      const widgetText = parentInstance.addText("");
+    return async parentInstance => {
+      const widgetText = parentInstance.addText('');
       const {
         textColor,
         font,
@@ -645,14 +647,14 @@ var GenrateView = class {
         shadowOffset,
         href,
         textAlign,
-        onClick
+        onClick,
       } = props;
       if (children && Array.isArray(children)) {
-        widgetText.text = children.join("");
+        widgetText.text = children.join('');
       }
       try {
         isDefined(textColor) && (widgetText.textColor = getColor(textColor));
-        isDefined(font) && (widgetText.font = typeof font === "number" ? Font.systemFont(font) : font);
+        isDefined(font) && (widgetText.font = typeof font === 'number' ? Font.systemFont(font) : font);
         isDefined(opacity) && (widgetText.textOpacity = opacity);
         isDefined(maxLine) && (widgetText.lineLimit = maxLine);
         isDefined(scale) && (widgetText.minimumScaleFactor = scale);
@@ -663,7 +665,7 @@ var GenrateView = class {
         const textAlignMap = {
           left: () => widgetText.leftAlignText(),
           center: () => widgetText.centerAlignText(),
-          right: () => widgetText.rightAlignText()
+          right: () => widgetText.rightAlignText(),
         };
         isDefined(textAlign) && textAlignMap[textAlign]();
         isDefined(onClick) && runOnClick(widgetText, onClick);
@@ -673,7 +675,7 @@ var GenrateView = class {
     };
   }
   static wdate(props) {
-    return async (parentInstance) => {
+    return async parentInstance => {
       const widgetDate = parentInstance.addDate(new Date());
       const {
         date,
@@ -688,12 +690,12 @@ var GenrateView = class {
         shadowOffset,
         href,
         textAlign,
-        onClick
+        onClick,
       } = props;
       try {
         isDefined(date) && (widgetDate.date = date);
         isDefined(textColor) && (widgetDate.textColor = getColor(textColor));
-        isDefined(font) && (widgetDate.font = typeof font === "number" ? Font.systemFont(font) : font);
+        isDefined(font) && (widgetDate.font = typeof font === 'number' ? Font.systemFont(font) : font);
         isDefined(opacity) && (widgetDate.textOpacity = opacity);
         isDefined(maxLine) && (widgetDate.lineLimit = maxLine);
         isDefined(scale) && (widgetDate.minimumScaleFactor = scale);
@@ -706,13 +708,13 @@ var GenrateView = class {
           date: () => widgetDate.applyDateStyle(),
           relative: () => widgetDate.applyRelativeStyle(),
           offset: () => widgetDate.applyOffsetStyle(),
-          timer: () => widgetDate.applyTimerStyle()
+          timer: () => widgetDate.applyTimerStyle(),
         };
         isDefined(mode) && modeMap[mode]();
         const textAlignMap = {
           left: () => widgetDate.leftAlignText(),
           center: () => widgetDate.centerAlignText(),
-          right: () => widgetDate.rightAlignText()
+          right: () => widgetDate.rightAlignText(),
         };
         isDefined(textAlign) && textAlignMap[textAlign]();
         isDefined(onClick) && runOnClick(widgetDate, onClick);
@@ -728,22 +730,22 @@ function h(type, props, ...children) {
   props = props || {};
   const _children = flatteningArr(children);
   switch (type) {
-    case "wbox":
+    case 'wbox':
       return GenrateView.wbox(props, ..._children);
       break;
-    case "wdate":
+    case 'wdate':
       return GenrateView.wdate(props);
       break;
-    case "wimage":
+    case 'wimage':
       return GenrateView.wimage(props);
       break;
-    case "wspacer":
+    case 'wspacer':
       return GenrateView.wspacer(props);
       break;
-    case "wstack":
+    case 'wstack':
       return GenrateView.wstack(props, ..._children);
       break;
-    case "wtext":
+    case 'wtext':
       return GenrateView.wtext(props, ..._children);
       break;
     default:
@@ -755,16 +757,18 @@ function Fragment({children}) {
   return children;
 }
 function flatteningArr(arr) {
-  return [].concat(...arr.map((item) => {
-    return Array.isArray(item) ? flatteningArr(item) : item;
-  }));
+  return [].concat(
+    ...arr.map(item => {
+      return Array.isArray(item) ? flatteningArr(item) : item;
+    }),
+  );
 }
 function getColor(color) {
-  return typeof color === "string" ? new Color(color, 1) : color;
+  return typeof color === 'string' ? new Color(color, 1) : color;
 }
 async function getBackground(bg) {
-  bg = typeof bg === "string" && !isUrl(bg) || bg instanceof Color ? getColor(bg) : bg;
-  if (typeof bg === "string") {
+  bg = (typeof bg === 'string' && !isUrl(bg)) || bg instanceof Color ? getColor(bg) : bg;
+  if (typeof bg === 'string') {
     bg = await getImage({url: bg});
   }
   return bg;
@@ -784,12 +788,12 @@ async function setBackground(widget, bg) {
 async function addChildren(instance, children) {
   if (children && Array.isArray(children)) {
     for (const child of children) {
-      child instanceof Function ? await child(instance) : "";
+      child instanceof Function ? await child(instance) : '';
     }
   }
 }
 function isDefined(value) {
-  if (typeof value === "number" && !isNaN(value)) {
+  if (typeof value === 'number' && !isNaN(value)) {
     return true;
   }
   return value !== void 0 && value !== null;
@@ -813,171 +817,178 @@ var Base = class {
   constructor() {
     this.componentWillMountBefore = async () => {
       const {getSetting} = useSetting(this.en);
-      const fontColorLight = await getSetting("fontColorLight") || this.fontColor;
-      const fontColorDark = await getSetting("fontColorDark") || this.fontColor;
+      const fontColorLight = (await getSetting('fontColorLight')) || this.fontColor;
+      const fontColorDark = (await getSetting('fontColorDark')) || this.fontColor;
       this.fontColor = Device.isUsingDarkAppearance() ? fontColorDark : fontColorLight;
-      const backgroundColorLight = await getSetting("backgroundColorLight") || this.backgroundColor;
-      const backgroundColorDark = await getSetting("backgroundColorDark") || this.backgroundColor;
+      const backgroundColorLight = (await getSetting('backgroundColorLight')) || this.backgroundColor;
+      const backgroundColorDark = (await getSetting('backgroundColorDark')) || this.backgroundColor;
       this.backgroundColor = Device.isUsingDarkAppearance() ? backgroundColorDark : backgroundColorLight;
-      const opacityLight = await getSetting("opacityLight") || this.opacity;
-      const opacityDark = await getSetting("opacityDark") || this.opacity;
+      const opacityLight = (await getSetting('opacityLight')) || this.opacity;
+      const opacityDark = (await getSetting('opacityDark')) || this.opacity;
       this.opacity = Device.isUsingDarkAppearance() ? opacityDark : opacityLight;
-      typeof this.componentWillMount === "function" && await this.componentWillMount();
+      typeof this.componentWillMount === 'function' && (await this.componentWillMount());
     };
-    this.name = "菜单";
-    this.en = "base";
-    this.prefix = "boxjs.net";
+    this.name = '菜单';
+    this.en = 'base';
+    this.prefix = 'boxjs.net';
     this.useBoxJS = true;
-    this.BOX_CATCH_KEY = "BoxJSData";
+    this.BOX_CATCH_KEY = 'BoxJSData';
     this.backgroundKey = `${this.name}_background`;
     this.render = async () => false;
-    this.componentWillMount = async () => {
-    };
-    this.backgroundColor = Device.isUsingDarkAppearance() ? "#000" : "#fff";
-    this.fontColor = Device.isUsingDarkAppearance() ? "#fff" : "#000";
-    this.opacity = Device.isUsingDarkAppearance() ? "0.7" : "0.4";
+    this.componentWillMount = async () => {};
+    this.backgroundColor = Device.isUsingDarkAppearance() ? '#000' : '#fff';
+    this.fontColor = Device.isUsingDarkAppearance() ? '#fff' : '#000';
+    this.opacity = Device.isUsingDarkAppearance() ? '0.7' : '0.4';
     this.updateInterval = async () => {
       const {getSetting} = useSetting(this.en);
-      const updateInterval = await getSetting("updateInterval") || "30";
+      const updateInterval = (await getSetting('updateInterval')) || '30';
       return parseInt(updateInterval) * 1e3 * 60;
     };
     this.baseActions = [
       {
-        title: "字体颜色",
+        title: '字体颜色',
         func: async () => {
-          await this.setLightAndDark("字体颜色", "Hex 颜色", "fontColor");
-        }
+          await this.setLightAndDark('字体颜色', 'Hex 颜色', 'fontColor');
+        },
       },
       {
-        title: "背景设置",
+        title: '背景设置',
         func: async () => {
           const actions = [
             {
-              title: "白天图",
+              title: '白天图',
               func: async () => {
                 const image = await Photos.fromLibrary();
-                if (!await this.verifyImage(image))
-                  return;
+                if (!(await this.verifyImage(image))) return;
                 await this.setImage(image, `${this.backgroundKey}_light`);
-              }
+              },
             },
             {
-              title: "夜间图",
+              title: '夜间图',
               func: async () => {
                 const image = await Photos.fromLibrary();
-                if (!await this.verifyImage(image))
-                  return;
+                if (!(await this.verifyImage(image))) return;
                 await this.setImage(image, `${this.backgroundKey}_night`);
-              }
+              },
             },
             {
-              title: "透明度",
+              title: '透明度',
               func: async () => {
-                return this.setLightAndDark("透明度", false, "opacity");
-              }
+                return this.setLightAndDark('透明度', false, 'opacity');
+              },
             },
             {
-              title: "背景色",
+              title: '背景色',
               func: async () => {
-                return this.setLightAndDark("背景色", false, "backgroundColor");
-              }
-            }
+                return this.setLightAndDark('背景色', false, 'backgroundColor');
+              },
+            },
           ];
-          await this.showActionSheet("背景设置", actions);
-        }
+          await this.showActionSheet('背景设置', actions);
+        },
       },
       {
-        title: "透明背景",
+        title: '透明背景',
         func: async () => {
           const image = await setTransparentBackground();
-          image && await this.setImage(image, this.backgroundKey);
-        }
+          image && (await this.setImage(image, this.backgroundKey));
+        },
       },
       {
-        title: "清空背景",
+        title: '清空背景',
         func: async () => {
           await this.setImage(null, `${this.backgroundKey}_light`);
           await this.setImage(null, `${this.backgroundKey}_night`);
-        }
+        },
       },
-      ...this.useBoxJS ? [
-        {
-          title: "BoxJS",
-          func: async () => {
-            const {getStorage: getStorage2, setStorage: setStorage2} = useStorage("boxjs");
-            const boxjs = getStorage2("prefix") || this.prefix;
-            const {texts} = await showModal({
-              title: "BoxJS设置",
-              inputItems: [{placeholder: "BoxJS域名", text: boxjs}]
-            });
-            await setStorage2("prefix", texts[0]);
-          }
-        }
-      ] : []
+      ...(this.useBoxJS
+        ? [
+            {
+              title: 'BoxJS',
+              func: async () => {
+                const {getStorage: getStorage2, setStorage: setStorage2} = useStorage('boxjs');
+                const boxjs = getStorage2('prefix') || this.prefix;
+                const {texts} = await showModal({
+                  title: 'BoxJS设置',
+                  inputItems: [{placeholder: 'BoxJS域名', text: boxjs}],
+                });
+                await setStorage2('prefix', texts[0]);
+              },
+            },
+          ]
+        : []),
     ];
     this.actions = [
       {
-        title: "预览组件",
+        title: '预览组件',
         func: async () => {
           await showPreviewOptions(this.render);
-        }
+        },
       },
       {
-        title: "刷新时间",
+        title: '刷新时间',
         func: async () => {
           const {getSetting, setSetting} = useSetting(this.en);
-          const updateInterval = await getSetting("updateInterval") || "";
+          const updateInterval = (await getSetting('updateInterval')) || '';
           const {texts} = await showModal({
-            title: "刷新时间",
+            title: '刷新时间',
             inputItems: [
               {
-                placeholder: "刷新时间单位分钟",
-                text: `${updateInterval}`
-              }
-            ]
+                placeholder: '刷新时间单位分钟',
+                text: `${updateInterval}`,
+              },
+            ],
           });
-          await setSetting("updateInterval", texts);
-        }
+          await setSetting('updateInterval', texts);
+        },
       },
       {
-        title: "基础设置",
+        title: '基础设置',
         func: async () => {
-          await this.showActionSheet("基础设置", this.baseActions);
-        }
-      }
+          await this.showActionSheet('基础设置', this.baseActions);
+        },
+      },
     ];
     this.setLightAndDark = async (title, desc, key) => {
       try {
         const {getSetting, setSetting} = useSetting(this.en);
-        const light = `${key}Light`, dark = `${key}Dark`;
-        const lightText = await getSetting(light) || "";
-        const darkText = await getSetting(dark) || "";
+        const light = `${key}Light`,
+          dark = `${key}Dark`;
+        const lightText = (await getSetting(light)) || '';
+        const darkText = (await getSetting(dark)) || '';
         const a = new Alert();
-        a.title = "白天和夜间" + title;
-        a.message = !desc ? "请自行去网站上搜寻颜色（Hex 颜色）" : desc;
-        a.addTextField("白天", lightText);
-        a.addTextField("夜间", darkText);
-        a.addAction("确定");
-        a.addCancelAction("取消");
+        a.title = '白天和夜间' + title;
+        a.message = !desc ? '请自行去网站上搜寻颜色（Hex 颜色）' : desc;
+        a.addTextField('白天', lightText);
+        a.addTextField('夜间', darkText);
+        a.addAction('确定');
+        a.addCancelAction('取消');
         const id = await a.presentAlert();
-        if (id === -1)
-          return;
+        if (id === -1) return;
         await setSetting(light, a.textFieldValue(0), false);
         await setSetting(dark, a.textFieldValue(1));
       } catch (e) {
         console.log(e);
       }
     };
-    this.verifyImage = async (img) => {
+    this.verifyImage = async img => {
       try {
         const {width, height} = img.size;
         const direct = true;
         if (width > 1e3) {
-          const options = ["取消", "打开图像处理"];
-          const message = "您的图片像素为" + width + " x " + height + "\n请将图片" + (direct ? "宽度" : "高度") + "调整到 1000 以下\n" + (!direct ? "宽度" : "高度") + "自动适应";
+          const options = ['取消', '打开图像处理'];
+          const message =
+            '您的图片像素为' +
+            width +
+            ' x ' +
+            height +
+            '\n请将图片' +
+            (direct ? '宽度' : '高度') +
+            '调整到 1000 以下\n' +
+            (!direct ? '宽度' : '高度') +
+            '自动适应';
           const index = await this.generateAlert(message, options);
-          if (index === 1)
-            await Safari.openInApp("https://www.sojson.com/image/change.html", false);
+          if (index === 1) await Safari.openInApp('https://www.sojson.com/image/change.html', false);
           return false;
         }
         return true;
@@ -986,24 +997,22 @@ var Base = class {
       }
     };
     this.setImage = async (img, key, notify = true) => {
-      const path = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "bg_" + key + ".jpg");
+      const path = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + key + '.jpg');
       if (!img) {
-        if (FILE_MGR_LOCAL.fileExists(path))
-          FILE_MGR_LOCAL.remove(path);
+        if (FILE_MGR_LOCAL.fileExists(path)) FILE_MGR_LOCAL.remove(path);
       } else {
         FILE_MGR_LOCAL.writeImage(path, img);
       }
-      if (notify)
-        await showNotification({title: this.name, body: "设置生效，稍后刷新", sound: "alert"});
+      if (notify) await showNotification({title: this.name, body: '设置生效，稍后刷新', sound: 'alert'});
     };
     this.getBackgroundImage = async () => {
       let result = void 0;
       const light = `${this.backgroundKey}_light`;
       const dark = `${this.backgroundKey}_dark`;
       const isNight = Device.isUsingDarkAppearance();
-      const path1 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "bg_" + light + ".jpg");
-      const path2 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "bg_" + dark + ".jpg");
-      const path3 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "bg_" + this.backgroundKey + ".jpg");
+      const path1 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + light + '.jpg');
+      const path2 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + dark + '.jpg');
+      const path3 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + this.backgroundKey + '.jpg');
       if (!FILE_MGR_LOCAL.fileExists(path3)) {
         if (isNight) {
           if (FILE_MGR_LOCAL.fileExists(path1)) {
@@ -1021,8 +1030,7 @@ var Base = class {
       } else {
         result = Image.fromFile(path3);
       }
-      if (this.opacity && result)
-        return this.shadowImage(result, "#000000", parseFloat(this.opacity));
+      if (this.opacity && result) return this.shadowImage(result, '#000000', parseFloat(this.opacity));
       return result;
     };
     this.registerAction = (title, func) => {
@@ -1031,68 +1039,65 @@ var Base = class {
     this.showActionSheet = async (title, actions) => {
       const selectIndex = await showActionSheet({
         title,
-        itemList: actions.map((item) => item.title)
+        itemList: actions.map(item => item.title),
       });
       const actionItem = actions.find((_, index) => selectIndex === index);
-      actionItem && await actionItem.func();
+      actionItem && (await actionItem.func());
     };
     this.showMenu = async () => {
       await this.showActionSheet(this.name, this.actions);
     };
-    this.getBoxJsCache = async (key) => {
+    this.getBoxJsCache = async key => {
       try {
-        const url = "http://" + this.prefix + "/query/boxdata";
-        const boxdata = (await request({url, dataType: "json"})).data;
-        if (key)
-          return boxdata.datas[key];
+        const url = 'http://' + this.prefix + '/query/boxdata';
+        const boxdata = (await request({url, dataType: 'json'})).data;
+        if (key) return boxdata.datas[key];
         return boxdata.datas;
       } catch (e) {
         console.log(e);
         return false;
       }
     };
-    this.setCacheBoxJSData = async (opt) => {
-      const options = ["取消", "确定"];
-      const message = "代理缓存仅支持 BoxJS 相关的代理\nLoon,Qx,Surge";
+    this.setCacheBoxJSData = async opt => {
+      const options = ['取消', '确定'];
+      const message = '代理缓存仅支持 BoxJS 相关的代理\nLoon,Qx,Surge';
       const index = await this.generateAlert(message, options);
-      if (index === 0)
-        return;
+      if (index === 0) return;
       try {
         const boxJSData = await this.getBoxJsCache();
         const settings = {};
-        Object.keys(opt).forEach((key) => {
-          settings[key] = boxJSData[opt[key]] || "";
+        Object.keys(opt).forEach(key => {
+          settings[key] = boxJSData[opt[key]] || '';
         });
         const {setSetting} = useSetting(this.en);
         await setSetting(this.BOX_CATCH_KEY, settings, false);
         await showNotification({
           title: this.name,
-          body: "缓存读取:" + JSON.stringify(settings),
-          sound: "alert"
+          body: '缓存读取:' + JSON.stringify(settings),
+          sound: 'alert',
         });
       } catch (e) {
         console.log(e);
         await showNotification({
           title: this.name,
-          body: "BoxJS 缓存读取失败！点击查看相关教程",
-          openURL: "https://chavyleung.gitbook.io/boxjs/awesome/videos",
-          sound: "alert"
+          body: 'BoxJS 缓存读取失败！点击查看相关教程',
+          openURL: 'https://chavyleung.gitbook.io/boxjs/awesome/videos',
+          sound: 'alert',
         });
       }
     };
     this.showAlertCatchInput = async (title, content, opt, useKey) => {
       const {getSetting, setSetting} = useSetting(this.en);
-      const catchValue = await getSetting(useKey || this.BOX_CATCH_KEY) || {};
+      const catchValue = (await getSetting(useKey || this.BOX_CATCH_KEY)) || {};
       const settings = catchValue;
-      const inputItems = Object.keys(opt).map((key) => {
+      const inputItems = Object.keys(opt).map(key => {
         return {placeholder: opt[key], text: catchValue[key]};
       });
       const {texts, confirm} = await showModal({title, content, inputItems});
       Object.keys(opt).map((key, index) => {
         settings[key] = texts[index];
       });
-      if (confirm)
-        await setSetting(useKey || this.BOX_CATCH_KEY, settings);
+      if (confirm) await setSetting(useKey || this.BOX_CATCH_KEY, settings);
       return settings;
     };
   }
@@ -1114,16 +1119,14 @@ var Base = class {
     }
     return await alert.presentAlert();
   }
-  shadowImage(img, color = "#000000", opacity) {
-    if (!img || !opacity)
-      return;
-    if (opacity === 0)
-      return img;
+  shadowImage(img, color = '#000000', opacity) {
+    if (!img || !opacity) return;
+    if (opacity === 0) return img;
     const ctx = new DrawContext();
     ctx.size = img.size;
-    ctx.drawImageInRect(img, new Rect(0, 0, img.size["width"], img.size["height"]));
+    ctx.drawImageInRect(img, new Rect(0, 0, img.size['width'], img.size['height']));
     ctx.setFillColor(new Color(color, opacity));
-    ctx.fillRect(new Rect(0, 0, img.size["width"], img.size["height"]));
+    ctx.fillRect(new Rect(0, 0, img.size['width'], img.size['height']));
     return ctx.getImage();
   }
 };
@@ -1132,297 +1135,445 @@ var Base_default = Base;
 // src/pages/COVID-19.tsx
 var addumFont = 12;
 var RowCenter = ({children, ...props}) => {
-  return /* @__PURE__ */ h("wstack", {
-    ...props
-  }, /* @__PURE__ */ h("wspacer", null), children, /* @__PURE__ */ h("wspacer", null));
+  return /* @__PURE__ */ h(
+    'wstack',
+    {
+      ...props,
+    },
+    /* @__PURE__ */ h('wspacer', null),
+    children,
+    /* @__PURE__ */ h('wspacer', null),
+  );
 };
 var Widget = class extends Base_default {
   constructor() {
     super(...arguments);
-    this.name = "疫情数据";
-    this.en = "covid-19";
-    this.today = "";
-    this.pinyin = "";
+    this.name = '疫情数据';
+    this.en = 'covid-19';
+    this.today = '';
+    this.pinyin = '';
     this.baseUrl = `https://api.inews.qq.com/newsqa/v1/query/pubished/daily/list`;
     this.componentWillMount = async () => {
-      this.registerAction("地区拼音", async () => {
-        const options = {py: "尝试首字母或者全拼"};
-        await this.showAlertCatchInput("地区拼音", "首字母或全部拼音", options, "pinyin");
+      this.registerAction('地区拼音', async () => {
+        const options = {py: '尝试首字母或者全拼'};
+        await this.showAlertCatchInput('地区拼音', '首字母或全部拼音', options, 'pinyin');
       });
       const {getSetting} = useSetting(this.en);
-      this.pinyin = (await getSetting("pinyin") || {}).py || this.pinyin;
+      this.pinyin = ((await getSetting('pinyin')) || {}).py || this.pinyin;
     };
     this.componentDidMount = async () => {
       const dateFormat = new DateFormatter();
-      dateFormat.dateFormat = "MM.dd";
+      dateFormat.dateFormat = 'MM.dd';
       this.today = dateFormat.string(new Date());
       this.location = await this.getLocation();
-      if (!this.location)
-        return;
-      const {state = ""} = this.location.postalAddress;
-      let {city = ""} = this.location.postalAddress;
+      if (!this.location) return;
+      const {state = ''} = this.location.postalAddress;
+      let {city = ''} = this.location.postalAddress;
       let province;
       if (state) {
-        province = state.replace("省", "").replace("市", "");
+        province = state.replace('省', '').replace('市', '');
         this.province = await this.getCovid19({province});
       } else {
-        province = city.replace("省", "").replace("市", "");
+        province = city.replace('省', '').replace('市', '');
         this.province = await this.getCovid19({province});
       }
       if (state && city) {
-        province = state.replace("省", "").replace("市", "");
-        city = city.replace("省", "").replace("市", "");
+        province = state.replace('省', '').replace('市', '');
+        city = city.replace('省', '').replace('市', '');
         this.city = await this.getCovid19({province, city});
       }
       await this.getCovid19ProvinceCompare();
-      config.widgetFamily === "large" && await this.getCovid19News();
+      config.widgetFamily === 'large' && (await this.getCovid19News());
     };
     this.getLocation = async () => {
       try {
         const location = await Location.current();
         const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
         console.log(locationText);
-        return {
-          inlandWater: null,
-          thoroughfare: "桃园南路",
-          areasOfInterest: ["西稍门"],
-          name: "桃园南路24号",
-          subLocality: "莲湖区",
-          postalAddress: {
-            city: "西安市",
-            country: "中国",
-            street: "桃园南路24号",
-            state: "陕西省",
-            subAdministrativeArea: "",
-            subLocality: "莲湖区",
-            postalCode: "",
-            isoCountryCode: "CN"
-          },
-          subThoroughfare: "24号",
-          timeZone: "Asia/Shanghai",
-          isoCountryCode: "CN",
-          country: "中国",
-          postalCode: null,
-          administrativeArea: "陕西省",
-          ocean: null,
-          locality: "西安市",
-          location: {altitude: 0, latitude: 34.25358776951946, longitude: 108.90199759327815},
-          subAdministrativeArea: null
-        };
+        return locationText[0];
       } catch (e) {
-        console.log("❌定位失败：" + e);
+        console.log('❌定位失败：' + e);
       }
     };
-    this.getCovid19 = async (params) => {
-      const query = Object.keys(params).map((item) => {
+    this.getCovid19 = async params => {
+      const query = Object.keys(params).map(item => {
         return `${item}=${encodeURIComponent(params[item])}`;
       });
-      query.push("today=" + this.today);
-      const url = `${this.baseUrl}?${query.join("&")}`;
+      query.push('today=' + this.today);
+      const url = `${this.baseUrl}?${query.join('&')}`;
       console.log(url);
-      const response = (await request({method: "POST", url, useCache: true})).data;
+      const response = (await request({method: 'POST', url, useCache: true})).data;
       if (response.ret === 0 && response.data && response.data instanceof Array) {
         const covid_19 = response.data[response.data.length - 1];
-        if (covid_19)
-          return covid_19;
+        if (covid_19) return covid_19;
       }
     };
-    this.tabInfo = (data) => {
-      return /* @__PURE__ */ h("wstack", {
-        flexDirection: "column",
-        background: data.bg
-      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
-        font: addumFont,
-        textColor: this.fontColor
-      }, "较上日"), /* @__PURE__ */ h("wtext", {
-        font: addumFont,
-        textColor: data.color
-      }, data.addnum)), /* @__PURE__ */ h("wspacer", {
-        length: 2
-      }), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
-        textColor: data.color
-      }, data.value)), /* @__PURE__ */ h("wspacer", {
-        length: 2
-      }), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
-        font: addumFont,
-        textColor: this.fontColor
-      }, data.tabText)), /* @__PURE__ */ h("wspacer", null));
+    this.tabInfo = data => {
+      return /* @__PURE__ */ h(
+        'wstack',
+        {
+          flexDirection: 'column',
+          background: data.bg,
+        },
+        /* @__PURE__ */ h('wspacer', null),
+        /* @__PURE__ */ h(
+          RowCenter,
+          null,
+          /* @__PURE__ */ h(
+            'wtext',
+            {
+              font: addumFont,
+              textColor: this.fontColor,
+            },
+            '较上日',
+          ),
+          /* @__PURE__ */ h(
+            'wtext',
+            {
+              font: addumFont,
+              textColor: data.color,
+            },
+            data.addnum,
+          ),
+        ),
+        /* @__PURE__ */ h('wspacer', {
+          length: 2,
+        }),
+        /* @__PURE__ */ h(
+          RowCenter,
+          null,
+          /* @__PURE__ */ h(
+            'wtext',
+            {
+              textColor: data.color,
+            },
+            data.value,
+          ),
+        ),
+        /* @__PURE__ */ h('wspacer', {
+          length: 2,
+        }),
+        /* @__PURE__ */ h(
+          RowCenter,
+          null,
+          /* @__PURE__ */ h(
+            'wtext',
+            {
+              font: addumFont,
+              textColor: this.fontColor,
+            },
+            data.tabText,
+          ),
+        ),
+        /* @__PURE__ */ h('wspacer', null),
+      );
     };
     this.render = async () => {
       await this.componentDidMount();
       const Footer = () => {
-        return /* @__PURE__ */ h("wstack", {
-          verticalAlign: "center",
-          padding: [0, 10, 10, 10]
-        }, /* @__PURE__ */ h("wimage", {
-          src: "https://img.icons8.com/cute-clipart/2x/coronavirus.png",
-          width: 15,
-          height: 15
-        }), /* @__PURE__ */ h("wspacer", {
-          length: 10
-        }), /* @__PURE__ */ h("wtext", {
-          opacity: 0.5,
-          font: 14,
-          textColor: this.fontColor
-        }, "疫情日报"), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wimage", {
-          src: "arrow.clockwise",
-          width: 10,
-          height: 10,
-          opacity: 0.5,
-          filter: this.fontColor
-        }), /* @__PURE__ */ h("wspacer", {
-          length: 10
-        }), /* @__PURE__ */ h("wtext", {
-          font: 12,
-          textAlign: "right",
-          opacity: 0.5,
-          textColor: this.fontColor
-        }, this.nowTime()));
+        return /* @__PURE__ */ h(
+          'wstack',
+          {
+            verticalAlign: 'center',
+            padding: [0, 10, 10, 10],
+          },
+          /* @__PURE__ */ h('wimage', {
+            src: 'https://img.icons8.com/cute-clipart/2x/coronavirus.png',
+            width: 15,
+            height: 15,
+          }),
+          /* @__PURE__ */ h('wspacer', {
+            length: 10,
+          }),
+          /* @__PURE__ */ h(
+            'wtext',
+            {
+              opacity: 0.5,
+              font: 14,
+              textColor: this.fontColor,
+            },
+            '疫情日报',
+          ),
+          /* @__PURE__ */ h('wspacer', null),
+          /* @__PURE__ */ h('wimage', {
+            src: 'arrow.clockwise',
+            width: 10,
+            height: 10,
+            opacity: 0.5,
+            filter: this.fontColor,
+          }),
+          /* @__PURE__ */ h('wspacer', {
+            length: 10,
+          }),
+          /* @__PURE__ */ h(
+            'wtext',
+            {
+              font: 12,
+              textAlign: 'right',
+              opacity: 0.5,
+              textColor: this.fontColor,
+            },
+            this.nowTime(),
+          ),
+        );
       };
-      if (config.widgetFamily === "small") {
-        return /* @__PURE__ */ h("wbox", null, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wtext", {
-          textAlign: "center"
-        }, "暂不支持"), /* @__PURE__ */ h("wspacer", null));
+      if (config.widgetFamily === 'small') {
+        return /* @__PURE__ */ h(
+          'wbox',
+          null,
+          /* @__PURE__ */ h('wspacer', null),
+          /* @__PURE__ */ h(
+            'wtext',
+            {
+              textAlign: 'center',
+            },
+            '暂不支持',
+          ),
+          /* @__PURE__ */ h('wspacer', null),
+        );
       }
       const background = await this.getBackgroundImage();
-      return /* @__PURE__ */ h("wbox", {
-        background: background || this.backgroundColor,
-        updateDate: new Date(Date.now() + await this.updateInterval())
-      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wstack", {
-        borderRadius: 10
-      }, this.tabInfo({
-        color: "#f23a3b",
-        bg: "#fff0f1",
-        value: `${(this.province?.confirm || 0) - parseInt(this.province?.heal || "0") || "-"}`,
-        tabText: "现有确诊",
-        addnum: this.formatNumber(this.updateData?.nowConfirm)
-      }), /* @__PURE__ */ h("wspacer", {
-        length: 2
-      }), this.tabInfo({
-        color: "#cc1e1e",
-        bg: "#fff0f1",
-        value: `${this.province?.confirm || "-"}`,
-        tabText: "累计确诊",
-        addnum: this.formatNumber(this.updateData?.confirmAdd)
-      }), /* @__PURE__ */ h("wspacer", {
-        length: 2
-      }), this.tabInfo({
-        color: "#178b50",
-        bg: "#f0f8f4",
-        value: `${this.province?.heal || "-"}`,
-        tabText: "累计治愈",
-        addnum: this.formatNumber(this.updateData?.heal)
-      }), /* @__PURE__ */ h("wspacer", {
-        length: 2
-      }), this.tabInfo({
-        color: "#4e5a65",
-        bg: "#f2f6f7",
-        value: `${this.province?.dead || "-"}`,
-        tabText: "累计死亡",
-        addnum: this.formatNumber(this.updateData?.dead)
-      })), /* @__PURE__ */ h("wspacer", {
-        length: 5
-      }), /* @__PURE__ */ h("wstack", {
-        borderRadius: 10,
-        padding: [5, 5, 5, 5],
-        flexDirection: "column",
-        background: "#f8f8f8"
-      }, /* @__PURE__ */ h("wstack", {
-        verticalAlign: "center"
-      }, /* @__PURE__ */ h("wimage", {
-        src: "location",
-        filter: "#005dff",
-        width: 12,
-        height: 12
-      }), /* @__PURE__ */ h("wspacer", {
-        length: 5
-      }), /* @__PURE__ */ h("wtext", {
-        textColor: "#005dff",
-        font: addumFont
-      }, (this.location?.postalAddress.city || "") + (this.location?.postalAddress.street || "") || "未找到定位"), /* @__PURE__ */ h("wspacer", null)), this.city && /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wspacer", {
-        length: 5
-      }), /* @__PURE__ */ h("wstack", {
-        verticalAlign: "center"
-      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wtext", {
-        font: addumFont,
-        textColor: this.fontColor
-      }, this.city?.confirm_add || "0", "新增"), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wtext", {
-        font: addumFont,
-        textColor: this.fontColor
-      }, this.city?.confirm || "0", "确诊"), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wtext", {
-        font: addumFont,
-        textColor: this.fontColor
-      }, this.city?.heal || "0", "治愈"), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wtext", {
-        font: addumFont,
-        textColor: this.fontColor
-      }, this.city?.dead || "0", "死亡"), /* @__PURE__ */ h("wspacer", null)))), this.news && /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wspacer", {
-        length: 5
-      }), /* @__PURE__ */ h("wstack", {
-        borderRadius: 10,
-        padding: [5, 5, 5, 5],
-        flexDirection: "column"
-      }, this.news.map((item, index) => {
-        return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wstack", {
-          href: item.news_url
-        }, /* @__PURE__ */ h("wstack", {
-          flexDirection: "column"
-        }, /* @__PURE__ */ h("wtext", {
-          font: addumFont,
-          maxLine: 1,
-          textColor: this.fontColor
-        }, item.title), /* @__PURE__ */ h("wspacer", {
-          length: 5
-        }), /* @__PURE__ */ h("wtext", {
-          font: addumFont,
-          textColor: this.fontColor,
-          opacity: 0.5
-        }, item.srcfrom)), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wimage", {
-          src: item.shortcut,
-          width: 40,
-          height: 30,
-          borderRadius: 4
-        })), (this.news && this.news?.length - 1) !== index && /* @__PURE__ */ h("wspacer", {
-          length: 5
-        }));
-      }))), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(Footer, null));
+      return /* @__PURE__ */ h(
+        'wbox',
+        {
+          background: background || this.backgroundColor,
+          updateDate: new Date(Date.now() + (await this.updateInterval())),
+        },
+        /* @__PURE__ */ h('wspacer', null),
+        /* @__PURE__ */ h(
+          'wstack',
+          {
+            borderRadius: 10,
+          },
+          this.tabInfo({
+            color: '#f23a3b',
+            bg: '#fff0f1',
+            value: `${(this.province?.confirm || 0) - parseInt(this.province?.heal || '0') || '-'}`,
+            tabText: '现有确诊',
+            addnum: this.formatNumber(this.updateData?.nowConfirm),
+          }),
+          /* @__PURE__ */ h('wspacer', {
+            length: 2,
+          }),
+          this.tabInfo({
+            color: '#cc1e1e',
+            bg: '#fff0f1',
+            value: `${this.province?.confirm || '-'}`,
+            tabText: '累计确诊',
+            addnum: this.formatNumber(this.updateData?.confirmAdd),
+          }),
+          /* @__PURE__ */ h('wspacer', {
+            length: 2,
+          }),
+          this.tabInfo({
+            color: '#178b50',
+            bg: '#f0f8f4',
+            value: `${this.province?.heal || '-'}`,
+            tabText: '累计治愈',
+            addnum: this.formatNumber(this.updateData?.heal),
+          }),
+          /* @__PURE__ */ h('wspacer', {
+            length: 2,
+          }),
+          this.tabInfo({
+            color: '#4e5a65',
+            bg: '#f2f6f7',
+            value: `${this.province?.dead || '-'}`,
+            tabText: '累计死亡',
+            addnum: this.formatNumber(this.updateData?.dead),
+          }),
+        ),
+        /* @__PURE__ */ h('wspacer', {
+          length: 5,
+        }),
+        /* @__PURE__ */ h(
+          'wstack',
+          {
+            borderRadius: 10,
+            padding: [5, 5, 5, 5],
+            flexDirection: 'column',
+            background: '#f8f8f8',
+          },
+          /* @__PURE__ */ h(
+            'wstack',
+            {
+              verticalAlign: 'center',
+            },
+            /* @__PURE__ */ h('wimage', {
+              src: 'location',
+              filter: '#005dff',
+              width: 12,
+              height: 12,
+            }),
+            /* @__PURE__ */ h('wspacer', {
+              length: 5,
+            }),
+            /* @__PURE__ */ h(
+              'wtext',
+              {
+                textColor: '#005dff',
+                font: addumFont,
+              },
+              (this.location?.postalAddress.city || '') + (this.location?.postalAddress.street || '') || '未找到定位',
+            ),
+            /* @__PURE__ */ h('wspacer', null),
+          ),
+          this.city &&
+            /* @__PURE__ */ h(
+              Fragment,
+              null,
+              /* @__PURE__ */ h('wspacer', {
+                length: 5,
+              }),
+              /* @__PURE__ */ h(
+                'wstack',
+                {
+                  verticalAlign: 'center',
+                },
+                /* @__PURE__ */ h('wspacer', null),
+                /* @__PURE__ */ h(
+                  'wtext',
+                  {
+                    font: addumFont,
+                    textColor: this.fontColor,
+                  },
+                  this.city?.confirm_add || '0',
+                  '新增',
+                ),
+                /* @__PURE__ */ h('wspacer', null),
+                /* @__PURE__ */ h(
+                  'wtext',
+                  {
+                    font: addumFont,
+                    textColor: this.fontColor,
+                  },
+                  this.city?.confirm || '0',
+                  '确诊',
+                ),
+                /* @__PURE__ */ h('wspacer', null),
+                /* @__PURE__ */ h(
+                  'wtext',
+                  {
+                    font: addumFont,
+                    textColor: this.fontColor,
+                  },
+                  this.city?.heal || '0',
+                  '治愈',
+                ),
+                /* @__PURE__ */ h('wspacer', null),
+                /* @__PURE__ */ h(
+                  'wtext',
+                  {
+                    font: addumFont,
+                    textColor: this.fontColor,
+                  },
+                  this.city?.dead || '0',
+                  '死亡',
+                ),
+                /* @__PURE__ */ h('wspacer', null),
+              ),
+            ),
+        ),
+        this.news &&
+          /* @__PURE__ */ h(
+            Fragment,
+            null,
+            /* @__PURE__ */ h('wspacer', {
+              length: 5,
+            }),
+            /* @__PURE__ */ h(
+              'wstack',
+              {
+                borderRadius: 10,
+                padding: [5, 5, 5, 5],
+                flexDirection: 'column',
+              },
+              this.news.map((item, index) => {
+                return /* @__PURE__ */ h(
+                  Fragment,
+                  null,
+                  /* @__PURE__ */ h(
+                    'wstack',
+                    {
+                      href: item.news_url,
+                    },
+                    /* @__PURE__ */ h(
+                      'wstack',
+                      {
+                        flexDirection: 'column',
+                      },
+                      /* @__PURE__ */ h(
+                        'wtext',
+                        {
+                          font: addumFont,
+                          maxLine: 1,
+                          textColor: this.fontColor,
+                        },
+                        item.title,
+                      ),
+                      /* @__PURE__ */ h('wspacer', {
+                        length: 5,
+                      }),
+                      /* @__PURE__ */ h(
+                        'wtext',
+                        {
+                          font: addumFont,
+                          textColor: this.fontColor,
+                          opacity: 0.5,
+                        },
+                        item.srcfrom,
+                      ),
+                    ),
+                    /* @__PURE__ */ h('wspacer', null),
+                    /* @__PURE__ */ h('wimage', {
+                      src: item.shortcut,
+                      width: 40,
+                      height: 30,
+                      borderRadius: 4,
+                    }),
+                  ),
+                  (this.news && this.news?.length - 1) !== index &&
+                    /* @__PURE__ */ h('wspacer', {
+                      length: 5,
+                    }),
+                );
+              }),
+            ),
+          ),
+        /* @__PURE__ */ h('wspacer', null),
+        /* @__PURE__ */ h(Footer, null),
+      );
     };
   }
   async getCovid19ProvinceCompare() {
     const url = `https://api.inews.qq.com/newsqa/v1/query/inner/publish/modules/list?modules=provinceCompare&today=${this.today}`;
-    const response = (await request({method: "POST", url})).data;
+    const response = (await request({method: 'POST', url})).data;
     if (response.ret === 0 && response.data) {
       const data = response.data.provinceCompare;
-      if (!this.location)
-        return;
-      let {state = "", city = ""} = this.location.postalAddress;
-      state = state.replace("省", "").replace("市", "");
-      city = city.replace("省", "").replace("市", "");
-      if (data[state])
-        this.updateData = data[state] || void 0;
-      if (data[city])
-        this.updateData = data[state] || void 0;
+      if (!this.location) return;
+      let {state = '', city = ''} = this.location.postalAddress;
+      state = state.replace('省', '').replace('市', '');
+      city = city.replace('省', '').replace('市', '');
+      if (data[state]) this.updateData = data[state] || void 0;
+      if (data[city]) this.updateData = data[state] || void 0;
     }
   }
   async getCovid19News() {
-    if (!this.pinyin)
-      return;
+    if (!this.pinyin) return;
     const url = `https://api.dreamreader.qq.com/news/v1/province/news/list?province_code=${this.pinyin}&page_size=4&today=${this.today}`;
     console.log(url);
-    const response = (await request({url, method: "GET", useCache: true})).data.data.items;
-    if (response)
-      this.news = response;
+    const response = (await request({url, method: 'GET', useCache: true})).data.data.items;
+    if (response) this.news = response;
   }
   formatNumber(number) {
-    if (!number)
-      return `+0`;
+    if (!number) return `+0`;
     return number >= 0 ? `+${number}` : `${number}`;
   }
   nowTime() {
     const date = new Date();
-    return date.toLocaleTimeString("chinese", {hour12: false});
+    return date.toLocaleTimeString('chinese', {hour12: false});
   }
 };
 EndAwait(() => new Widget().init());
 
 await __topLevelAwait__();
-

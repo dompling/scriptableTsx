@@ -137,34 +137,7 @@ class Widget extends Base {
       const location = await Location.current();
       const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
       console.log(locationText);
-      // return locationText[0] as locationType;
-      return {
-        inlandWater: null,
-        thoroughfare: '桃园南路',
-        areasOfInterest: ['西稍门'],
-        name: '桃园南路24号',
-        subLocality: '莲湖区',
-        postalAddress: {
-          city: '西安市',
-          country: '中国',
-          street: '桃园南路24号',
-          state: '陕西省',
-          subAdministrativeArea: '',
-          subLocality: '莲湖区',
-          postalCode: '',
-          isoCountryCode: 'CN',
-        },
-        subThoroughfare: '24号',
-        timeZone: 'Asia/Shanghai',
-        isoCountryCode: 'CN',
-        country: '中国',
-        postalCode: null,
-        administrativeArea: '陕西省',
-        ocean: null,
-        locality: '西安市',
-        location: {altitude: 0, latitude: 34.25358776951946, longitude: 108.90199759327815},
-        subAdministrativeArea: null,
-      } as locationType;
+      return locationText[0] as locationType;
     } catch (e) {
       console.log('❌定位失败：' + e);
     }
