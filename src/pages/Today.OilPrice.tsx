@@ -52,21 +52,43 @@ const RowCenter: FC<WstackProps> = ({children, ...props}) => {
 };
 
 class Widget extends Base {
-  constructor() {
-    super();
-    this.registerAction('腾讯Token', this.setMenuTokenInput);
-    this.registerAction('代理缓存', this.setMenuTencentToken);
-  }
-
   name = '地方油价';
   en = 'todayOilPrice';
   token: string | undefined;
   location: locationType | undefined;
+  headerColor = '#40a9ff';
+  bodyColor = '#69c0ff';
 
   componentWillMount = async () => {
+    this.registerAction('腾讯Token', this.setMenuTokenInput);
+    this.registerAction('代理缓存', this.setMenuTencentToken);
+    this.baseActions = [
+      {
+        title: '颜色主题',
+        func: async () => {
+          await this.showAlertCatchInput(
+            '颜色主题',
+            'hex 颜色',
+            {
+              headerColor: '顶部油价背景',
+              bodyColor: '加油站背景',
+            },
+            'oilBackground',
+          );
+        },
+      },
+      ...this.baseActions.splice(-1, 1),
+    ];
     const {getSetting} = useSetting(this.en);
     const cache = (await getSetting<{token?: string}>(this.BOX_CATCH_KEY)) || {};
     this.token = cache?.token;
+
+    const {headerColor, bodyColor} =
+      (await getSetting<{headerColor: string; bodyColor: string}>('oilBackground')) || {};
+    this.headerColor = headerColor || this.headerColor;
+    this.bodyColor = bodyColor || this.bodyColor;
+
+    this.fontColor = '#fff';
   };
 
   setMenuTokenInput = () => {
@@ -105,7 +127,8 @@ class Widget extends Base {
     const url = 'https://apis.map.qq.com/ws/place/v1/search?' + encodeURIComponent(data.join('&'));
     console.log(url);
     const res = (await request<{[key: string]: any; data: gasStationResponse[]}>({url, dataType: 'json'})).data?.data;
-    return res?.splice(0, 4) as gasStationResponse[];
+    const size = config.widgetFamily === 'large' ? 4 : 1;
+    return res?.splice(0, size) as gasStationResponse[];
   };
 
   renderWebView = async (str: string[]): Promise<oilRes[]> => {
@@ -151,13 +174,13 @@ class Widget extends Base {
     return (
       <wstack flexDirection="column" verticalAlign="center">
         <RowCenter>
-          <wtext textAlign="center" color={this.fontColor} font={title}>
+          <wtext textAlign="center" textColor={this.fontColor} font={title}>
             {data.cate.replace('汽油', '')}
           </wtext>
         </RowCenter>
         <wspacer length={10} />
         <RowCenter>
-          <wtext color={this.fontColor} font={12} textAlign="center">
+          <wtext textColor={this.fontColor} font={12} textAlign="center">
             {data.value.replace('/升', '')}
           </wtext>
         </RowCenter>
@@ -166,49 +189,41 @@ class Widget extends Base {
   };
 
   stackGasStation = (gasStation: gasStationResponse[]) => {
-    return gasStation.map(item => {
+    return gasStation.map((item, index) => {
       const href = `iosamap://navi?sourceApplication=applicationName&backScheme=applicationScheme&poiname=fangheng&poiid=BGVIS&lat=${item.location.lat}&lon=${item.location.lng}&dev=1&style=2`;
       return (
-        <>
-          <wstack
-            background={this.fontColor}
-            flexDirection="column"
-            borderRadius={4}
-            padding={[2, 0, 2, 0]}
-            href={href}
-          >
-            <wstack verticalAlign="center">
-              <wspacer length={5} />
-              <wimage src="star.fill" width={10} height={10} />
-              <wspacer length={5} />
-              <wtext font={10} textColor={this.backgroundColor}>
-                油站：{item.title}({item._distance}米)
-              </wtext>
-              <wspacer />
-            </wstack>
-            <wspacer length={2} />
-            <wstack verticalAlign="center">
-              <wspacer length={5} />
-              <wimage src="star.fill" width={10} height={10} />
-              <wspacer length={5} />
-              <wtext font={10} textColor={this.backgroundColor}>
-                地址：{item.address}
-              </wtext>
-              <wspacer />
-            </wstack>
-            <wspacer length={2} />
-            <wstack verticalAlign="center">
-              <wspacer length={5} />
-              <wimage src="star.fill" width={10} height={10} />
-              <wspacer length={5} />
-              <wtext href={'tel:' + item.tel} font={10} textColor={this.backgroundColor}>
-                电话：{item.tel || '-'}
-              </wtext>
-              <wspacer />
-            </wstack>
+        <wstack flexDirection="column" borderRadius={4} href={href}>
+          <wstack verticalAlign="center">
+            <wspacer length={5} />
+            <wimage src="star.fill" width={10} height={10} />
+            <wspacer length={5} />
+            <wtext font={10} textColor={this.fontColor}>
+              油站：{item.title}({item._distance}米)
+            </wtext>
+            <wspacer />
           </wstack>
-          <wspacer />
-        </>
+          <wspacer length={2} />
+          <wstack verticalAlign="center">
+            <wspacer length={5} />
+            <wimage src="star.fill" width={10} height={10} />
+            <wspacer length={5} />
+            <wtext font={10} textColor={this.fontColor}>
+              地址：{item.address}
+            </wtext>
+            <wspacer />
+          </wstack>
+          <wspacer length={2} />
+          <wstack verticalAlign="center">
+            <wspacer length={5} />
+            <wimage src="star.fill" width={10} height={10} />
+            <wspacer length={5} />
+            <wtext href={'tel:' + item.tel} font={10} textColor={this.fontColor}>
+              电话：{item.tel || '-'}
+            </wtext>
+            <wspacer />
+          </wstack>
+          {gasStation.length - 1 !== index && <wspacer />}
+        </wstack>
       );
     });
   };
@@ -227,33 +242,33 @@ class Widget extends Base {
     }
     const locality = await this.getLocation();
     const data = await this.renderWebView(locality);
-    const background = await this.getBackgroundImage();
-    if (config.widgetFamily === 'large' && this.token) gasStation = (await this.searchGasStation()) || [];
+    if (this.token) gasStation = (await this.searchGasStation()) || [];
     return (
-      <wbox
-        background={background || this.backgroundColor}
-        updateDate={new Date(Date.now() + (await this.updateInterval()))}
-      >
-        <wstack verticalAlign="center">
-          <wimage src={'https://www.bitauto.com/favicon.ico'} width={15} height={15} />
-          <wspacer length={10} />
-          <wtext opacity={0.9} font={14} textColor={this.fontColor}>
-            今日油价
-          </wtext>
-        </wstack>
-        <wspacer />
-        <wstack>
+      <wbox padding={[0, 0, 0, 0]} updateDate={new Date(Date.now() + (await this.updateInterval()))}>
+        <wstack background={this.headerColor} padding={[10, 10, 10, 10]}>
           {data.map(item => {
             const city = locality[1].replace('市', '');
             const cate = item.cate.replace(city, '').replace('#', '号').replace('价格', '');
             return this.content({...item, cate});
           })}
         </wstack>
+        {gasStation.length > 0 && (
+          <wstack background={this.bodyColor} flexDirection="column" padding={[10, 10, 10, 10]}>
+            {this.stackGasStation(gasStation)}
+          </wstack>
+        )}
         <wspacer />
-        {gasStation.length > 0 && <wstack flexDirection="column">{this.stackGasStation(gasStation)}</wstack>}
-        <wtext font={12} textAlign="right" opacity={0.5}>
-          更新于:{this.nowTime()}
-        </wtext>
+        <wstack verticalAlign="center" padding={[0, 10, 10, 10]}>
+          <wimage src={'https://www.bitauto.com/favicon.ico'} width={15} height={15} />
+          <wspacer length={10} />
+          <wtext opacity={0.5} font={14}>
+            今日油价
+          </wtext>
+          <wspacer />
+          <wtext font={12} textAlign="right" opacity={0.5}>
+            更新于:{this.nowTime()}
+          </wtext>
+        </wstack>
       </wbox>
     );
   };

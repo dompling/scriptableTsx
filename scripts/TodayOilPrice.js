@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：12/14/2020
+ * 更新时间：12/15/2020
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1607955444936
+// @编译时间 1607999258007
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -753,9 +753,6 @@ function h(type, props, ...children) {
       break;
   }
 }
-function Fragment({children}) {
-  return children;
-}
 function flatteningArr(arr) {
   return [].concat(
     ...arr.map(item => {
@@ -1086,9 +1083,9 @@ var Base = class {
         });
       }
     };
-    this.showAlertCatchInput = async (title2, content, opt) => {
+    this.showAlertCatchInput = async (title2, content, opt, useKey) => {
       const {getSetting, setSetting} = useSetting(this.en);
-      const catchValue = (await getSetting(this.BOX_CATCH_KEY)) || '';
+      const catchValue = (await getSetting(useKey || this.BOX_CATCH_KEY)) || '';
       const inputItems = Object.keys(opt).map(key => {
         return {placeholder: opt[key], text: catchValue[key]};
       });
@@ -1097,7 +1094,7 @@ var Base = class {
       Object.keys(opt).map((key, index) => {
         settings[key] = texts[index];
       });
-      if (confirm) await setSetting(this.BOX_CATCH_KEY, settings);
+      if (confirm) await setSetting(useKey || this.BOX_CATCH_KEY, settings);
       return settings;
     };
   }
@@ -1602,13 +1599,38 @@ var RowCenter = ({children, ...props}) => {
 };
 var Widget = class extends Base_default {
   constructor() {
-    super();
+    super(...arguments);
     this.name = '地方油价';
     this.en = 'todayOilPrice';
+    this.headerColor = '#40a9ff';
+    this.bodyColor = '#69c0ff';
     this.componentWillMount = async () => {
+      this.registerAction('腾讯Token', this.setMenuTokenInput);
+      this.registerAction('代理缓存', this.setMenuTencentToken);
+      this.baseActions = [
+        {
+          title: '颜色主题',
+          func: async () => {
+            await this.showAlertCatchInput(
+              '颜色主题',
+              'hex 颜色',
+              {
+                headerColor: '顶部油价背景',
+                bodyColor: '加油站背景',
+              },
+              'oilBackground',
+            );
+          },
+        },
+        ...this.baseActions.splice(-1, 1),
+      ];
       const {getSetting} = useSetting(this.en);
       const cache = (await getSetting(this.BOX_CATCH_KEY)) || {};
       this.token = cache?.token;
+      const {headerColor, bodyColor} = (await getSetting('oilBackground')) || {};
+      this.headerColor = headerColor || this.headerColor;
+      this.bodyColor = bodyColor || this.bodyColor;
+      this.fontColor = '#fff';
     };
     this.setMenuTokenInput = () => {
       return this.showAlertCatchInput('腾讯Token', 'BoxJS 缓存', {token: '腾讯地图 Token'});
@@ -1643,7 +1665,8 @@ var Widget = class extends Base_default {
       const url = 'https://apis.map.qq.com/ws/place/v1/search?' + encodeURIComponent(data.join('&'));
       console.log(url);
       const res = (await request({url, dataType: 'json'})).data?.data;
-      return res?.splice(0, 4);
+      const size = config.widgetFamily === 'large' ? 4 : 1;
+      return res?.splice(0, size);
     };
     this.renderWebView = async str => {
       const webView = new WebView();
@@ -1691,7 +1714,7 @@ var Widget = class extends Base_default {
             'wtext',
             {
               textAlign: 'center',
-              color: this.fontColor,
+              textColor: this.fontColor,
               font: title,
             },
             data.cate.replace('汽油', ''),
@@ -1706,7 +1729,7 @@ var Widget = class extends Base_default {
           /* @__PURE__ */ h(
             'wtext',
             {
-              color: this.fontColor,
+              textColor: this.fontColor,
               font: 12,
               textAlign: 'center',
             },
@@ -1716,113 +1739,107 @@ var Widget = class extends Base_default {
       );
     };
     this.stackGasStation = gasStation => {
-      return gasStation.map(item => {
+      return gasStation.map((item, index) => {
         const href = `iosamap://navi?sourceApplication=applicationName&backScheme=applicationScheme&poiname=fangheng&poiid=BGVIS&lat=${item.location.lat}&lon=${item.location.lng}&dev=1&style=2`;
         return /* @__PURE__ */ h(
-          Fragment,
-          null,
+          'wstack',
+          {
+            flexDirection: 'column',
+            borderRadius: 4,
+            href,
+          },
           /* @__PURE__ */ h(
             'wstack',
             {
-              background: this.fontColor,
-              flexDirection: 'column',
-              borderRadius: 4,
-              padding: [2, 0, 2, 0],
-              href,
+              verticalAlign: 'center',
             },
-            /* @__PURE__ */ h(
-              'wstack',
-              {
-                verticalAlign: 'center',
-              },
-              /* @__PURE__ */ h('wspacer', {
-                length: 5,
-              }),
-              /* @__PURE__ */ h('wimage', {
-                src: 'star.fill',
-                width: 10,
-                height: 10,
-              }),
-              /* @__PURE__ */ h('wspacer', {
-                length: 5,
-              }),
-              /* @__PURE__ */ h(
-                'wtext',
-                {
-                  font: 10,
-                  textColor: this.backgroundColor,
-                },
-                '油站：',
-                item.title,
-                '(',
-                item._distance,
-                '米)',
-              ),
-              /* @__PURE__ */ h('wspacer', null),
-            ),
             /* @__PURE__ */ h('wspacer', {
-              length: 2,
+              length: 5,
+            }),
+            /* @__PURE__ */ h('wimage', {
+              src: 'star.fill',
+              width: 10,
+              height: 10,
+            }),
+            /* @__PURE__ */ h('wspacer', {
+              length: 5,
             }),
             /* @__PURE__ */ h(
-              'wstack',
+              'wtext',
               {
-                verticalAlign: 'center',
+                font: 10,
+                textColor: this.fontColor,
               },
-              /* @__PURE__ */ h('wspacer', {
-                length: 5,
-              }),
-              /* @__PURE__ */ h('wimage', {
-                src: 'star.fill',
-                width: 10,
-                height: 10,
-              }),
-              /* @__PURE__ */ h('wspacer', {
-                length: 5,
-              }),
-              /* @__PURE__ */ h(
-                'wtext',
-                {
-                  font: 10,
-                  textColor: this.backgroundColor,
-                },
-                '地址：',
-                item.address,
-              ),
-              /* @__PURE__ */ h('wspacer', null),
+              '油站：',
+              item.title,
+              '(',
+              item._distance,
+              '米)',
             ),
-            /* @__PURE__ */ h('wspacer', {
-              length: 2,
-            }),
-            /* @__PURE__ */ h(
-              'wstack',
-              {
-                verticalAlign: 'center',
-              },
-              /* @__PURE__ */ h('wspacer', {
-                length: 5,
-              }),
-              /* @__PURE__ */ h('wimage', {
-                src: 'star.fill',
-                width: 10,
-                height: 10,
-              }),
-              /* @__PURE__ */ h('wspacer', {
-                length: 5,
-              }),
-              /* @__PURE__ */ h(
-                'wtext',
-                {
-                  href: 'tel:' + item.tel,
-                  font: 10,
-                  textColor: this.backgroundColor,
-                },
-                '电话：',
-                item.tel || '-',
-              ),
-              /* @__PURE__ */ h('wspacer', null),
-            ),
+            /* @__PURE__ */ h('wspacer', null),
           ),
-          /* @__PURE__ */ h('wspacer', null),
+          /* @__PURE__ */ h('wspacer', {
+            length: 2,
+          }),
+          /* @__PURE__ */ h(
+            'wstack',
+            {
+              verticalAlign: 'center',
+            },
+            /* @__PURE__ */ h('wspacer', {
+              length: 5,
+            }),
+            /* @__PURE__ */ h('wimage', {
+              src: 'star.fill',
+              width: 10,
+              height: 10,
+            }),
+            /* @__PURE__ */ h('wspacer', {
+              length: 5,
+            }),
+            /* @__PURE__ */ h(
+              'wtext',
+              {
+                font: 10,
+                textColor: this.fontColor,
+              },
+              '地址：',
+              item.address,
+            ),
+            /* @__PURE__ */ h('wspacer', null),
+          ),
+          /* @__PURE__ */ h('wspacer', {
+            length: 2,
+          }),
+          /* @__PURE__ */ h(
+            'wstack',
+            {
+              verticalAlign: 'center',
+            },
+            /* @__PURE__ */ h('wspacer', {
+              length: 5,
+            }),
+            /* @__PURE__ */ h('wimage', {
+              src: 'star.fill',
+              width: 10,
+              height: 10,
+            }),
+            /* @__PURE__ */ h('wspacer', {
+              length: 5,
+            }),
+            /* @__PURE__ */ h(
+              'wtext',
+              {
+                href: 'tel:' + item.tel,
+                font: 10,
+                textColor: this.fontColor,
+              },
+              '电话：',
+              item.tel || '-',
+            ),
+            /* @__PURE__ */ h('wspacer', null),
+          ),
+          gasStation.length - 1 !== index && /* @__PURE__ */ h('wspacer', null),
         );
       });
     };
@@ -1845,18 +1862,41 @@ var Widget = class extends Base_default {
       }
       const locality = await this.getLocation();
       const data = await this.renderWebView(locality);
-      const background = await this.getBackgroundImage();
-      if (config.widgetFamily === 'large' && this.token) gasStation = (await this.searchGasStation()) || [];
+      if (this.token) gasStation = (await this.searchGasStation()) || [];
       return /* @__PURE__ */ h(
         'wbox',
         {
-          background: background || this.backgroundColor,
+          padding: [0, 0, 0, 0],
           updateDate: new Date(Date.now() + (await this.updateInterval())),
         },
         /* @__PURE__ */ h(
           'wstack',
           {
+            background: this.headerColor,
+            padding: [10, 10, 10, 10],
+          },
+          data.map(item => {
+            const city = locality[1].replace('市', '');
+            const cate = item.cate.replace(city, '').replace('#', '号').replace('价格', '');
+            return this.content({...item, cate});
+          }),
+        ),
+        gasStation.length > 0 &&
+          /* @__PURE__ */ h(
+            'wstack',
+            {
+              background: this.bodyColor,
+              flexDirection: 'column',
+              padding: [10, 10, 10, 10],
+            },
+            this.stackGasStation(gasStation),
+          ),
+        /* @__PURE__ */ h('wspacer', null),
+        /* @__PURE__ */ h(
+          'wstack',
+          {
             verticalAlign: 'center',
+            padding: [0, 10, 10, 10],
           },
           /* @__PURE__ */ h('wimage', {
             src: 'https://www.bitauto.com/favicon.ico',
@@ -1869,46 +1909,25 @@ var Widget = class extends Base_default {
           /* @__PURE__ */ h(
             'wtext',
             {
-              opacity: 0.9,
+              opacity: 0.5,
               font: 14,
-              textColor: this.fontColor,
             },
             '今日油价',
           ),
-        ),
-        /* @__PURE__ */ h('wspacer', null),
-        /* @__PURE__ */ h(
-          'wstack',
-          null,
-          data.map(item => {
-            const city = locality[1].replace('市', '');
-            const cate = item.cate.replace(city, '').replace('#', '号').replace('价格', '');
-            return this.content({...item, cate});
-          }),
-        ),
-        /* @__PURE__ */ h('wspacer', null),
-        gasStation.length > 0 &&
+          /* @__PURE__ */ h('wspacer', null),
           /* @__PURE__ */ h(
-            'wstack',
+            'wtext',
             {
-              flexDirection: 'column',
+              font: 12,
+              textAlign: 'right',
+              opacity: 0.5,
             },
-            this.stackGasStation(gasStation),
+            '更新于:',
+            this.nowTime(),
           ),
-        /* @__PURE__ */ h(
-          'wtext',
-          {
-            font: 12,
-            textAlign: 'right',
-            opacity: 0.5,
-          },
-          '更新于:',
-          this.nowTime(),
         ),
       );
     };
-    this.registerAction('腾讯Token', this.setMenuTokenInput);
-    this.registerAction('代理缓存', this.setMenuTencentToken);
   }
   nowTime() {
     const date = new Date();

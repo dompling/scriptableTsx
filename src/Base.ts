@@ -353,11 +353,17 @@ class Base {
    * @param title 标题
    * @param content  描述
    * @param opt
+   * @param useKey
    * @returns {Promise<void>}
    */
-  showAlertCatchInput = async (title: string, content: string, opt: {[key: string]: any}): Promise<void> => {
+  showAlertCatchInput = async (
+    title: string,
+    content: string,
+    opt: {[key: string]: any},
+    useKey?: string,
+  ): Promise<void> => {
     const {getSetting, setSetting} = useSetting(this.en);
-    const catchValue = (await getSetting<any>(this.BOX_CATCH_KEY)) || '';
+    const catchValue = (await getSetting<any>(useKey || this.BOX_CATCH_KEY)) || '';
     const inputItems = Object.keys(opt).map(key => {
       return {placeholder: opt[key], text: catchValue[key]};
     });
@@ -366,7 +372,7 @@ class Base {
     Object.keys(opt).map((key, index: number) => {
       settings[key] = texts[index];
     });
-    if (confirm) await setSetting(this.BOX_CATCH_KEY, settings);
+    if (confirm) await setSetting(useKey || this.BOX_CATCH_KEY, settings);
     return settings;
   };
 }
