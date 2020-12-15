@@ -1,8 +1,7 @@
 import {FC} from 'react';
 import Base from '@app/Base';
 import {WstackProps} from '@app/types/widget';
-import C2Pin from '@app/assets/pinyin';
-import {request} from '@app/lib/help';
+import {request, useSetting} from '@app/lib/help';
 
 interface locationType {
   administrativeArea: string;
@@ -90,12 +89,22 @@ class Widget extends Base {
   name = '疫情数据';
   en = 'covid-19';
   today = '';
+  pinyin = '';
   province: covid_19Item | undefined;
   city: covid_19Item | undefined;
   updateData: provinceCompareItem | undefined;
   location: locationType | undefined;
   baseUrl = `https://api.inews.qq.com/newsqa/v1/query/pubished/daily/list`;
   news: covid_19NewsItem[] | undefined;
+
+  componentWillMount = async () => {
+    this.registerAction('地区拼音', async () => {
+      const options = {py: '尝试首字母或者全拼'};
+      await this.showAlertCatchInput('地区拼音', '首字母或全部拼音', options, 'pinyin');
+    });
+    const {getSetting} = useSetting(this.en);
+    this.pinyin = ((await getSetting<{py: string}>('pinyin')) || {}).py || this.pinyin;
+  };
 
   componentDidMount = async () => {
     const dateFormat = new DateFormatter();
@@ -128,7 +137,34 @@ class Widget extends Base {
       const location = await Location.current();
       const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
       console.log(locationText);
-      return locationText[0] as locationType;
+      // return locationText[0] as locationType;
+      return {
+        inlandWater: null,
+        thoroughfare: '桃园南路',
+        areasOfInterest: ['西稍门'],
+        name: '桃园南路24号',
+        subLocality: '莲湖区',
+        postalAddress: {
+          city: '西安市',
+          country: '中国',
+          street: '桃园南路24号',
+          state: '陕西省',
+          subAdministrativeArea: '',
+          subLocality: '莲湖区',
+          postalCode: '',
+          isoCountryCode: 'CN',
+        },
+        subThoroughfare: '24号',
+        timeZone: 'Asia/Shanghai',
+        isoCountryCode: 'CN',
+        country: '中国',
+        postalCode: null,
+        administrativeArea: '陕西省',
+        ocean: null,
+        locality: '西安市',
+        location: {altitude: 0, latitude: 34.25358776951946, longitude: 108.90199759327815},
+        subAdministrativeArea: null,
+      } as locationType;
     } catch (e) {
       console.log('❌定位失败：' + e);
     }
@@ -147,7 +183,7 @@ class Widget extends Base {
     console.log(url);
     const response = (await request<covid_19Response>({method: 'POST', url, useCache: true})).data as covid_19Response;
     if (response.ret === 0 && response.data && response.data instanceof Array) {
-      const covid_19: covid_19Item | undefined = response.data.find(item => item.date === this.today);
+      const covid_19: covid_19Item = response.data[response.data.length - 1];
       if (covid_19) return covid_19;
     }
   };
@@ -167,11 +203,8 @@ class Widget extends Base {
   }
 
   async getCovid19News() {
-    if (!this.location) return;
-    let {city = ''} = this.location.postalAddress;
-    city = city.replace('省', '').replace('市', '');
-    const py = C2Pin.firstChar(city);
-    const url = `https://api.dreamreader.qq.com/news/v1/province/news/list?province_code=${py}&page_size=4&today=${this.today}`;
+    if (!this.pinyin) return;
+    const url = `https://api.dreamreader.qq.com/news/v1/province/news/list?province_code=${this.pinyin}&page_size=4&today=${this.today}`;
     console.log(url);
     const response = (await request<any>({url, method: 'GET', useCache: true})).data.data.items as covid_19NewsItem[];
     if (response) this.news = response;
@@ -179,7 +212,7 @@ class Widget extends Base {
 
   formatNumber(number: number | undefined): string {
     if (!number) return `+0`;
-    return number >= 0 ? `+${number}` : `-${number}`;
+    return number >= 0 ? `+${number}` : `${number}`;
   }
 
   //当前时间
@@ -290,29 +323,35 @@ class Widget extends Base {
             <wimage src={'location'} filter={'#005dff'} width={12} height={12} />
             <wspacer length={5} />
             <wtext textColor={'#005dff'} font={addumFont}>
-              {this.city?.city || '未找到定位'}
-            </wtext>
-          </wstack>
-          <wspacer length={5} />
-          <wstack verticalAlign={'center'}>
-            <wspacer />
-            <wtext font={addumFont} textColor={this.fontColor}>
-              {this.city?.confirm_add || '0'}新增
-            </wtext>
-            <wspacer />
-            <wtext font={addumFont} textColor={this.fontColor}>
-              {this.city?.confirm || '0'}确诊
-            </wtext>
-            <wspacer />
-            <wtext font={addumFont} textColor={this.fontColor}>
-              {this.city?.heal || '0'}治愈
-            </wtext>
-            <wspacer />
-            <wtext font={addumFont} textColor={this.fontColor}>
-              {this.city?.dead || '0'}死亡
+              {(this.location?.postalAddress.city || '') + (this.location?.postalAddress.street || '') || '未找到定位'}
             </wtext>
             <wspacer />
           </wstack>
+
+          {this.city && (
+            <>
+              <wspacer length={5} />
+              <wstack verticalAlign={'center'}>
+                <wspacer />
+                <wtext font={addumFont} textColor={this.fontColor}>
+                  {this.city?.confirm_add || '0'}新增
+                </wtext>
+                <wspacer />
+                <wtext font={addumFont} textColor={this.fontColor}>
+                  {this.city?.confirm || '0'}确诊
+                </wtext>
+                <wspacer />
+                <wtext font={addumFont} textColor={this.fontColor}>
+                  {this.city?.heal || '0'}治愈
+                </wtext>
+                <wspacer />
+                <wtext font={addumFont} textColor={this.fontColor}>
+                  {this.city?.dead || '0'}死亡
+                </wtext>
+                <wspacer />
+              </wstack>
+            </>
+          )}
         </wstack>
         {this.news && (
           <>
@@ -347,4 +386,5 @@ class Widget extends Base {
     );
   };
 }
+
 EndAwait(() => new Widget().init());

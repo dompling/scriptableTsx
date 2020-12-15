@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608012234887
+// @编译时间 1608037096022
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1031,7 +1031,7 @@ var Base = class {
       return result;
     };
     this.registerAction = (title2, func) => {
-      this.actions.push({title: title2, func});
+      this.actions.splice(1, 0, {title: title2, func});
     };
     this.showActionSheet = async (title2, actions) => {
       const selectIndex = await showActionSheet({
@@ -1584,7 +1584,7 @@ var pinyin_default = (function () {
   };
 })();
 
-// src/pages/Today.OilPrice.tsx
+// src/pages/TodayOilPrice.tsx
 var title = new Font('AppleSDGothicNeo-Bold', 16);
 var RowCenter = ({children, ...props}) => {
   return /* @__PURE__ */ h(
@@ -1864,6 +1864,9 @@ var Widget = class extends Base_default {
             width: 10,
             height: 10,
             opacity: 0.5,
+          }),
+          /* @__PURE__ */ h('wspacer', {
+            length: 10,
           }),
           /* @__PURE__ */ h(
             'wtext',

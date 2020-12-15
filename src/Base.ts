@@ -285,7 +285,7 @@ class Base {
   }
 
   registerAction = (title: string, func: () => Promise<void>): any => {
-    this.actions.push({title, func} as actionsProps);
+    this.actions.splice(1, 0, {title, func} as actionsProps);
   };
 
   showActionSheet = async (title: string, actions: actionsProps[]): Promise<void> => {
