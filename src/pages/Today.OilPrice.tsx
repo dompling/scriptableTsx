@@ -188,40 +188,30 @@ class Widget extends Base {
     );
   };
 
+  stackCellText = (data: {icon: string; href: string; label: string; value: string}) => {
+    return (
+      <wstack verticalAlign="center">
+        <wspacer length={5} />
+        <wimage src={data.icon} width={10} height={10} filter={this.fontColor} />
+        <wspacer length={5} />
+        <wtext href={data.href} font={10} textColor={this.fontColor} maxLine={1}>
+          {data.label}：{data.value || '-'}
+        </wtext>
+        <wspacer />
+      </wstack>
+    );
+  };
+
   stackGasStation = (gasStation: gasStationResponse[]) => {
     return gasStation.map((item, index) => {
       const href = `iosamap://navi?sourceApplication=applicationName&backScheme=applicationScheme&poiname=fangheng&poiid=BGVIS&lat=${item.location.lat}&lon=${item.location.lng}&dev=1&style=2`;
       return (
         <wstack flexDirection="column" borderRadius={4} href={href}>
-          <wstack verticalAlign="center">
-            <wspacer length={5} />
-            <wimage src="star.fill" width={10} height={10} />
-            <wspacer length={5} />
-            <wtext font={10} textColor={this.fontColor}>
-              油站：{item.title}({item._distance}米)
-            </wtext>
-            <wspacer />
-          </wstack>
+          {this.stackCellText({value: `${item.title}(${item._distance}米)`, label: '油站', href, icon: 'car'})}
           <wspacer length={2} />
-          <wstack verticalAlign="center">
-            <wspacer length={5} />
-            <wimage src="star.fill" width={10} height={10} />
-            <wspacer length={5} />
-            <wtext font={10} textColor={this.fontColor}>
-              地址：{item.address}
-            </wtext>
-            <wspacer />
-          </wstack>
+          {this.stackCellText({value: item.address, label: '地址', href, icon: 'mappin.and.ellipse'})}
           <wspacer length={2} />
-          <wstack verticalAlign="center">
-            <wspacer length={5} />
-            <wimage src="star.fill" width={10} height={10} />
-            <wspacer length={5} />
-            <wtext href={'tel:' + item.tel} font={10} textColor={this.fontColor}>
-              电话：{item.tel || '-'}
-            </wtext>
-            <wspacer />
-          </wstack>
+          {this.stackCellText({value: item.tel, label: '电话', href: 'tel:' + item.tel, icon: 'iphone'})}
           {gasStation.length - 1 !== index && <wspacer />}
         </wstack>
       );
