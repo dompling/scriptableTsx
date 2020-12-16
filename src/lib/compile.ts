@@ -224,6 +224,13 @@ await __topLevelAwait__();
     // 确保路径存在
     await ensureFile(outputFile.path);
     // 写入代码
+    const iconColorRex = /ICONCOLOR = \"([a-z]*)\";/;
+    const iconGlyphRex = /ICONGLYPH = \"([a-z]*)\";/;
+
+    const matchColor = writeText.match(iconColorRex);
+    const matchIcon = writeText.match(iconGlyphRex);
+    if (matchColor) writeText = writeText.replace(matchColor[0], '').replace('@IconColor', matchColor[1]);
+    if (matchIcon) writeText = writeText.replace(matchIcon[0], '').replace('@IconGlyph', matchIcon[1]);
     await writeFile(outputFile.path, writeText, {encoding: 'utf8'});
   }
 

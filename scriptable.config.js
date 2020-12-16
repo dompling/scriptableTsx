@@ -21,7 +21,10 @@ const minify = false;
 const encrypt = false;
 
 /**往编译后的代码头部插入的代码*/
-const header = `
+const header = `// Variables used by Scriptable.
+// These must be at the very top of the file. Do not edit.
+// icon-color: @IconColor; icon-glyph: @IconGlyph;
+
 /**
  * 作者: 2Ya
  * 版本: 1.0.0

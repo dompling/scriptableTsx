@@ -10,6 +10,7 @@ interface Module {
   filename: string;
   exports: unknown;
 }
+
 declare const MODULE: Module;
 
 declare namespace Scriptable {
@@ -21,3 +22,6 @@ declare namespace Scriptable {
  * @param promiseFunc 渲染函数，如: () => render()
  */
 declare const EndAwait: <T>(promiseFunc: () => Promise<T>) => Promise<T>;
+
+declare let ICONCOLOR: string;
+declare let ICONGLYPH: string;

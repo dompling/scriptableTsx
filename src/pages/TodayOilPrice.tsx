@@ -259,4 +259,6 @@ class Widget extends Base {
   };
 }
 
+ICONCOLOR = 'purple'; // 小组件颜色
+ICONGLYPH = 'oil-can'; // 小组件图标
 EndAwait(() => new Widget().init());
