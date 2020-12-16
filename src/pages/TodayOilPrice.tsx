@@ -1,5 +1,5 @@
 import {FC} from 'react';
-import Base from '@app/Base';
+import Base, {RenderError} from '@app/Base';
 import C2Pin from '@app/assets/pinyin';
 import {WstackProps} from '@app/types/widget';
 import {request, useSetting} from '@app/lib/help';
@@ -60,8 +60,8 @@ class Widget extends Base {
   bodyColor = '#69c0ff';
 
   componentWillMount = async () => {
-    this.registerAction('腾讯Token', this.setMenuTokenInput);
     this.registerAction('代理缓存', this.setMenuTencentToken);
+    this.registerAction('腾讯Token', this.setMenuTokenInput);
     this.baseActions = [
       {
         title: '颜色主题',
@@ -214,15 +214,7 @@ class Widget extends Base {
   //渲染组件
   render = async (): Promise<unknown> => {
     let gasStation: gasStationResponse[] = [];
-    if (config.widgetFamily === 'small') {
-      return (
-        <wbox>
-          <wspacer />
-          <wtext textAlign="center">暂不支持</wtext>
-          <wspacer />
-        </wbox>
-      );
-    }
+    if (config.widgetFamily === 'small') return RenderError('暂不支持');
     const locality = await this.getLocation();
     const data = await this.renderWebView(locality);
     if (this.token) gasStation = (await this.searchGasStation()) || [];

@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608085218505
+// @编译时间 1608111011781
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -132,7 +132,7 @@ function useSetting(settingFilename) {
     settings[key] = value;
     await fileManager.writeString(settingsPath, JSON.stringify(settings));
     if (notify)
-      await showNotification({title: "缓存提示", body: "设置保存成功,稍后刷新组件"});
+      await showNotification({title: "消息提示", body: "设置保存成功,稍后刷新组件"});
     return settings;
   };
   return {getSetting, setSetting};
@@ -807,7 +807,7 @@ function runOnClick(instance, onClick) {
   }
 }
 
-// src/Base.ts
+// src/Base.tsx
 var FILE_MGR_LOCAL = fm();
 var Base = class {
   constructor() {
@@ -832,6 +832,8 @@ var Base = class {
     this.backgroundKey = `${this.name}_background`;
     this.render = async () => false;
     this.componentWillMount = async () => {
+    };
+    this.componentDidMount = async () => {
     };
     this.backgroundColor = Device.isUsingDarkAppearance() ? "#000" : "#fff";
     this.fontColor = Device.isUsingDarkAppearance() ? "#fff" : "#000";
@@ -919,7 +921,11 @@ var Base = class {
       {
         title: "预览组件",
         func: async () => {
-          await showPreviewOptions(this.render);
+          const render = async () => {
+            await this.componentDidMount();
+            return this.render();
+          };
+          await showPreviewOptions(render);
         }
       },
       {
@@ -1101,6 +1107,7 @@ var Base = class {
     if (config.runsInApp) {
       await this.showMenu();
     } else {
+      await this.componentDidMount();
       const widget = await this.render();
       Script.setWidget(widget);
       Script.complete();
@@ -1224,7 +1231,6 @@ var Widget = class extends Base_default {
       }, data.tabText)), /* @__PURE__ */ h("wspacer", null));
     };
     this.render = async () => {
-      await this.componentDidMount();
       const Footer = () => {
         return /* @__PURE__ */ h("wstack", {
           verticalAlign: "center",
@@ -1259,9 +1265,8 @@ var Widget = class extends Base_default {
           textAlign: "center"
         }, "暂不支持"), /* @__PURE__ */ h("wspacer", null));
       }
-      const background = await this.getBackgroundImage();
       return /* @__PURE__ */ h("wbox", {
-        background: background || this.backgroundColor,
+        background: await this.getBackgroundImage() || this.backgroundColor,
         updateDate: new Date(Date.now() + await this.updateInterval())
       }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wstack", {
         borderRadius: 10

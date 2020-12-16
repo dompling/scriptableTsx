@@ -1,1 +1,1 @@
-import './pages/COVID-19';
+import './pages/VPNLoginBord';

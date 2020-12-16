@@ -398,7 +398,7 @@ export function useSetting(settingFilename?: string) {
     const settings = JSON.parse(json) || {};
     settings[key] = value;
     await fileManager.writeString(settingsPath, JSON.stringify(settings));
-    if (notify) await showNotification({title: '缓存提示', body: '设置保存成功,稍后刷新组件'});
+    if (notify) await showNotification({title: '消息提示', body: '设置保存成功,稍后刷新组件'});
     return settings;
   };
 

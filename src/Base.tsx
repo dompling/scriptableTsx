@@ -23,6 +23,7 @@ class Base {
     if (config.runsInApp) {
       await this.showMenu();
     } else {
+      await this.componentDidMount();
       const widget = ((await this.render()) as unknown) as ListWidget;
       Script.setWidget(widget);
       Script.complete();
@@ -53,6 +54,7 @@ class Base {
   backgroundKey = `${this.name}_background`;
   render = async (): Promise<unknown> => false;
   componentWillMount = async (): Promise<void> => {};
+  componentDidMount = async (): Promise<void> => {};
   backgroundColor: string = Device.isUsingDarkAppearance() ? '#000' : '#fff';
   fontColor: string = Device.isUsingDarkAppearance() ? '#fff' : '#000';
   opacity: string = Device.isUsingDarkAppearance() ? '0.7' : '0.4';
@@ -142,7 +144,11 @@ class Base {
     {
       title: '预览组件',
       func: async (): Promise<void> => {
-        await showPreviewOptions(this.render);
+        const render = async () => {
+          await this.componentDidMount();
+          return this.render();
+        };
+        await showPreviewOptions(render);
       },
     },
     {
@@ -361,7 +367,7 @@ class Base {
     content: string,
     opt: {[key: string]: any},
     useKey?: string,
-  ): Promise<void> => {
+  ): Promise<void | any> => {
     const {getSetting, setSetting} = useSetting(this.en);
     const catchValue = (await getSetting<any>(useKey || this.BOX_CATCH_KEY)) || {};
     const settings: any = catchValue;
@@ -376,5 +382,15 @@ class Base {
     return settings;
   };
 }
+
+export const RenderError = async (text: string): Promise<unknown> => {
+  return (
+    <wbox>
+      <wspacer />
+      <wtext textAlign="center">{text}</wtext>
+      <wspacer />
+    </wbox>
+  );
+};
 
 export default Base;

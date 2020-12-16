@@ -223,7 +223,6 @@ class Widget extends Base {
   };
   //渲染组件
   render = async (): Promise<unknown> => {
-    await this.componentDidMount();
     const Footer = () => {
       return (
         <wstack verticalAlign="center" padding={[0, 10, 10, 10]}>
@@ -251,10 +250,10 @@ class Widget extends Base {
         </wbox>
       );
     }
-    const background = await this.getBackgroundImage();
+
     return (
       <wbox
-        background={background || this.backgroundColor}
+        background={(await this.getBackgroundImage()) || this.backgroundColor}
         updateDate={new Date(Date.now() + (await this.updateInterval()))}
       >
         <wspacer />
