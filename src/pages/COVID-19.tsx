@@ -104,6 +104,7 @@ class Widget extends Base {
     });
     const {getSetting} = useSetting(this.en);
     this.pinyin = ((await getSetting<{py: string}>('pinyin')) || {}).py || this.pinyin;
+    this.pinyin = this.pinyin.trim();
   };
 
   componentDidMount = async () => {
