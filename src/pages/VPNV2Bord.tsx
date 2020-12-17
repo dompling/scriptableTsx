@@ -233,8 +233,17 @@ class Widget extends Base {
     this.registerAction('删除机场', this.delSubscribe);
     this.registerAction('新增机场', this.addSubscribe);
     this.registerAction('机场列表', this.listSubscribe);
-    this.account = (await getSetting<accountItem>('account')) || this.account;
-    this.account.icon = this.account.icon || this.logo;
+    const index: number | undefined = args.widgetParameter ? parseInt(args.widgetParameter) : undefined;
+    const data = (await getSetting<accountItem[]>('subscribe')) || [];
+    let account: accountItem;
+    if (typeof index !== 'undefined' && data[index]) {
+      account = data[index];
+      account.icon = account.icon || this.logo;
+    } else {
+      account = (await getSetting<accountItem>('account')) || this.account;
+      account.icon = account.icon || this.logo;
+    }
+    this.account = account;
   };
 
   componentDidMount = async () => {

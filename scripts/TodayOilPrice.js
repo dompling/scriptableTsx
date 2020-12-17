@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：12/16/2020
+ * 更新时间：12/17/2020
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608111011781
+// @编译时间 1608167731188
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1094,9 +1094,10 @@ var Base = class {
       Object.keys(opt).map((key, index) => {
         settings[key] = texts[index];
       });
-      if (confirm)
+      if (confirm) {
         await setSetting(useKey || this.BOX_CATCH_KEY, settings);
-      return settings;
+        return settings;
+      }
     };
   }
   async init() {

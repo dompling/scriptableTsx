@@ -378,8 +378,10 @@ class Base {
     Object.keys(opt).map((key, index: number) => {
       settings[key] = texts[index];
     });
-    if (confirm) await setSetting(useKey || this.BOX_CATCH_KEY, settings);
-    return settings;
+    if (confirm) {
+      await setSetting(useKey || this.BOX_CATCH_KEY, settings);
+      return settings;
+    }
   };
 }
 

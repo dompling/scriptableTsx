@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：12/16/2020
+ * 更新时间：12/17/2020
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608111011781
+// @编译时间 1608167731188
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1097,9 +1097,10 @@ var Base = class {
       Object.keys(opt).map((key, index) => {
         settings[key] = texts[index];
       });
-      if (confirm)
+      if (confirm) {
         await setSetting2(useKey || this.BOX_CATCH_KEY, settings);
-      return settings;
+        return settings;
+      }
     };
   }
   async init() {
@@ -1353,8 +1354,17 @@ var Widget = class extends Base_default {
       this.registerAction("删除机场", this.delSubscribe);
       this.registerAction("新增机场", this.addSubscribe);
       this.registerAction("机场列表", this.listSubscribe);
-      this.account = await getSetting("account") || this.account;
-      this.account.icon = this.account.icon || this.logo;
+      const index = args.widgetParameter ? parseInt(args.widgetParameter) : void 0;
+      const data = await getSetting("subscribe") || [];
+      let account;
+      if (typeof index !== "undefined" && data[index]) {
+        account = data[index];
+        account.icon = account.icon || this.logo;
+      } else {
+        account = await getSetting("account") || this.account;
+        account.icon = account.icon || this.logo;
+      }
+      this.account = account;
     };
     this.componentDidMount = async () => {
       try {
