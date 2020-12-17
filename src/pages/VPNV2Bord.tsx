@@ -307,8 +307,10 @@ class Widget extends Base {
       options,
       'add',
     );
-    dataSource.push(account);
-    await setSetting('subscribe', dataSource, false);
+    if (account) {
+      dataSource.push(account);
+      await setSetting('subscribe', dataSource, false);
+    }
   };
 
   login = async (url: string) => {

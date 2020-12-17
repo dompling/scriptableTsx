@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608167731188
+// @编译时间 1608184498574
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1385,8 +1385,10 @@ var Widget = class extends Base_default {
       };
       const dataSource = await getSetting("subscribe") || [];
       const account = await this.showAlertCatchInput("新增订阅", "订阅的登陆地址域名请自行寻找，以/api/v1/passport/auth/login结尾", options, "add");
-      dataSource.push(account);
-      await setSetting("subscribe", dataSource, false);
+      if (account) {
+        dataSource.push(account);
+        await setSetting("subscribe", dataSource, false);
+      }
     };
     this.login = async (url) => {
       const data = {email: this.account.email, password: this.account.password};
