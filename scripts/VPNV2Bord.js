@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608271347872
+// @编译时间 1608272059282
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1361,11 +1361,12 @@ var Widget = class extends Base_default {
       let account;
       if (typeof index !== "undefined" && data[index]) {
         account = data[index];
-        account.icon = account.icon || this.logo;
       } else {
         account = await getSetting("account") || this.account;
-        account.icon = account.icon || this.logo;
       }
+      if (!account.url && data[0])
+        account = data[0];
+      account.icon = account.icon || this.logo;
       this.account = account;
     };
     this.componentDidMount = async () => {

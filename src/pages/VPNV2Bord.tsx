@@ -243,11 +243,11 @@ class Widget extends Base {
     let account: accountItem;
     if (typeof index !== 'undefined' && data[index]) {
       account = data[index];
-      account.icon = account.icon || this.logo;
     } else {
       account = (await getSetting<accountItem>('account')) || this.account;
-      account.icon = account.icon || this.logo;
     }
+    if (!account.url && data[0]) account = data[0];
+    account.icon = account.icon || this.logo;
     this.account = account;
   };
 
