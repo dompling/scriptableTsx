@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：12/17/2020
+ * 更新时间：12/18/2020
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608184498574
+// @编译时间 1608271347872
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1291,10 +1291,12 @@ var StackCell = (data) => {
   }), /* @__PURE__ */ h("wspacer", {
     length: 5
   }), /* @__PURE__ */ h("wtext", {
-    font: data.size
+    font: data.size,
+    textColor: data.fontColor
   }, data.label), data.value && /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wspacer", {
     length: 5
   }), /* @__PURE__ */ h("wtext", {
+    textColor: data.fontColor,
     font: data.size
   }, data.value || ""), /* @__PURE__ */ h("wspacer", null)));
 };
@@ -1454,11 +1456,13 @@ var Widget = class extends Base_default {
       }, /* @__PURE__ */ h(StackCell, {
         url: this.account.icon,
         label: this.account.title,
-        size: 12
+        size: 12,
+        fontColor: this.fontColor
       }), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(StackCell, {
         url: "waveform.path.badge.minus",
         label: todayData,
-        size: 12
+        size: 12,
+        fontColor: this.fontColor
       })), /* @__PURE__ */ h(ColumnCenter, {
         flexDirection: "row"
       }, /* @__PURE__ */ h(Circle, {
@@ -1500,25 +1504,29 @@ var Widget = class extends Base_default {
       }), /* @__PURE__ */ h(ColumnCenter, null, /* @__PURE__ */ h(StackCell, {
         url: this.logo,
         label: this.account.title,
-        value: "."
+        value: ".",
+        fontColor: this.fontColor
       }), /* @__PURE__ */ h("wspacer", {
         length: 10
       }), /* @__PURE__ */ h(StackCell, {
         color: this.color3,
         label: "今日",
-        value: todayData
+        value: todayData,
+        fontColor: this.fontColor
       }), /* @__PURE__ */ h("wspacer", {
         length: 10
       }), /* @__PURE__ */ h(StackCell, {
         color: this.color2,
         label: "累计",
-        value: usedData
+        value: usedData,
+        fontColor: this.fontColor
       }), /* @__PURE__ */ h("wspacer", {
         length: 10
       }), /* @__PURE__ */ h(StackCell, {
         color: this.color1,
         label: "剩余",
-        value: restData
+        value: restData,
+        fontColor: this.fontColor
       })), /* @__PURE__ */ h("wspacer", null)));
     };
   }

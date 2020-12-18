@@ -149,6 +149,7 @@ const StackCell: FC<{
   label: string;
   value?: string;
   size?: number;
+  fontColor?: string;
 }> = data => {
   return (
     <wstack verticalAlign={'center'}>
@@ -158,11 +159,15 @@ const StackCell: FC<{
         <wstack background={gradient(data.color || [])} width={16} height={16} borderRadius={8} />
       )}
       <wspacer length={5} />
-      <wtext font={data.size}>{data.label}</wtext>
+      <wtext font={data.size} textColor={data.fontColor}>
+        {data.label}
+      </wtext>
       {data.value && (
         <>
           <wspacer length={5} />
-          <wtext font={data.size}>{data.value || ''}</wtext>
+          <wtext textColor={data.fontColor} font={data.size}>
+            {data.value || ''}
+          </wtext>
           <wspacer />
         </>
       )}
@@ -405,9 +410,9 @@ class Widget extends Base {
         updateDate={new Date(Date.now() + (await this.updateInterval()))}
       >
         <wstack padding={[10, 5, 10, 10]} verticalAlign={'center'}>
-          <StackCell url={this.account.icon} label={this.account.title} size={12} />
+          <StackCell url={this.account.icon} label={this.account.title} size={12} fontColor={this.fontColor} />
           <wspacer />
-          <StackCell url={'waveform.path.badge.minus'} label={todayData} size={12} />
+          <StackCell url={'waveform.path.badge.minus'} label={todayData} size={12} fontColor={this.fontColor} />
         </wstack>
         <ColumnCenter flexDirection={'row'}>
           <Circle width={80} height={80} data={{chart1, chart2, chart3}} />
@@ -440,13 +445,13 @@ class Widget extends Base {
           </ColumnCenter>
           <wspacer length={20} />
           <ColumnCenter>
-            <StackCell url={this.logo} label={this.account.title} value={'.'} />
+            <StackCell url={this.logo} label={this.account.title} value={'.'} fontColor={this.fontColor} />
             <wspacer length={10} />
-            <StackCell color={this.color3} label={'今日'} value={todayData} />
+            <StackCell color={this.color3} label={'今日'} value={todayData} fontColor={this.fontColor} />
             <wspacer length={10} />
-            <StackCell color={this.color2} label={'累计'} value={usedData} />
+            <StackCell color={this.color2} label={'累计'} value={usedData} fontColor={this.fontColor} />
             <wspacer length={10} />
-            <StackCell color={this.color1} label={'剩余'} value={restData} />
+            <StackCell color={this.color1} label={'剩余'} value={restData} fontColor={this.fontColor} />
           </ColumnCenter>
           <wspacer />
         </wstack>
