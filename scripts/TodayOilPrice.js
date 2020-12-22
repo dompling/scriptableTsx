@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：12/17/2020
+ * 更新时间：12/22/2020
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608184498574
+// @编译时间 1608622966707
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1628,9 +1628,9 @@ var Widget = class extends Base_default {
         const location = await Location.current();
         const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
         console.log(locationText);
-        const {locality, administrativeArea} = locationText[0];
-        this.location = locationText[0];
-        return [administrativeArea || "", locality];
+        const {locality = "成都", administrativeArea = "四川"} = locationText[0] || {};
+        this.location = locationText[0] || {};
+        return [administrativeArea, locality];
       } catch (e) {
         console.log("❌错误信息：" + e);
         return [];
