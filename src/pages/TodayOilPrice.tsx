@@ -97,7 +97,7 @@ class Widget extends Base {
       const location = await Location.current();
       const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
       console.log(locationText);
-      const {locality = '成都', administrativeArea = '四川'} = (locationText[0] || {}) as locationType;
+      const {locality = '', administrativeArea = '四川'} = (locationText[0] || {}) as locationType;
       this.location = (locationText[0] || {}) as locationType;
       return [administrativeArea, locality];
     } catch (e) {
