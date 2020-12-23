@@ -345,22 +345,26 @@ class Widget extends Base {
     this.dataSource.totalData = `${subscribe.transfer_enable}`;
     this.dataSource.usedData = `${subscribe.d + subscribe.u}`;
     this.dataSource.restData = `${subscribe.transfer_enable - (subscribe.d + subscribe.u)}`;
-    this.dataSource.todayData = `${subscribe.u}`;
+    this.dataSource.todayData = `${subscribe.reset_day}`;
   };
 
   createChart = async (size: {w: number; h: number}): Promise<void> => {
     const dateFormat = new DateFormatter();
     dateFormat.dateFormat = 'YYYYMMddHH';
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const days = new Date(year, month, 0).getDate();
     const today = dateFormat.string(new Date());
 
     const {restData, usedData, todayData, totalData} = this.dataSource;
     const total = parseFloat(totalData) || 1;
-    const data3 = Math.floor((parseInt(todayData) / total) * 100);
+    const data3 = Math.floor((1 - parseInt(todayData) / days) * 100);
     const data2 = Math.floor((parseInt(usedData) / total) * 100);
     const data1 = Math.floor((parseInt(restData) / total) * 100);
     const data = [data1 || 0, data2 || 0, data3 || 0];
 
-    this.dataSource.todayData = this.formatFileSize(parseInt(todayData));
+    this.dataSource.todayData = `${todayData}天后`;
     this.dataSource.usedData = this.formatFileSize(parseInt(usedData));
     this.dataSource.restData = this.formatFileSize(parseInt(restData));
 
@@ -412,7 +416,7 @@ class Widget extends Base {
         <wstack padding={[10, 5, 10, 10]} verticalAlign={'center'}>
           <StackCell url={this.account.icon} label={this.account.title} size={12} fontColor={this.fontColor} />
           <wspacer />
-          <StackCell url={'waveform.path.badge.minus'} label={todayData} size={12} fontColor={this.fontColor} />
+          <StackCell url={'arrow.clockwise'} label={todayData} size={12} fontColor={this.fontColor} />
         </wstack>
         <ColumnCenter flexDirection={'row'}>
           <Circle width={80} height={80} data={{chart1, chart2, chart3}} />
@@ -447,7 +451,7 @@ class Widget extends Base {
           <ColumnCenter>
             <StackCell url={this.logo} label={this.account.title} value={'.'} fontColor={this.fontColor} />
             <wspacer length={10} />
-            <StackCell color={this.color3} label={'今日'} value={todayData} fontColor={this.fontColor} />
+            <StackCell color={this.color3} label={'重置'} value={todayData} fontColor={this.fontColor} />
             <wspacer length={10} />
             <StackCell color={this.color2} label={'累计'} value={usedData} fontColor={this.fontColor} />
             <wspacer length={10} />

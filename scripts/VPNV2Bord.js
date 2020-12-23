@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：12/18/2020
+ * 更新时间：12/23/2020
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1608272059282
+// @编译时间 1608706465697
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1421,19 +1421,23 @@ var Widget = class extends Base_default {
       this.dataSource.totalData = `${subscribe.transfer_enable}`;
       this.dataSource.usedData = `${subscribe.d + subscribe.u}`;
       this.dataSource.restData = `${subscribe.transfer_enable - (subscribe.d + subscribe.u)}`;
-      this.dataSource.todayData = `${subscribe.u}`;
+      this.dataSource.todayData = `${subscribe.reset_day}`;
     };
     this.createChart = async (size) => {
       const dateFormat = new DateFormatter();
       dateFormat.dateFormat = "YYYYMMddHH";
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const days = new Date(year, month, 0).getDate();
       const today = dateFormat.string(new Date());
       const {restData, usedData, todayData, totalData} = this.dataSource;
       const total = parseFloat(totalData) || 1;
-      const data3 = Math.floor(parseInt(todayData) / total * 100);
+      const data3 = Math.floor((1 - parseInt(todayData) / days) * 100);
       const data2 = Math.floor(parseInt(usedData) / total * 100);
       const data1 = Math.floor(parseInt(restData) / total * 100);
       const data = [data1 || 0, data2 || 0, data3 || 0];
-      this.dataSource.todayData = this.formatFileSize(parseInt(todayData));
+      this.dataSource.todayData = `${todayData}天后`;
       this.dataSource.usedData = this.formatFileSize(parseInt(usedData));
       this.dataSource.restData = this.formatFileSize(parseInt(restData));
       const {template1, template2, template3} = getChartConfig(data, [this.color1, this.color2, this.color3], this.dataSource.restData, this.fontColor);
@@ -1460,7 +1464,7 @@ var Widget = class extends Base_default {
         size: 12,
         fontColor: this.fontColor
       }), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(StackCell, {
-        url: "waveform.path.badge.minus",
+        url: "arrow.clockwise",
         label: todayData,
         size: 12,
         fontColor: this.fontColor
@@ -1511,7 +1515,7 @@ var Widget = class extends Base_default {
         length: 10
       }), /* @__PURE__ */ h(StackCell, {
         color: this.color3,
-        label: "今日",
+        label: "重置",
         value: todayData,
         fontColor: this.fontColor
       }), /* @__PURE__ */ h("wspacer", {
