@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1609148341469
+// @编译时间 1609149057070
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1143,6 +1143,7 @@ var en = "CountDown";
 var weeks = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 var referenceTime = new Date("2001/01/01").getTime();
 var $calendar = {};
+var $calendarEvents = [];
 var $eventsBtn = [];
 async function getNextCalendarEvent() {
   const events = await CalendarEvent.thisWeek([]);
@@ -1191,8 +1192,7 @@ async function getMonthDaysArray(year, month, day) {
       text: lunar,
       day: preDays - thisMonthFirstDayInWeek + i + 1,
       weekDay: weeks[i],
-      weekNum: i,
-      calendarEvent: await getCalendarEvent(date, i)
+      weekNum: i
     });
   }
   for (let i = 1; i <= days; i++) {
@@ -1207,8 +1207,7 @@ async function getMonthDaysArray(year, month, day) {
       weekDay: weeks[weekDayFlag],
       selected: i === +day,
       isThisMonth: true,
-      weekNum: weekDayFlag,
-      calendarEvent: await getCalendarEvent(date, i)
+      weekNum: weekDayFlag
     });
   }
   for (let i = 1; i <= 6 - thisMonthLastDayInWeek; i++) {
@@ -1221,20 +1220,14 @@ async function getMonthDaysArray(year, month, day) {
       day: i,
       text: lunar,
       weekDay: weeks[weekDayFlag],
-      weekNum: weekDayFlag,
-      calendarEvent: await getCalendarEvent(date, i)
+      weekNum: weekDayFlag
     });
   }
   return dayArrays;
 }
-async function getCalendarEvent(date, day) {
-  const nextMonth = getNextMonth(date.getFullYear(), date.getMonth());
-  const endDate = new Date(nextMonth[0], nextMonth[1], day);
-  endDate.setHours(23, 59, 59);
-  const events = await CalendarEvent.between(date, endDate);
-  const thisDay = date.getDate();
-  const thisMonth = date.getMonth();
-  return events.find((event) => event.startDate.getDate() === thisDay && event.startDate.getMonth() === thisMonth && event.calendar.title.includes("节假日"));
+async function getCalendarEvent(start, end) {
+  const events = await CalendarEvent.between(start, end);
+  return events.filter((event) => event.calendar.title.includes("节假日"));
 }
 async function getCalendarJs() {
   const response = await request({
@@ -1249,10 +1242,11 @@ function evil(str) {
 var CreateCalendarItem = (props) => {
   const stackProps = {};
   const {data} = props;
-  const {text, calendarEvent} = data || {};
+  const {text} = data || {};
   if (text)
     stackProps.flexDirection = "column";
   let textColor = props.color;
+  let calendarEvent;
   if (!data) {
     if (props.text === "周六" || props.text === "周日")
       textColor = "#aaa";
@@ -1264,6 +1258,7 @@ var CreateCalendarItem = (props) => {
       stackProps.background = "#006666";
     if (data?.selected)
       textColor = "#fff";
+    calendarEvent = $calendarEvents.find((item) => item.startDate.getDate() === data?.date.getDate() && item.startDate.getMonth() === data.date.getMonth());
   }
   return /* @__PURE__ */ h("wstack", {
     ...stackProps,
@@ -1420,6 +1415,7 @@ var Widget = class extends Base_default {
       const day = this.date.getDate();
       const week = this.date.getDay();
       this.dataSource = await getMonthDaysArray(year, month, day);
+      $calendarEvents = await getCalendarEvent(this.dataSource[0].date, this.dataSource[this.dataSource.length - 1].date);
       let thisWeekIndex = 0;
       this.dataSource.forEach((item, index) => {
         if (item.date.getDate() === day)

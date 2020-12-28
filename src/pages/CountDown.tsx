@@ -8,6 +8,7 @@ const en = 'CountDown';
 let weeks = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 const referenceTime = new Date('2001/01/01').getTime();
 let $calendar: any = {};
+let $calendarEvents: CalendarEvent[] = [];
 
 const $eventsBtn: {
   title: string;
@@ -74,7 +75,6 @@ async function getMonthDaysArray(year: any, month: number, day: number) {
       day: preDays - thisMonthFirstDayInWeek + i + 1,
       weekDay: weeks[i],
       weekNum: i,
-      calendarEvent: await getCalendarEvent(date, i),
     });
   }
   //当月日历面板中的排列
@@ -91,7 +91,6 @@ async function getMonthDaysArray(year: any, month: number, day: number) {
       selected: i === +day,
       isThisMonth: true,
       weekNum: weekDayFlag,
-      calendarEvent: await getCalendarEvent(date, i),
     });
   }
   //下月在当月日历面板中的排列
@@ -106,25 +105,14 @@ async function getMonthDaysArray(year: any, month: number, day: number) {
       text: lunar,
       weekDay: weeks[weekDayFlag],
       weekNum: weekDayFlag,
-      calendarEvent: await getCalendarEvent(date, i),
     });
   }
   return dayArrays;
 }
 
-async function getCalendarEvent(date: Date, day: number | undefined): Promise<CalendarEvent | undefined> {
-  const nextMonth = getNextMonth(date.getFullYear(), date.getMonth());
-  const endDate = new Date(nextMonth[0], nextMonth[1], day);
-  endDate.setHours(23, 59, 59);
-  const events = await CalendarEvent.between(date, endDate);
-  const thisDay = date.getDate();
-  const thisMonth = date.getMonth();
-  return events.find(
-    event =>
-      event.startDate.getDate() === thisDay &&
-      event.startDate.getMonth() === thisMonth &&
-      event.calendar.title.includes('节假日'),
-  );
+async function getCalendarEvent(start: Date, end: Date): Promise<CalendarEvent[]> {
+  const events = await CalendarEvent.between(start, end);
+  return events.filter(event => event.calendar.title.includes('节假日'));
 }
 
 interface calendarInterface {
@@ -153,9 +141,10 @@ function evil(str: unknown) {
 const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterface}> = props => {
   const stackProps: WstackProps = {};
   const {data} = props;
-  const {text, calendarEvent} = data || {};
+  const {text} = data || {};
   if (text) stackProps.flexDirection = 'column';
   let textColor = props.color;
+  let calendarEvent;
   if (!data) {
     if (props.text === '周六' || props.text === '周日') textColor = '#aaa';
   } else {
@@ -163,7 +152,11 @@ const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterf
     stackProps.href = 'calshow:' + (data.date.getTime() - referenceTime) / 1000;
     if (data?.selected) stackProps.background = '#006666';
     if (data?.selected) textColor = '#fff';
+    calendarEvent = $calendarEvents.find(
+      item => item.startDate.getDate() === data?.date.getDate() && item.startDate.getMonth() === data.date.getMonth(),
+    );
   }
+
   return (
     <wstack {...stackProps} borderRadius={5} width={40} height={40} verticalAlign={'center'}>
       {text ? (
@@ -345,6 +338,7 @@ class Widget extends Base {
     const day = this.date.getDate();
     const week = this.date.getDay();
     this.dataSource = await getMonthDaysArray(year, month, day);
+    $calendarEvents = await getCalendarEvent(this.dataSource[0].date, this.dataSource[this.dataSource.length - 1].date);
     let thisWeekIndex = 0;
     this.dataSource.forEach((item: calendarInterface, index: number) => {
       if (item.date.getDate() === day) thisWeekIndex = index;
