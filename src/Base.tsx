@@ -31,6 +31,7 @@ class Base {
   }
 
   componentWillMountBefore = async (): Promise<void> => {
+    this.backgroundKey = `${this.name}_background`;
     const {getSetting} = useSetting(this.en);
     const fontColorLight = (await getSetting<string>('fontColorLight')) || this.fontColor;
     const fontColorDark = (await getSetting<string>('fontColorDark')) || this.fontColor;
@@ -51,7 +52,7 @@ class Base {
   prefix = 'boxjs.net';
   useBoxJS = true;
   BOX_CATCH_KEY = 'BoxJSData';
-  backgroundKey = `${this.name}_background`;
+  backgroundKey = '';
   render = async (): Promise<unknown> => false;
   componentWillMount = async (): Promise<void> => {};
   componentDidMount = async (): Promise<void> => {};
