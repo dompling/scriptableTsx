@@ -252,7 +252,7 @@ const CreateCalendarEvent: FC<{title: string; time: Date; color: string | Color 
         </wtext>
       </RowCenter>
       <RowCenter>
-        <wdate date={time} mode={'timer'} font={10} textColor={'#00bbbb'} />
+        <wdate date={time} mode={'timer'} font={10} textColor={'#00bbbb'} textAlign={'center'} />
       </RowCenter>
     </wstack>
   );
