@@ -155,11 +155,15 @@ const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterf
   const {data} = props;
   const {text, calendarEvent} = data || {};
   if (text) stackProps.flexDirection = 'column';
-  if (data?.selected) stackProps.background = '#006666';
   let textColor = props.color;
-  if (!data?.isThisMonth || data.weekNum === 0 || data.weekNum === 6) textColor = '#aaa';
-  if (data?.selected) textColor = '#fff';
-  if (data) stackProps.href = 'calshow://' + (data.date.getTime() - referenceTime);
+  if (!data) {
+    if (props.text === '周六' || props.text === '周日') textColor = '#aaa';
+  } else {
+    if (!data?.isThisMonth || data.weekNum === 0 || data.weekNum === 6) textColor = '#aaa';
+    stackProps.href = 'calshow://' + (data.date.getTime() - referenceTime);
+    if (data?.selected) stackProps.background = '#006666';
+    if (data?.selected) textColor = '#fff';
+  }
   return (
     <wstack {...stackProps} borderRadius={5} width={40} height={40} verticalAlign={'center'}>
       {text ? (
@@ -184,7 +188,7 @@ const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterf
           )}
         </>
       ) : (
-        <wtext font={16} textColor={props.color} textAlign={'center'}>
+        <wtext font={16} textColor={textColor} textAlign={'center'}>
           {props.text}
         </wtext>
       )}
@@ -314,12 +318,14 @@ class Widget extends Base {
   dataSource: any = [];
   useBoxJS = false;
 
-  componentDidMount = async () => {
+  componentWillMount = async () => {
     this.registerAction('下班时间', async () => {
       const options = {time: '17:30:00'};
       await this.showAlertCatchInput('下班时间', '设置下班结束时间', options, 'work');
     });
+  };
 
+  componentDidMount = async () => {
     const {getSetting} = useSetting(this.en);
     const time = (((await getSetting<{time: string}>('work')) || {}).time || '17:30:00').split(':');
     $calendar = await getCalendarJs();
@@ -349,7 +355,11 @@ class Widget extends Base {
       const start = thisWeekIndex - week;
       this.dataSource = this.dataSource.splice(start, 7);
     } else if (config.widgetFamily === 'small') {
-      this.dataSource = this.dataSource.splice(thisWeekIndex - 2, 3);
+      this.dataSource = [
+        this.dataSource[thisWeekIndex - 1],
+        this.dataSource[thisWeekIndex],
+        this.dataSource[thisWeekIndex + 1],
+      ];
       weeks = this.dataSource.map((item: calendarInterface) => item.weekDay);
     }
     const data: any[] = [[]];
