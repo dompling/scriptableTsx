@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1609146878492
+// @编译时间 1609148341469
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1259,7 +1259,7 @@ var CreateCalendarItem = (props) => {
   } else {
     if (!data?.isThisMonth || data.weekNum === 0 || data.weekNum === 6)
       textColor = "#aaa";
-    stackProps.href = "calshow://" + (data.date.getTime() - referenceTime);
+    stackProps.href = "calshow:" + (data.date.getTime() - referenceTime) / 1e3;
     if (data?.selected)
       stackProps.background = "#006666";
     if (data?.selected)
@@ -1330,17 +1330,17 @@ var CreateCalendarEvent = ({
     borderRadius: 4,
     width: 65,
     height: 35,
-    href: "calshow://" + (time.getTime() - referenceTime)
+    href: `calshow:${(time.getTime() - referenceTime) / 1e3}`
   }, /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
     font: 10,
     textColor: color
-  }, title)), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wdate", {
+  }, title)), /* @__PURE__ */ h("wdate", {
     date: time,
     mode: "timer",
     font: 10,
     textColor: "#00bbbb",
     textAlign: "center"
-  })));
+  }));
 };
 var RowCenter = ({children, ...props}) => {
   return /* @__PURE__ */ h("wstack", {

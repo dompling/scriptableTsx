@@ -160,7 +160,7 @@ const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterf
     if (props.text === '周六' || props.text === '周日') textColor = '#aaa';
   } else {
     if (!data?.isThisMonth || data.weekNum === 0 || data.weekNum === 6) textColor = '#aaa';
-    stackProps.href = 'calshow://' + (data.date.getTime() - referenceTime);
+    stackProps.href = 'calshow:' + (data.date.getTime() - referenceTime) / 1000;
     if (data?.selected) stackProps.background = '#006666';
     if (data?.selected) textColor = '#fff';
   }
@@ -244,16 +244,14 @@ const CreateCalendarEvent: FC<{title: string; time: Date; color: string | Color 
       borderRadius={4}
       width={65}
       height={35}
-      href={'calshow://' + (time.getTime() - referenceTime)}
+      href={`calshow:${(time.getTime() - referenceTime) / 1000}`}
     >
       <RowCenter>
         <wtext font={10} textColor={color}>
           {title}
         </wtext>
       </RowCenter>
-      <RowCenter>
-        <wdate date={time} mode={'timer'} font={10} textColor={'#00bbbb'} textAlign={'center'} />
-      </RowCenter>
+      <wdate date={time} mode={'timer'} font={10} textColor={'#00bbbb'} textAlign={'center'} />
     </wstack>
   );
 };
