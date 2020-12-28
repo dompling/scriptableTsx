@@ -5,20 +5,137 @@ import {request, useSetting} from '@app/lib/help';
 
 const en = 'CountDown';
 
-const weeks = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+let weeks = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+const referenceTime = new Date('2001/01/01').getTime();
 let $calendar: any = {};
-let $calendarEvent: CalendarEvent[] = [];
+
 const $eventsBtn: {
   title: string;
   time: Date;
 }[] = [];
-const curr = new Date();
-const today = curr.getDate();
+
+async function getNextCalendarEvent() {
+  const events = await CalendarEvent.thisWeek([]);
+  const nextWeek = await CalendarEvent.nextWeek([]);
+  events.push(...nextWeek);
+  return events
+    .filter(calendar => {
+      const diff = dateDiff(new Date(), calendar.endDate);
+      if (diff < 0) return false;
+      return !calendar.title.startsWith('Canceled:');
+    })
+    .map(item => ({title: item.title, time: item.startDate}))
+    .splice(0, 2);
+}
+
+function dateDiff(first: Date, second: Date) {
+  const firstDate: any = new Date(first.getFullYear(), first.getMonth(), first.getDate(), 0, 0, 0);
+  const secondDate: any = new Date(second.getFullYear(), second.getMonth(), second.getDate(), 0, 0, 0);
+  return Math.round((secondDate - firstDate) / (1000 * 60 * 60 * 24));
+}
+
+function getMonthDays(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function getWeekday(year: number, month: number, day: number | undefined) {
+  return new Date(year, month, day).getDay();
+}
+
+function getPreMonth(year: number, month: number) {
+  if (month === 0) return [year - 1, 11];
+  return [year, month - 1];
+}
+
+function getNextMonth(year: number, month: number) {
+  if (month === 11) return [year + 1, 0];
+  return [year, month + 1];
+}
+
+async function getMonthDaysArray(year: any, month: number, day: number) {
+  const dayArrays: calendarInterface[] = [];
+
+  const preMonth = getPreMonth(year, month);
+  const nextMonth = getNextMonth(year, month);
+
+  const days = getMonthDays(year, month),
+    preDays = getMonthDays(preMonth[0], preMonth[1]);
+  const thisMonthFirstDayInWeek = getWeekday(year, month, 1),
+    thisMonthLastDayInWeek = getWeekday(year, month, days);
+
+  //上月在当月日历面板中的排列
+  for (let i = 0; i < thisMonthFirstDayInWeek; i++) {
+    const date = new Date(preMonth[0], preMonth[1], i);
+    let lunar = $calendar.solar2lunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    lunar = lunar.IDayCn;
+    dayArrays.push({
+      date,
+      text: lunar,
+      day: preDays - thisMonthFirstDayInWeek + i + 1,
+      weekDay: weeks[i],
+      weekNum: i,
+      calendarEvent: await getCalendarEvent(date, i),
+    });
+  }
+  //当月日历面板中的排列
+  for (let i = 1; i <= days; i++) {
+    const weekDayFlag = (thisMonthFirstDayInWeek + i - 1) % 7;
+    const date = new Date(year, month, i);
+    let lunar = $calendar.solar2lunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    lunar = lunar.IDayCn;
+    dayArrays.push({
+      day: i,
+      date,
+      text: lunar,
+      weekDay: weeks[weekDayFlag],
+      selected: i === +day,
+      isThisMonth: true,
+      weekNum: weekDayFlag,
+      calendarEvent: await getCalendarEvent(date, i),
+    });
+  }
+  //下月在当月日历面板中的排列
+  for (let i = 1; i <= 6 - thisMonthLastDayInWeek; i++) {
+    const weekDayFlag = (thisMonthFirstDayInWeek + days + i - 1) % 7;
+    const date = new Date(nextMonth[0], nextMonth[1], i);
+    let lunar = $calendar.solar2lunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    lunar = lunar.IDayCn;
+    dayArrays.push({
+      date,
+      day: i,
+      text: lunar,
+      weekDay: weeks[weekDayFlag],
+      weekNum: weekDayFlag,
+      calendarEvent: await getCalendarEvent(date, i),
+    });
+  }
+  return dayArrays;
+}
+
+async function getCalendarEvent(date: Date, day: number | undefined): Promise<CalendarEvent | undefined> {
+  const nextMonth = getNextMonth(date.getFullYear(), date.getMonth());
+  const endDate = new Date(nextMonth[0], nextMonth[1], day);
+  endDate.setHours(23, 59, 59);
+  const events = await CalendarEvent.between(date, endDate);
+  const thisDay = date.getDate();
+  const thisMonth = date.getMonth();
+  return events.find(
+    event =>
+      event.startDate.getDate() === thisDay &&
+      event.startDate.getMonth() === thisMonth &&
+      event.calendar.title.includes('节假日'),
+  );
+}
 
 interface calendarInterface {
   date: Date;
-  lunar: string;
-  isToday: boolean;
+  day: number;
+  text: string;
+  weekDay: string;
+  selected?: boolean;
+  isThisMonth?: boolean;
+  weekNum: number;
+  calendarEvent?: CalendarEvent | undefined;
 }
 
 async function getCalendarJs() {
@@ -33,57 +150,35 @@ function evil(str: unknown) {
   return new Function('return ' + str)()();
 }
 
-async function getRangeCalendarEvent(start: Date, end: Date) {
-  const events = await CalendarEvent.between(start, end, []);
-  return events.filter(calendar => {
-    const diff = dateDiff(new Date(), calendar.endDate);
-    if (diff < 0) return false;
-    return !calendar.title.startsWith('Canceled:');
-  });
-}
-
-function dateDiff(first: Date, second: Date) {
-  const firstDate: any = new Date(first.getFullYear(), first.getMonth(), first.getDate(), 0, 0, 0);
-  const secondDate: any = new Date(second.getFullYear(), second.getMonth(), second.getDate(), 0, 0, 0);
-  return Math.round((secondDate - firstDate) / (1000 * 60 * 60 * 24));
-}
-
 const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterface}> = props => {
   const stackProps: WstackProps = {};
   const {data} = props;
-  let {lunar} = data || {};
-  if (lunar) stackProps.flexDirection = 'column';
-  if (data?.isToday) stackProps.background = '#006666';
-  const textColor = data?.isToday ? '#fff' : props.color;
-  let circle = '';
-  if (data?.date) {
-    $calendarEvent.forEach(item => {
-      const time = dateDiff(data?.date, item.startDate);
-      if (time === 0 && item.calendar.title.includes('节假日')) {
-        lunar = item.title;
-        circle = item.calendar.color.hex;
-      }
-    });
-  }
+  const {text, calendarEvent} = data || {};
+  if (text) stackProps.flexDirection = 'column';
+  if (data?.selected) stackProps.background = '#006666';
+  let textColor = props.color;
+  if (!data?.isThisMonth || data.weekNum === 0 || data.weekNum === 6) textColor = '#aaa';
+  if (data?.selected) textColor = '#fff';
+  if (data) stackProps.href = 'calshow://' + (data.date.getTime() - referenceTime);
   return (
     <wstack {...stackProps} borderRadius={5} width={40} height={40} verticalAlign={'center'}>
-      {lunar ? (
+      {text ? (
         <>
           <RowCenter>
-            <wtext font={16} textColor={textColor} textAlign={'center'}>
+            <wtext font={calendarEvent ? 10 : 16} textColor={textColor} textAlign={'center'}>
               {props.text}
             </wtext>
           </RowCenter>
           <RowCenter>
             <wtext font={7} textColor={textColor} textAlign={'center'}>
-              {lunar}
+              {calendarEvent ? calendarEvent.title : text}
             </wtext>
           </RowCenter>
-          {circle && (
+          {calendarEvent && (
             <>
               <wspacer length={2} />
               <RowCenter>
-                <wstack width={4} height={4} borderRadius={4} background={circle} />
+                <wstack width={4} height={4} borderRadius={4} background={`#${calendarEvent.calendar.color.hex}`} />
               </RowCenter>
             </>
           )}
@@ -109,22 +204,21 @@ const CreateCalendar: FC<{color: string; data: any[]}> = ({color, data}) => {
           </>
         ))}
       </RowCenter>
-      <wspacer />
-      {data.map(dataItem => {
+      <wspacer length={space} />
+      {data.map((dataItem, itemIndex) => {
         return (
           <>
             <RowCenter>
               {dataItem.map((item: any, index: number) => {
-                const textColor = index === 6 || index === 0 ? '#aaa' : color;
                 return (
                   <>
-                    <CreateCalendarItem color={textColor} text={`${item.date.getDate()}`} data={item} />
+                    <CreateCalendarItem color={color} text={`${item.date.getDate()}`} data={item} />
                     {index !== dataItem.length - 1 && <wspacer length={space} />}
                   </>
                 );
               })}
             </RowCenter>
-            <wspacer />
+            {itemIndex !== data.length - 1 && <wspacer length={space} />}
           </>
         );
       })}
@@ -146,6 +240,7 @@ const CreateCalendarEvent: FC<{title: string; time: Date; color: string | Color 
       borderRadius={4}
       width={65}
       height={35}
+      href={'calshow://' + (time.getTime() - referenceTime)}
     >
       <RowCenter>
         <wtext font={10} textColor={color}>
@@ -197,13 +292,17 @@ const StackHeader = (props: {color: string | Color | undefined}) => {
           {lunar}
         </wtext>
       </wstack>
-      <wspacer length={10} />
-      {events.map((item, index) => (
+      {config.widgetFamily !== 'small' && (
         <>
-          <CreateCalendarEvent color={props.color} time={item.time} title={item.title} />
-          {index !== events.length - 1 && <wspacer length={5} />}
+          <wspacer length={10} />
+          {events.map((item, index) => (
+            <>
+              <CreateCalendarEvent color={props.color} time={item.time} title={item.title} />
+              {index !== events.length - 1 && <wspacer length={5} />}
+            </>
+          ))}
         </>
-      ))}
+      )}
     </wstack>
   );
 };
@@ -212,15 +311,8 @@ class Widget extends Base {
   name = '休息日倒计时';
   en = en;
   date = new Date();
-  dataSource: any[] = [];
-  state = {
-    week: this.date.getDay() || 7,
-    friday: 0,
-    lunar: '',
-    today: '',
-  };
+  dataSource: any = [];
   useBoxJS = false;
-  private currentFriday: any;
 
   componentDidMount = async () => {
     this.registerAction('下班时间', async () => {
@@ -229,58 +321,47 @@ class Widget extends Base {
     });
 
     const {getSetting} = useSetting(this.en);
-    const time = ((await getSetting<{time: string}>('work')) || {}).time || '17:30:00';
-
+    const time = (((await getSetting<{time: string}>('work')) || {}).time || '17:30:00').split(':');
     $calendar = await getCalendarJs();
-    this.state.friday = 5 - this.state.week;
-    const {friday} = this.state;
-    const now = this.date.getTime();
-    this.currentFriday = new Date();
-    let currentFriday = now + Math.abs(friday) * 1000 * 60 * 60 * 24;
-    const event: any = {};
-    if (friday) {
-      event.title = '周五时间';
-    } else if (friday === 0) {
+    const day = this.date.getDay();
+    if (day > 0 && day < 6) {
+      const event: any = {};
       event.title = '下班时间';
-      const dateFormat = new DateFormatter();
-      dateFormat.dateFormat = 'YYYY/MM/dd ' + time;
-      const dateStr = dateFormat.string(this.currentFriday);
-      currentFriday = new Date(dateStr).getTime();
-    } else {
-      event.title = '休息结束';
+      this.date.setHours(parseInt(time[0]), parseInt(time[1]), parseInt(time[2]));
+      event.time = this.date;
+      $eventsBtn.push(event);
     }
-    this.currentFriday.setTime(currentFriday);
-    event.time = this.currentFriday;
-    $eventsBtn.push(event);
-    const weekOffset = config.widgetFamily === 'large' ? [-21, -14, -7, 0, 7] : [0];
-    this.dataSource = await this.createCalendar(weekOffset);
+    $eventsBtn.push(...(await getNextCalendarEvent()));
+    await this.createCalendar();
   };
 
-  createCalendar = async (weekOffset: number[]) => {
-    const range = weekOffset.length;
-    const data = [];
-    for (let i = 1; i <= range; i++) {
-      const dataItem: calendarInterface[] = [];
-      for (let col = 0; col < 7; col++) {
-        const offset = weekOffset[i - 1];
-        const dateOfFirstDayOfThisWeek = new Date(curr.setDate(curr.getDate() - curr.getDay()));
-        const day = new Date(dateOfFirstDayOfThisWeek.setDate(dateOfFirstDayOfThisWeek.getDate() + offset + col));
-        let lunar: any;
-        const year = day.getFullYear();
-        const month = day.getMonth() + 1;
-        const toDay = day.getDate();
-        lunar = $calendar.solar2lunar(year, month, toDay);
-        lunar = lunar.IDayCn;
-        dataItem.push({date: day, lunar, isToday: day.getDate() === today});
-      }
-      data.push(dataItem);
+  createCalendar = async () => {
+    const year = this.date.getFullYear();
+    const month = this.date.getMonth();
+    const day = this.date.getDate();
+    const week = this.date.getDay();
+    this.dataSource = await getMonthDaysArray(year, month, day);
+    let thisWeekIndex = 0;
+    this.dataSource.forEach((item: calendarInterface, index: number) => {
+      if (item.date.getDate() === day) thisWeekIndex = index;
+    });
+    if (config.widgetFamily === 'medium') {
+      const start = thisWeekIndex - week;
+      this.dataSource = this.dataSource.splice(start, 7);
+    } else if (config.widgetFamily === 'small') {
+      this.dataSource = this.dataSource.splice(thisWeekIndex - 2, 3);
+      weeks = this.dataSource.map((item: calendarInterface) => item.weekDay);
     }
-    $calendarEvent = await getRangeCalendarEvent(
-      data[0][0].date,
-      data[data.length - 1][data[data.length - 1].length - 1].date,
-    );
-    $eventsBtn.push(...$calendarEvent.map(item => ({title: item.title, time: item.startDate})));
-    return data;
+    const data: any[] = [[]];
+    let i = 0;
+    this.dataSource.forEach((item: any) => {
+      if (data[i].length === 7) {
+        i += 1;
+        data[i] = [];
+      }
+      data[i].push(item);
+    });
+    this.dataSource = data;
   };
 
   render = async (): Promise<unknown> => {
