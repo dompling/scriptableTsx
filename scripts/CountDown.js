@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：12/28/2020
+ * 更新时间：12/29/2020
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1609149057070
+// @编译时间 1609225094619
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1242,11 +1242,10 @@ function evil(str) {
 var CreateCalendarItem = (props) => {
   const stackProps = {};
   const {data} = props;
-  const {text} = data || {};
+  const {text, calendarEvent} = data || {};
   if (text)
     stackProps.flexDirection = "column";
   let textColor = props.color;
-  let calendarEvent;
   if (!data) {
     if (props.text === "周六" || props.text === "周日")
       textColor = "#aaa";
@@ -1258,34 +1257,36 @@ var CreateCalendarItem = (props) => {
       stackProps.background = "#006666";
     if (data?.selected)
       textColor = "#fff";
-    calendarEvent = $calendarEvents.find((item) => item.startDate.getDate() === data?.date.getDate() && item.startDate.getMonth() === data.date.getMonth());
   }
   return /* @__PURE__ */ h("wstack", {
+    flexDirection: "column",
+    verticalAlign: "center",
+    width: 40,
+    height: text ? 44 : 30
+  }, /* @__PURE__ */ h("wstack", {
     ...stackProps,
     borderRadius: 5,
     width: 40,
     height: 40,
     verticalAlign: "center"
   }, text ? /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
-    font: calendarEvent ? 10 : 16,
+    font: 16,
     textColor,
     textAlign: "center"
   }, props.text)), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
     font: 7,
     textColor,
     textAlign: "center"
-  }, calendarEvent ? calendarEvent.title : text)), calendarEvent && /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wspacer", {
-    length: 2
-  }), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wstack", {
-    width: 4,
-    height: 4,
-    borderRadius: 4,
-    background: `#${calendarEvent.calendar.color.hex}`
-  })))) : /* @__PURE__ */ h("wtext", {
+  }, calendarEvent ? calendarEvent.title : text))) : /* @__PURE__ */ h("wtext", {
     font: 16,
     textColor,
     textAlign: "center"
-  }, props.text));
+  }, props.text)), calendarEvent && config.widgetFamily !== "large" && /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wstack", {
+    width: 4,
+    height: 4,
+    background: `#${calendarEvent.calendar.color.hex}`,
+    borderRadius: 2
+  })));
 };
 var CreateCalendar = ({color, data}) => {
   const space = 5;
@@ -1298,7 +1299,7 @@ var CreateCalendar = ({color, data}) => {
     length: space
   })))), /* @__PURE__ */ h("wspacer", {
     length: space
-  }), data.map((dataItem, itemIndex) => {
+  }), data.map((dataItem) => {
     return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(RowCenter, null, dataItem.map((item, index) => {
       return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(CreateCalendarItem, {
         color,
@@ -1307,9 +1308,7 @@ var CreateCalendar = ({color, data}) => {
       }), index !== dataItem.length - 1 && /* @__PURE__ */ h("wspacer", {
         length: space
       }));
-    })), itemIndex !== data.length - 1 && /* @__PURE__ */ h("wspacer", {
-      length: space
-    }));
+    })));
   }));
 };
 var CreateCalendarEvent = ({
@@ -1417,9 +1416,11 @@ var Widget = class extends Base_default {
       this.dataSource = await getMonthDaysArray(year, month, day);
       $calendarEvents = await getCalendarEvent(this.dataSource[0].date, this.dataSource[this.dataSource.length - 1].date);
       let thisWeekIndex = 0;
-      this.dataSource.forEach((item, index) => {
+      this.dataSource = this.dataSource.map((item, index) => {
         if (item.date.getDate() === day)
           thisWeekIndex = index;
+        const calendarEvent = $calendarEvents.find((event) => event.startDate.getDate() === item.date.getDate() && event.startDate.getMonth() === item.date.getMonth());
+        return {...item, calendarEvent};
       });
       if (config.widgetFamily === "medium") {
         const start = thisWeekIndex - week;

@@ -141,10 +141,9 @@ function evil(str: unknown) {
 const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterface}> = props => {
   const stackProps: WstackProps = {};
   const {data} = props;
-  const {text} = data || {};
+  const {text, calendarEvent} = data || {};
   if (text) stackProps.flexDirection = 'column';
   let textColor = props.color;
-  let calendarEvent;
   if (!data) {
     if (props.text === '周六' || props.text === '周日') textColor = '#aaa';
   } else {
@@ -152,38 +151,34 @@ const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterf
     stackProps.href = 'calshow:' + (data.date.getTime() - referenceTime) / 1000;
     if (data?.selected) stackProps.background = '#006666';
     if (data?.selected) textColor = '#fff';
-    calendarEvent = $calendarEvents.find(
-      item => item.startDate.getDate() === data?.date.getDate() && item.startDate.getMonth() === data.date.getMonth(),
-    );
   }
 
   return (
-    <wstack {...stackProps} borderRadius={5} width={40} height={40} verticalAlign={'center'}>
-      {text ? (
-        <>
-          <RowCenter>
-            <wtext font={calendarEvent ? 10 : 16} textColor={textColor} textAlign={'center'}>
-              {props.text}
-            </wtext>
-          </RowCenter>
-          <RowCenter>
-            <wtext font={7} textColor={textColor} textAlign={'center'}>
-              {calendarEvent ? calendarEvent.title : text}
-            </wtext>
-          </RowCenter>
-          {calendarEvent && (
-            <>
-              <wspacer length={2} />
-              <RowCenter>
-                <wstack width={4} height={4} borderRadius={4} background={`#${calendarEvent.calendar.color.hex}`} />
-              </RowCenter>
-            </>
-          )}
-        </>
-      ) : (
-        <wtext font={16} textColor={textColor} textAlign={'center'}>
-          {props.text}
-        </wtext>
+    <wstack flexDirection={'column'} verticalAlign={'center'} width={40} height={text ? 44 : 30}>
+      <wstack {...stackProps} borderRadius={5} width={40} height={40} verticalAlign={'center'}>
+        {text ? (
+          <>
+            <RowCenter>
+              <wtext font={16} textColor={textColor} textAlign={'center'}>
+                {props.text}
+              </wtext>
+            </RowCenter>
+            <RowCenter>
+              <wtext font={7} textColor={textColor} textAlign={'center'}>
+                {calendarEvent ? calendarEvent.title : text}
+              </wtext>
+            </RowCenter>
+          </>
+        ) : (
+          <wtext font={16} textColor={textColor} textAlign={'center'}>
+            {props.text}
+          </wtext>
+        )}
+      </wstack>
+      {calendarEvent && config.widgetFamily !== 'large' && (
+        <RowCenter>
+          <wstack width={4} height={4} background={`#${calendarEvent.calendar.color.hex}`} borderRadius={2} />
+        </RowCenter>
       )}
     </wstack>
   );
@@ -202,7 +197,7 @@ const CreateCalendar: FC<{color: string; data: any[]}> = ({color, data}) => {
         ))}
       </RowCenter>
       <wspacer length={space} />
-      {data.map((dataItem, itemIndex) => {
+      {data.map(dataItem => {
         return (
           <>
             <RowCenter>
@@ -215,7 +210,6 @@ const CreateCalendar: FC<{color: string; data: any[]}> = ({color, data}) => {
                 );
               })}
             </RowCenter>
-            {itemIndex !== data.length - 1 && <wspacer length={space} />}
           </>
         );
       })}
@@ -340,8 +334,13 @@ class Widget extends Base {
     this.dataSource = await getMonthDaysArray(year, month, day);
     $calendarEvents = await getCalendarEvent(this.dataSource[0].date, this.dataSource[this.dataSource.length - 1].date);
     let thisWeekIndex = 0;
-    this.dataSource.forEach((item: calendarInterface, index: number) => {
+    this.dataSource = this.dataSource.map((item: calendarInterface, index: number) => {
       if (item.date.getDate() === day) thisWeekIndex = index;
+      const calendarEvent = $calendarEvents.find(
+        event =>
+          event.startDate.getDate() === item.date.getDate() && event.startDate.getMonth() === item.date.getMonth(),
+      );
+      return {...item, calendarEvent};
     });
     if (config.widgetFamily === 'medium') {
       const start = thisWeekIndex - week;
