@@ -74,7 +74,7 @@ interface covid_19NewsItem {
 }
 
 const addumFont = 12;
-const viewColor = '#aaa';
+const viewColor = '#000';
 /**横向居中组件*/
 const RowCenter: FC<WstackProps> = ({children, ...props}) => {
   return (
