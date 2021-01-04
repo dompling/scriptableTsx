@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1609722285117
+// @编译时间 1609722459984
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1140,7 +1140,7 @@ var Base_default = Base;
 
 // src/pages/COVID-19.tsx
 var addumFont = 12;
-var viewColor = "#aaa";
+var viewColor = "#000";
 var RowCenter = ({children, ...props}) => {
   return /* @__PURE__ */ h("wstack", {
     ...props
