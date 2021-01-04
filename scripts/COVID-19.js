@@ -5,17 +5,17 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：12/28/2020
+ * 更新时间：1/4/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1609144950117
+// @编译时间 1609722285117
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-    
+
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {
@@ -1140,6 +1140,7 @@ var Base_default = Base;
 
 // src/pages/COVID-19.tsx
 var addumFont = 12;
+var viewColor = "#aaa";
 var RowCenter = ({children, ...props}) => {
   return /* @__PURE__ */ h("wstack", {
     ...props
@@ -1217,7 +1218,7 @@ var Widget = class extends Base_default {
         background: data.bg
       }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
         font: addumFont,
-        textColor: this.fontColor
+        textColor: viewColor
       }, "较上日"), /* @__PURE__ */ h("wtext", {
         font: addumFont,
         textColor: data.color
@@ -1229,7 +1230,7 @@ var Widget = class extends Base_default {
         length: 2
       }), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
         font: addumFont,
-        textColor: this.fontColor
+        textColor: viewColor
       }, data.tabText)), /* @__PURE__ */ h("wspacer", null));
     };
     this.render = async () => {
@@ -1327,16 +1328,16 @@ var Widget = class extends Base_default {
         verticalAlign: "center"
       }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wtext", {
         font: addumFont,
-        textColor: this.fontColor
+        textColor: viewColor
       }, this.city?.confirm_add || "0", "新增"), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wtext", {
         font: addumFont,
-        textColor: this.fontColor
+        textColor: viewColor
       }, this.city?.confirm || "0", "确诊"), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wtext", {
         font: addumFont,
-        textColor: this.fontColor
+        textColor: viewColor
       }, this.city?.heal || "0", "治愈"), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wtext", {
         font: addumFont,
-        textColor: this.fontColor
+        textColor: viewColor
       }, this.city?.dead || "0", "死亡"), /* @__PURE__ */ h("wspacer", null)))), this.news && /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wspacer", {
         length: 5
       }), /* @__PURE__ */ h("wstack", {

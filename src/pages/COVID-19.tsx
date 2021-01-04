@@ -74,6 +74,7 @@ interface covid_19NewsItem {
 }
 
 const addumFont = 12;
+const viewColor = '#aaa';
 /**横向居中组件*/
 const RowCenter: FC<WstackProps> = ({children, ...props}) => {
   return (
@@ -200,7 +201,7 @@ class Widget extends Base {
       <wstack flexDirection={'column'} background={data.bg}>
         <wspacer />
         <RowCenter>
-          <wtext font={addumFont} textColor={this.fontColor}>
+          <wtext font={addumFont} textColor={viewColor}>
             较上日
           </wtext>
           <wtext font={addumFont} textColor={data.color}>
@@ -213,7 +214,7 @@ class Widget extends Base {
         </RowCenter>
         <wspacer length={2} />
         <RowCenter>
-          <wtext font={addumFont} textColor={this.fontColor}>
+          <wtext font={addumFont} textColor={viewColor}>
             {data.tabText}
           </wtext>
         </RowCenter>
@@ -306,19 +307,19 @@ class Widget extends Base {
               <wspacer length={5} />
               <wstack verticalAlign={'center'}>
                 <wspacer />
-                <wtext font={addumFont} textColor={this.fontColor}>
+                <wtext font={addumFont} textColor={viewColor}>
                   {this.city?.confirm_add || '0'}新增
                 </wtext>
                 <wspacer />
-                <wtext font={addumFont} textColor={this.fontColor}>
+                <wtext font={addumFont} textColor={viewColor}>
                   {this.city?.confirm || '0'}确诊
                 </wtext>
                 <wspacer />
-                <wtext font={addumFont} textColor={this.fontColor}>
+                <wtext font={addumFont} textColor={viewColor}>
                   {this.city?.heal || '0'}治愈
                 </wtext>
                 <wspacer />
-                <wtext font={addumFont} textColor={this.fontColor}>
+                <wtext font={addumFont} textColor={viewColor}>
                   {this.city?.dead || '0'}死亡
                 </wtext>
                 <wspacer />
