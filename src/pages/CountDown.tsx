@@ -152,11 +152,10 @@ const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterf
     if (data?.selected) stackProps.background = '#006666';
     if (data?.selected) textColor = '#fff';
   }
-  const height = text ? (config.widgetFamily === 'large' ? 37 : 44) : 30;
-  const width = text ? height : 40;
+
   return (
-    <wstack flexDirection={'column'} verticalAlign={'center'} width={40} height={height}>
-      <wstack {...stackProps} borderRadius={5} width={width} height={height} verticalAlign={'center'}>
+    <wstack flexDirection={'column'} verticalAlign={'center'} width={36} height={text ? 40 : 30}>
+      <wstack {...stackProps} borderRadius={5} width={36} height={36} verticalAlign={'center'}>
         {text ? (
           <>
             <RowCenter>
