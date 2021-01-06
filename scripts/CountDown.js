@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1609923041166
+// @编译时间 1609924475131
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1258,29 +1258,33 @@ var CreateCalendarItem = (props) => {
     if (data?.selected)
       textColor = "#fff";
   }
-  const height = text ? config.widgetFamily === "large" ? 37 : 44 : 30;
-  const width = text ? height : 40;
   return /* @__PURE__ */ h("wstack", {
     flexDirection: "column",
     verticalAlign: "center",
-    width: 40,
-    height
+    width: text ? 30 : 34,
+    height: text ? 34 : 30
   }, /* @__PURE__ */ h("wstack", {
     ...stackProps,
     borderRadius: 5,
-    width,
-    height,
+    width: 30,
+    height: 30,
     verticalAlign: "center"
-  }, text ? /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
-    font: 16,
+  }, text ? /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wstack", {
+    width: 30,
+    height: 15
+  }, /* @__PURE__ */ h("wtext", {
+    font: 12,
     textColor,
     textAlign: "center"
-  }, day)), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
+  }, day)), /* @__PURE__ */ h("wstack", {
+    width: 30,
+    height: 15
+  }, /* @__PURE__ */ h("wtext", {
     font: 7,
     textColor,
     textAlign: "center"
   }, calendarEvent ? calendarEvent.title : text))) : /* @__PURE__ */ h("wtext", {
-    font: 16,
+    font: 14,
     textColor,
     textAlign: "center"
   }, props.text)), calendarEvent && config.widgetFamily !== "large" && /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wstack", {
@@ -1291,25 +1295,20 @@ var CreateCalendarItem = (props) => {
   })));
 };
 var CreateCalendar = ({color, data}) => {
-  const space = 5;
   return /* @__PURE__ */ h(RowCenter, {
     flexDirection: "column"
   }, /* @__PURE__ */ h(RowCenter, null, weeks.map((week, index) => /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(CreateCalendarItem, {
     color,
     text: week
-  }), index !== weeks.length - 1 && /* @__PURE__ */ h("wspacer", {
-    length: space
-  })))), /* @__PURE__ */ h("wspacer", {
-    length: space
+  }), index !== weeks.length - 1 && /* @__PURE__ */ h("wspacer", null)))), /* @__PURE__ */ h("wspacer", {
+    length: 5
   }), data.map((dataItem) => {
     return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(RowCenter, null, dataItem.map((item, index) => {
       return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(CreateCalendarItem, {
         color,
         text: `${item.date.getDate()}`,
         data: item
-      }), index !== dataItem.length - 1 && /* @__PURE__ */ h("wspacer", {
-        length: space
-      }));
+      }), index !== dataItem.length - 1 && /* @__PURE__ */ h("wspacer", null));
     })));
   }));
 };

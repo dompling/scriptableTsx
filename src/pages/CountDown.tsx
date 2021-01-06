@@ -154,23 +154,23 @@ const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterf
   }
 
   return (
-    <wstack flexDirection={'column'} verticalAlign={'center'} width={36} height={text ? 40 : 30}>
-      <wstack {...stackProps} borderRadius={5} width={36} height={36} verticalAlign={'center'}>
+    <wstack flexDirection={'column'} verticalAlign={'center'} width={text ? 30 : 34} height={text ? 34 : 30}>
+      <wstack {...stackProps} borderRadius={5} width={30} height={30} verticalAlign={'center'}>
         {text ? (
           <>
-            <RowCenter>
-              <wtext font={16} textColor={textColor} textAlign={'center'}>
+            <wstack width={30} height={15}>
+              <wtext font={12} textColor={textColor} textAlign={'center'}>
                 {day}
               </wtext>
-            </RowCenter>
-            <RowCenter>
+            </wstack>
+            <wstack width={30} height={15}>
               <wtext font={7} textColor={textColor} textAlign={'center'}>
                 {calendarEvent ? calendarEvent.title : text}
               </wtext>
-            </RowCenter>
+            </wstack>
           </>
         ) : (
-          <wtext font={16} textColor={textColor} textAlign={'center'}>
+          <wtext font={14} textColor={textColor} textAlign={'center'}>
             {props.text}
           </wtext>
         )}
@@ -185,18 +185,17 @@ const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterf
 };
 
 const CreateCalendar: FC<{color: string; data: any[]}> = ({color, data}) => {
-  const space = 5;
   return (
     <RowCenter flexDirection={'column'}>
       <RowCenter>
         {weeks.map((week, index) => (
           <>
             <CreateCalendarItem color={color} text={week} />
-            {index !== weeks.length - 1 && <wspacer length={space} />}
+            {index !== weeks.length - 1 && <wspacer />}
           </>
         ))}
       </RowCenter>
-      <wspacer length={space} />
+      <wspacer length={5} />
       {data.map(dataItem => {
         return (
           <>
@@ -205,7 +204,7 @@ const CreateCalendar: FC<{color: string; data: any[]}> = ({color, data}) => {
                 return (
                   <>
                     <CreateCalendarItem color={color} text={`${item.date.getDate()}`} data={item} />
-                    {index !== dataItem.length - 1 && <wspacer length={space} />}
+                    {index !== dataItem.length - 1 && <wspacer />}
                   </>
                 );
               })}
