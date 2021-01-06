@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：12/29/2020
+ * 更新时间：1/6/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1609225578625
+// @编译时间 1609923041166
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1242,7 +1242,7 @@ function evil(str) {
 var CreateCalendarItem = (props) => {
   const stackProps = {};
   const {data} = props;
-  const {text, calendarEvent} = data || {};
+  const {text, calendarEvent, day} = data || {};
   if (text)
     stackProps.flexDirection = "column";
   let textColor = props.color;
@@ -1258,22 +1258,24 @@ var CreateCalendarItem = (props) => {
     if (data?.selected)
       textColor = "#fff";
   }
+  const height = text ? config.widgetFamily === "large" ? 37 : 44 : 30;
+  const width = text ? height : 40;
   return /* @__PURE__ */ h("wstack", {
     flexDirection: "column",
     verticalAlign: "center",
     width: 40,
-    height: text ? 44 : 30
+    height
   }, /* @__PURE__ */ h("wstack", {
     ...stackProps,
     borderRadius: 5,
-    width: 40,
-    height: 40,
+    width,
+    height,
     verticalAlign: "center"
   }, text ? /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
     font: 16,
     textColor,
     textAlign: "center"
-  }, props.text)), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
+  }, day)), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
     font: 7,
     textColor,
     textAlign: "center"
@@ -1417,13 +1419,14 @@ var Widget = class extends Base_default {
       $calendarEvents = await getCalendarEvent(this.dataSource[0].date, this.dataSource[this.dataSource.length - 1].date);
       let thisWeekIndex = 0;
       this.dataSource = this.dataSource.map((item, index) => {
-        if (item.date.getDate() === day)
+        if (item.date.getDate() === day && item.date.getMonth() === month)
           thisWeekIndex = index;
         const calendarEvent = $calendarEvents.find((event) => event.startDate.getDate() === item.date.getDate() && event.startDate.getMonth() === item.date.getMonth());
         return {...item, calendarEvent};
       });
       if (config.widgetFamily === "medium") {
         const start = thisWeekIndex - week;
+        console.log(thisWeekIndex);
         this.dataSource = this.dataSource.splice(start, 7);
       } else if (config.widgetFamily === "small") {
         this.dataSource = [
@@ -1433,6 +1436,7 @@ var Widget = class extends Base_default {
         ];
         weeks = this.dataSource.map((item) => item.weekDay);
       }
+      console.log(this.dataSource);
       const data = [[]];
       let i = 0;
       this.dataSource.forEach((item) => {

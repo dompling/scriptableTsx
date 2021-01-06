@@ -141,7 +141,7 @@ function evil(str: unknown) {
 const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterface}> = props => {
   const stackProps: WstackProps = {};
   const {data} = props;
-  const {text, calendarEvent} = data || {};
+  const {text, calendarEvent, day} = data || {};
   if (text) stackProps.flexDirection = 'column';
   let textColor = props.color;
   if (!data) {
@@ -152,15 +152,16 @@ const CreateCalendarItem: FC<{text: string; color: string; data?: calendarInterf
     if (data?.selected) stackProps.background = '#006666';
     if (data?.selected) textColor = '#fff';
   }
-
+  const height = text ? (config.widgetFamily === 'large' ? 37 : 44) : 30;
+  const width = text ? height : 40;
   return (
-    <wstack flexDirection={'column'} verticalAlign={'center'} width={40} height={text ? 44 : 30}>
-      <wstack {...stackProps} borderRadius={5} width={40} height={40} verticalAlign={'center'}>
+    <wstack flexDirection={'column'} verticalAlign={'center'} width={40} height={height}>
+      <wstack {...stackProps} borderRadius={5} width={width} height={height} verticalAlign={'center'}>
         {text ? (
           <>
             <RowCenter>
               <wtext font={16} textColor={textColor} textAlign={'center'}>
-                {props.text}
+                {day}
               </wtext>
             </RowCenter>
             <RowCenter>
@@ -335,7 +336,7 @@ class Widget extends Base {
     $calendarEvents = await getCalendarEvent(this.dataSource[0].date, this.dataSource[this.dataSource.length - 1].date);
     let thisWeekIndex = 0;
     this.dataSource = this.dataSource.map((item: calendarInterface, index: number) => {
-      if (item.date.getDate() === day) thisWeekIndex = index;
+      if (item.date.getDate() === day && item.date.getMonth() === month) thisWeekIndex = index;
       const calendarEvent = $calendarEvents.find(
         event =>
           event.startDate.getDate() === item.date.getDate() && event.startDate.getMonth() === item.date.getMonth(),
@@ -344,6 +345,7 @@ class Widget extends Base {
     });
     if (config.widgetFamily === 'medium') {
       const start = thisWeekIndex - week;
+      console.log(thisWeekIndex);
       this.dataSource = this.dataSource.splice(start, 7);
     } else if (config.widgetFamily === 'small') {
       this.dataSource = [
@@ -353,6 +355,8 @@ class Widget extends Base {
       ];
       weeks = this.dataSource.map((item: calendarInterface) => item.weekDay);
     }
+    console.log(this.dataSource);
+
     const data: any[] = [[]];
     let i = 0;
     this.dataSource.forEach((item: any) => {
