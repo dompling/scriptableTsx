@@ -121,6 +121,7 @@ class Base {
       func: async (): Promise<void> => {
         await this.setImage(null, `${this.backgroundKey}_light`);
         await this.setImage(null, `${this.backgroundKey}_night`);
+        await this.setImage(null, this.backgroundKey);
       },
     },
     ...(this.useBoxJS
@@ -238,14 +239,16 @@ class Base {
   };
 
   setImage = async (img: Image | null, key: string, notify = true): Promise<void> => {
-    const path = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + key + '.jpg');
+    const path = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), '/images');
+    if (!FILE_MGR_LOCAL.fileExists(path)) FILE_MGR_LOCAL.createDirectory(path, true);
+    const imgPath = FILE_MGR_LOCAL.joinPath(path, `img_${key}.jpg`);
     if (!img) {
       // 移除背景
-      if (FILE_MGR_LOCAL.fileExists(path)) FILE_MGR_LOCAL.remove(path);
+      if (FILE_MGR_LOCAL.fileExists(imgPath)) FILE_MGR_LOCAL.remove(imgPath);
     } else {
       // 设置背景
       // 全部设置一遍，
-      FILE_MGR_LOCAL.writeImage(path, img);
+      FILE_MGR_LOCAL.writeImage(imgPath, img);
     }
     if (notify) await showNotification({title: this.name, body: '设置生效，稍后刷新', sound: 'alert'});
   };
@@ -255,9 +258,12 @@ class Base {
     const light = `${this.backgroundKey}_light`;
     const dark = `${this.backgroundKey}_dark`;
     const isNight = Device.isUsingDarkAppearance();
-    const path1 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + light + '.jpg');
-    const path2 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + dark + '.jpg');
-    const path3 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), 'bg_' + this.backgroundKey + '.jpg');
+    const path1 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), '/images/img_' + light + '.jpg');
+    const path2 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), '/images/img_' + dark + '.jpg');
+    const path3 = FILE_MGR_LOCAL.joinPath(
+      FILE_MGR_LOCAL.documentsDirectory(),
+      '/images/img_' + this.backgroundKey + '.jpg',
+    );
     if (!FILE_MGR_LOCAL.fileExists(path3)) {
       if (isNight) {
         if (FILE_MGR_LOCAL.fileExists(path1)) {
@@ -275,13 +281,14 @@ class Base {
     } else {
       result = Image.fromFile(path3);
     }
-    if (this.opacity && result) return this.shadowImage(result, '#000000', parseFloat(this.opacity));
+    if (parseFloat(this.opacity) && result) {
+      return this.shadowImage(result, '#000000', parseFloat(this.opacity));
+    }
     return result;
   };
 
-  shadowImage(img: Image | undefined, color = '#000000', opacity?: number): Image | undefined {
-    if (!img || !opacity) return;
-    if (opacity === 0) return img;
+  shadowImage(img: Image, color = '#000000', opacity?: number): Image | undefined {
+    if (!opacity || opacity === 0) return img;
     const ctx: DrawContext = new DrawContext();
     // 获取图片的尺寸
     ctx.size = img.size;

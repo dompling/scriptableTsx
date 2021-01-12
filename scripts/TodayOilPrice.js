@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1610429997211
+// @编译时间 1610433027162
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -898,6 +898,7 @@ var Base = class {
         func: async () => {
           await this.setImage(null, `${this.backgroundKey}_light`);
           await this.setImage(null, `${this.backgroundKey}_night`);
+          await this.setImage(null, this.backgroundKey);
         }
       },
       ...this.useBoxJS ? [
@@ -990,12 +991,15 @@ var Base = class {
       }
     };
     this.setImage = async (img, key, notify = true) => {
-      const path = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "bg_" + key + ".jpg");
+      const path = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "/images");
+      if (!FILE_MGR_LOCAL.fileExists(path))
+        FILE_MGR_LOCAL.createDirectory(path, true);
+      const imgPath = FILE_MGR_LOCAL.joinPath(path, `img_${key}.jpg`);
       if (!img) {
-        if (FILE_MGR_LOCAL.fileExists(path))
-          FILE_MGR_LOCAL.remove(path);
+        if (FILE_MGR_LOCAL.fileExists(imgPath))
+          FILE_MGR_LOCAL.remove(imgPath);
       } else {
-        FILE_MGR_LOCAL.writeImage(path, img);
+        FILE_MGR_LOCAL.writeImage(imgPath, img);
       }
       if (notify)
         await showNotification({title: this.name, body: "设置生效，稍后刷新", sound: "alert"});
@@ -1005,9 +1009,9 @@ var Base = class {
       const light = `${this.backgroundKey}_light`;
       const dark = `${this.backgroundKey}_dark`;
       const isNight = Device.isUsingDarkAppearance();
-      const path1 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "bg_" + light + ".jpg");
-      const path2 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "bg_" + dark + ".jpg");
-      const path3 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "bg_" + this.backgroundKey + ".jpg");
+      const path1 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "/images/img_" + light + ".jpg");
+      const path2 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "/images/img_" + dark + ".jpg");
+      const path3 = FILE_MGR_LOCAL.joinPath(FILE_MGR_LOCAL.documentsDirectory(), "/images/img_" + this.backgroundKey + ".jpg");
       if (!FILE_MGR_LOCAL.fileExists(path3)) {
         if (isNight) {
           if (FILE_MGR_LOCAL.fileExists(path1)) {
@@ -1025,8 +1029,9 @@ var Base = class {
       } else {
         result = Image.fromFile(path3);
       }
-      if (this.opacity && result)
+      if (parseFloat(this.opacity) && result) {
         return this.shadowImage(result, "#000000", parseFloat(this.opacity));
+      }
       return result;
     };
     this.registerAction = (title2, func) => {
@@ -1121,9 +1126,7 @@ var Base = class {
     return await alert.presentAlert();
   }
   shadowImage(img, color = "#000000", opacity) {
-    if (!img || !opacity)
-      return;
-    if (opacity === 0)
+    if (!opacity || opacity === 0)
       return img;
     const ctx = new DrawContext();
     ctx.size = img.size;
