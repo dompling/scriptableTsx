@@ -5,17 +5,17 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：1/6/2021
+ * 更新时间：1/12/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1609924475131
+// @编译时间 1610429997211
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-
+    
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {
@@ -812,7 +812,7 @@ var FILE_MGR_LOCAL = fm();
 var Base = class {
   constructor() {
     this.componentWillMountBefore = async () => {
-      this.backgroundKey = `${this.name}_background`;
+      this.backgroundKey = `${this.en}_background`;
       const {getSetting} = useSetting(this.en);
       const fontColorLight = await getSetting("fontColorLight") || this.fontColor;
       const fontColorDark = await getSetting("fontColorDark") || this.fontColor;
@@ -1313,10 +1313,10 @@ var CreateCalendar = ({color, data}) => {
   }));
 };
 var CreateCalendarEvent = ({
-                             color,
-                             time,
-                             title
-                           }) => {
+  color,
+  time,
+  title
+}) => {
   return /* @__PURE__ */ h("wstack", {
     flexDirection: "column",
     verticalAlign: "center",

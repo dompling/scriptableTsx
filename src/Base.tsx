@@ -31,7 +31,7 @@ class Base {
   }
 
   componentWillMountBefore = async (): Promise<void> => {
-    this.backgroundKey = `${this.name}_background`;
+    this.backgroundKey = `${this.en}_background`;
     const {getSetting} = useSetting(this.en);
     const fontColorLight = (await getSetting<string>('fontColorLight')) || this.fontColor;
     const fontColorDark = (await getSetting<string>('fontColorDark')) || this.fontColor;

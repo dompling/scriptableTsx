@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：12/28/2020
+ * 更新时间：1/12/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1609144950117
+// @编译时间 1610429997211
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -812,7 +812,7 @@ var FILE_MGR_LOCAL = fm();
 var Base = class {
   constructor() {
     this.componentWillMountBefore = async () => {
-      this.backgroundKey = `${this.name}_background`;
+      this.backgroundKey = `${this.en}_background`;
       const {getSetting: getSetting2} = useSetting(this.en);
       const fontColorLight = await getSetting2("fontColorLight") || this.fontColor;
       const fontColorDark = await getSetting2("fontColorDark") || this.fontColor;
