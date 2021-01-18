@@ -37,9 +37,11 @@ class Base {
     const fontColorDark = (await getSetting<string>('fontColorDark')) || this.fontColor;
     this.fontColor = Device.isUsingDarkAppearance() ? fontColorDark : fontColorLight;
 
-    const backgroundColorLight = (await getSetting<string>('backgroundColorLight')) || this.backgroundColor;
-    const backgroundColorDark = (await getSetting<string>('backgroundColorDark')) || this.backgroundColor;
-    this.backgroundColor = Device.isUsingDarkAppearance() ? backgroundColorDark : backgroundColorLight;
+    const backgroundColorLight = (await getSetting<string>('backgroundColorLight')) || '#fff';
+    const backgroundColorDark = (await getSetting<string>('backgroundColorDark')) || '#000';
+    this.backgroundColor = Device.isUsingDarkAppearance()
+      ? this.getBackgroundColor(backgroundColorDark)
+      : this.getBackgroundColor(backgroundColorLight);
 
     const opacityLight = (await getSetting<string>('opacityLight')) || this.opacity;
     const opacityDark = (await getSetting<string>('opacityDark')) || this.opacity;
@@ -56,7 +58,7 @@ class Base {
   render = async (): Promise<unknown> => false;
   componentWillMount = async (): Promise<void> => {};
   componentDidMount = async (): Promise<void> => {};
-  backgroundColor: string = Device.isUsingDarkAppearance() ? '#000' : '#fff';
+  backgroundColor: string | LinearGradient | undefined;
   fontColor: string = Device.isUsingDarkAppearance() ? '#fff' : '#000';
   opacity: string = Device.isUsingDarkAppearance() ? '0.7' : '0.4';
 
@@ -177,6 +179,22 @@ class Base {
       },
     },
   ];
+
+  getBackgroundColor = (color: string): string | LinearGradient => {
+    const colors = color.split(',');
+    if (colors.length > 0) {
+      const locations: number[] = [];
+      const linearColor = new LinearGradient();
+      const cLen = colors.length;
+      linearColor.colors = colors.map((item, index) => {
+        locations.push(Math.floor(((index + 1) / cLen) * 100) / 100);
+        return new Color(item, 1);
+      });
+      linearColor.locations = locations;
+      return linearColor;
+    }
+    return color;
+  };
 
   setLightAndDark = async (title: string, desc: string | false, key: string): Promise<void> => {
     try {

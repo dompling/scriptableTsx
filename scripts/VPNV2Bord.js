@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：1/12/2021
+ * 更新时间：1/18/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1610433955514
+// @编译时间 1610936786347
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -817,9 +817,9 @@ var Base = class {
       const fontColorLight = await getSetting2("fontColorLight") || this.fontColor;
       const fontColorDark = await getSetting2("fontColorDark") || this.fontColor;
       this.fontColor = Device.isUsingDarkAppearance() ? fontColorDark : fontColorLight;
-      const backgroundColorLight = await getSetting2("backgroundColorLight") || this.backgroundColor;
-      const backgroundColorDark = await getSetting2("backgroundColorDark") || this.backgroundColor;
-      this.backgroundColor = Device.isUsingDarkAppearance() ? backgroundColorDark : backgroundColorLight;
+      const backgroundColorLight = await getSetting2("backgroundColorLight") || "#fff";
+      const backgroundColorDark = await getSetting2("backgroundColorDark") || "#000";
+      this.backgroundColor = Device.isUsingDarkAppearance() ? this.getBackgroundColor(backgroundColorDark) : this.getBackgroundColor(backgroundColorLight);
       const opacityLight = await getSetting2("opacityLight") || this.opacity;
       const opacityDark = await getSetting2("opacityDark") || this.opacity;
       this.opacity = Device.isUsingDarkAppearance() ? opacityDark : opacityLight;
@@ -836,7 +836,6 @@ var Base = class {
     };
     this.componentDidMount = async () => {
     };
-    this.backgroundColor = Device.isUsingDarkAppearance() ? "#000" : "#fff";
     this.fontColor = Device.isUsingDarkAppearance() ? "#fff" : "#000";
     this.opacity = Device.isUsingDarkAppearance() ? "0.7" : "0.4";
     this.updateInterval = async () => {
@@ -954,6 +953,21 @@ var Base = class {
         }
       }
     ];
+    this.getBackgroundColor = (color) => {
+      const colors = color.split(",");
+      if (colors.length > 0) {
+        const locations = [];
+        const linearColor = new LinearGradient();
+        const cLen = colors.length;
+        linearColor.colors = colors.map((item, index) => {
+          locations.push(Math.floor((index + 1) / cLen * 100) / 100);
+          return new Color(item, 1);
+        });
+        linearColor.locations = locations;
+        return linearColor;
+      }
+      return color;
+    };
     this.setLightAndDark = async (title, desc, key) => {
       try {
         const {getSetting: getSetting2, setSetting: setSetting2} = useSetting(this.en);
