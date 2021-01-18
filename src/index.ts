@@ -1,1 +1,1 @@
-import './pages/CountDown';
+import './pages/JDDou';
