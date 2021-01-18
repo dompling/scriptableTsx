@@ -1176,7 +1176,7 @@ var drawCircle = (x, y, color, textConfig, line = 4, size = smallCircle) => {
   canvas.strokeEllipse(circle);
   if (textConfig) {
     canvas.setFont(Font.systemFont(12));
-    canvas.setTextColor(new Color("#000", 1));
+    canvas.setTextColor(new Color(textConfig.color, 1));
     const point = new Point(x + 18, y + 10);
     canvas.drawText(textConfig.text, point);
     const rect = new Rect(x + 10, y + 30, 40, 20);
