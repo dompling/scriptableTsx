@@ -1,8 +1,7 @@
-import {FC} from 'react';
 import Base, {RenderError} from '@app/Base';
 import C2Pin from '@app/assets/pinyin';
-import {WstackProps} from '@app/types/widget';
 import {request, useSetting} from '@app/lib/help';
+import RowCenter from '@app/Component/RowCeneter';
 
 interface oilRes {
   cate: string;
@@ -39,17 +38,6 @@ interface gasStationResponse {
 }
 
 const title = new Font('AppleSDGothicNeo-Bold', 16);
-
-/**横向居中组件*/
-const RowCenter: FC<WstackProps> = ({children, ...props}) => {
-  return (
-    <wstack {...props}>
-      <wspacer />
-      {children}
-      <wspacer />
-    </wstack>
-  );
-};
 
 class Widget extends Base {
   name = '地方油价';

@@ -1,7 +1,7 @@
 import {FC} from 'react';
 import Base, {RenderError} from '@app/Base';
-import {WstackProps} from '@app/types/widget';
 import {request, ResponseType, showNotification, useSetting} from '@app/lib/help';
+import RowCenter from '@app/Component/RowCeneter';
 
 const en = 'VPNV2Bord';
 
@@ -126,16 +126,6 @@ const Circle: FC<{
   );
 };
 
-const ColumnCenter: FC<WstackProps> = ({children, ...props}) => {
-  return (
-    <wstack flexDirection={'column'} {...props}>
-      <wspacer />
-      {children}
-      <wspacer />
-    </wstack>
-  );
-};
-
 const gradient = (color: string[]): LinearGradient => {
   const linear = new LinearGradient();
   linear.colors = color.map(item => new Color(item, 1));
@@ -178,21 +168,21 @@ const StackCell: FC<{
 const FooterCell: FC<{color: string[]; label: string; value?: string; fontColor: string}> = data => {
   return (
     <wstack flexDirection={'column'}>
-      <ColumnCenter flexDirection={'row'}>
+      <RowCenter flexDirection={'row'}>
         <wstack background={gradient(data.color)} width={10} height={10} borderRadius={5} />
-      </ColumnCenter>
+      </RowCenter>
       <wspacer length={2} />
-      <ColumnCenter flexDirection={'row'}>
+      <RowCenter flexDirection={'row'}>
         <wtext textAlign={'center'} textColor={data.fontColor} font={8}>
           {data.value}
         </wtext>
-      </ColumnCenter>
+      </RowCenter>
       <wspacer length={2} />
-      <ColumnCenter flexDirection={'row'}>
+      <RowCenter flexDirection={'row'}>
         <wtext textAlign={'center'} textColor={data.fontColor} font={8}>
           {data.label}
         </wtext>
-      </ColumnCenter>
+      </RowCenter>
     </wstack>
   );
 };
@@ -418,9 +408,9 @@ class Widget extends Base {
           <wspacer />
           <StackCell url={'arrow.clockwise'} label={todayData} size={12} fontColor={this.fontColor} />
         </wstack>
-        <ColumnCenter flexDirection={'row'}>
+        <RowCenter flexDirection={'row'}>
           <Circle width={80} height={80} data={{chart1, chart2, chart3}} />
-        </ColumnCenter>
+        </RowCenter>
         <wstack>
           <FooterCell fontColor={this.fontColor} color={this.color1} label={'剩余'} value={restData} />
           <wspacer />
@@ -444,11 +434,11 @@ class Widget extends Base {
       >
         <wstack>
           <wspacer length={10} />
-          <ColumnCenter>
+          <RowCenter>
             <Circle width={140} height={140} data={{chart1, chart2, chart3}} />
-          </ColumnCenter>
+          </RowCenter>
           <wspacer length={20} />
-          <ColumnCenter>
+          <RowCenter>
             <StackCell url={this.logo} label={this.account.title} value={'.'} fontColor={this.fontColor} />
             <wspacer length={10} />
             <StackCell color={this.color3} label={'重置'} value={todayData} fontColor={this.fontColor} />
@@ -456,7 +446,7 @@ class Widget extends Base {
             <StackCell color={this.color2} label={'累计'} value={usedData} fontColor={this.fontColor} />
             <wspacer length={10} />
             <StackCell color={this.color1} label={'剩余'} value={restData} fontColor={this.fontColor} />
-          </ColumnCenter>
+          </RowCenter>
           <wspacer />
         </wstack>
       </wbox>

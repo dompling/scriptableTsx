@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：1/18/2021
+ * 更新时间：1/19/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1610968441509
+// @编译时间 1611037837737
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1600,13 +1600,16 @@ var pinyin_default = function() {
   };
 }();
 
-// src/pages/TodayOilPrice.tsx
-var title = new Font("AppleSDGothicNeo-Bold", 16);
+// src/Component/RowCeneter/index.tsx
 var RowCenter = ({children, ...props}) => {
   return /* @__PURE__ */ h("wstack", {
     ...props
   }, /* @__PURE__ */ h("wspacer", null), children, /* @__PURE__ */ h("wspacer", null));
 };
+var RowCeneter_default = RowCenter;
+
+// src/pages/TodayOilPrice.tsx
+var title = new Font("AppleSDGothicNeo-Bold", 16);
 var Widget = class extends Base_default {
   constructor() {
     super(...arguments);
@@ -1704,13 +1707,13 @@ var Widget = class extends Base_default {
       return /* @__PURE__ */ h("wstack", {
         flexDirection: "column",
         verticalAlign: "center"
-      }, /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
+      }, /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
         textAlign: "center",
         textColor: this.fontColor,
         font: title
       }, data.cate.replace("汽油", ""))), /* @__PURE__ */ h("wspacer", {
         length: 10
-      }), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
+      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
         textColor: this.fontColor,
         font: 12,
         textAlign: "center"

@@ -1,18 +1,9 @@
 import {FC} from 'react';
 import Base, {RenderError} from '@app/Base';
-import {WstackProps} from '@app/types/widget';
 import {request, showNotification, useSetting} from '@app/lib/help';
+import RowCenter from '@app/Component/RowCeneter';
+import StackLine from '@app/Component/StackLine';
 
-/**横向居中组件*/
-const RowCenter: FC<WstackProps> = ({children, ...props}) => {
-  return (
-    <wstack {...props}>
-      <wspacer />
-      {children}
-      <wspacer />
-    </wstack>
-  );
-};
 const canvasSize = 258;
 const smallCircle = 60;
 
@@ -39,7 +30,7 @@ const drawCircle = (
   canvas.strokeEllipse(circle);
   if (textConfig) {
     canvas.setFont(Font.systemFont(12));
-    canvas.setTextColor(new Color('#000', 1));
+    canvas.setTextColor(new Color(textConfig.color, 1));
     const point = new Point(x + 18, y + 10);
     canvas.drawText(textConfig.text, point);
     const rect = new Rect(x + 10, y + 30, 40, 20);
@@ -121,7 +112,9 @@ const Label: FC<{
     <wstack verticalAlign={'center'} padding={[0, 0, 0, 20]}>
       <wimage filter={labelColor} src={label} width={15} height={15} borderRadius={4} />
       <wspacer length={5} />
-      <wtext textColor={color}>{value}</wtext>
+      <wtext font={12} textColor={color}>
+        {value}
+      </wtext>
     </wstack>
   );
 };
@@ -175,16 +168,11 @@ class Widget extends Base {
       if (index === 0) {
         await this.jdWebView();
       } else {
-        await this.showAlertCatchInput(
-          '账号设置',
-          '京东账号 Ck',
-          {
-            userName: '昵称',
-            cookie: 'Cookie',
-          },
-          'JDCK',
-        );
+        await this.showAlertCatchInput('账号设置', '京东账号 Ck', {userName: '昵称', cookie: 'Cookie'}, 'JDCK');
       }
+    });
+    this.registerAction('圆形背景', async () => {
+      return this.showAlertCatchInput('圆形背景', '中心圆背景', {light: '白天', dark: '夜间'}, 'centerCircle');
     });
   };
 
@@ -308,12 +296,9 @@ class Widget extends Base {
     drawCenterCircle(0, '#c3cdF2', jdNum);
     drawCenterCircle(jdNum, '#DD8AB7', incomeBean);
     drawCenterCircle(jdNum + incomeBean, '#FBBFA7', expenseBean);
-
-    await drawCenterText(Device.isUsingDarkAppearance() ? '#1C1C1C' : '#F4F4F4', {
-      color: this.fontColor,
-      text: '京豆',
-      value: this.userInfo.base.jdNum,
-    });
+    const {light, dark} = (await getSetting<{light: string; dark: string}>('centerCircle')) || {};
+    const centerCircleColor = Device.isUsingDarkAppearance() ? dark || '#1C1C1C' : light || '#F4F4F4';
+    await drawCenterText(centerCircleColor, {color: this.fontColor, text: '京豆', value: this.userInfo.base.jdNum});
   };
 
   fetchBaseInfo = async () => {
@@ -434,11 +419,14 @@ class Widget extends Base {
       <wbox
         background={(await this.getBackgroundImage()) || this.backgroundColor}
         updateDate={new Date(Date.now() + (await this.updateInterval()))}
+        padding={[0, 0, 0, 0]}
       >
         <wstack href={'https://home.m.jd.com/myJd/home.action'} verticalAlign={'center'}>
           <RowCenter flexDirection={'column'}>
-            <wimage src={contentImg} width={140} height={140} />
+            <wimage src={contentImg} width={150} height={150} />
           </RowCenter>
+          <wspacer />
+          <StackLine borderColor={'#e8e8e8'} flexDirection={'column'} />
           <wspacer />
           {config.widgetFamily === 'medium' && (
             <wstack flexDirection={'column'} verticalAlign={'center'}>

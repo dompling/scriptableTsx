@@ -2,6 +2,8 @@ import {FC} from 'react';
 import Base from '@app/Base';
 import {WstackProps} from '@app/types/widget';
 import {request, useSetting} from '@app/lib/help';
+import StackLine from '@app/Component/StackLine';
+import RowCenter from '@app/Component/RowCeneter';
 
 const en = 'CountDown';
 
@@ -238,26 +240,6 @@ const CreateCalendarEvent: FC<{title: string; time: Date; color: string | Color 
         </wtext>
       </RowCenter>
       <wdate date={time} mode={'timer'} font={10} textColor={'#00bbbb'} textAlign={'center'} />
-    </wstack>
-  );
-};
-
-const RowCenter: FC<WstackProps> = ({children, ...props}) => {
-  return (
-    <wstack {...props}>
-      <wspacer />
-      {children}
-      <wspacer />
-    </wstack>
-  );
-};
-
-const StackLine: FC<{borderColor: string}> = props => {
-  return (
-    <wstack background={props.borderColor}>
-      <RowCenter>
-        <wstack height={1} width={1} />
-      </RowCenter>
     </wstack>
   );
 };

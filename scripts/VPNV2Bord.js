@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：1/18/2021
+ * 更新时间：1/19/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1610968441509
+// @编译时间 1611037837737
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1160,6 +1160,14 @@ var RenderError = async (text) => {
 };
 var Base_default = Base;
 
+// src/Component/RowCeneter/index.tsx
+var RowCenter = ({children, ...props}) => {
+  return /* @__PURE__ */ h("wstack", {
+    ...props
+  }, /* @__PURE__ */ h("wspacer", null), children, /* @__PURE__ */ h("wspacer", null));
+};
+var RowCeneter_default = RowCenter;
+
 // src/pages/VPNV2Bord.tsx
 var en = "VPNV2Bord";
 var getChartConfig = (data, color, value, fontColor) => {
@@ -1281,12 +1289,6 @@ var Circle = (props) => {
     height: props.height
   })));
 };
-var ColumnCenter = ({children, ...props}) => {
-  return /* @__PURE__ */ h("wstack", {
-    flexDirection: "column",
-    ...props
-  }, /* @__PURE__ */ h("wspacer", null), children, /* @__PURE__ */ h("wspacer", null));
-};
 var gradient = (color) => {
   const linear = new LinearGradient();
   linear.colors = color.map((item) => new Color(item, 1));
@@ -1321,7 +1323,7 @@ var StackCell = (data) => {
 var FooterCell = (data) => {
   return /* @__PURE__ */ h("wstack", {
     flexDirection: "column"
-  }, /* @__PURE__ */ h(ColumnCenter, {
+  }, /* @__PURE__ */ h(RowCeneter_default, {
     flexDirection: "row"
   }, /* @__PURE__ */ h("wstack", {
     background: gradient(data.color),
@@ -1330,7 +1332,7 @@ var FooterCell = (data) => {
     borderRadius: 5
   })), /* @__PURE__ */ h("wspacer", {
     length: 2
-  }), /* @__PURE__ */ h(ColumnCenter, {
+  }), /* @__PURE__ */ h(RowCeneter_default, {
     flexDirection: "row"
   }, /* @__PURE__ */ h("wtext", {
     textAlign: "center",
@@ -1338,7 +1340,7 @@ var FooterCell = (data) => {
     font: 8
   }, data.value)), /* @__PURE__ */ h("wspacer", {
     length: 2
-  }), /* @__PURE__ */ h(ColumnCenter, {
+  }), /* @__PURE__ */ h(RowCeneter_default, {
     flexDirection: "row"
   }, /* @__PURE__ */ h("wtext", {
     textAlign: "center",
@@ -1486,7 +1488,7 @@ var Widget = class extends Base_default {
         label: todayData,
         size: 12,
         fontColor: this.fontColor
-      })), /* @__PURE__ */ h(ColumnCenter, {
+      })), /* @__PURE__ */ h(RowCeneter_default, {
         flexDirection: "row"
       }, /* @__PURE__ */ h(Circle, {
         width: 80,
@@ -1518,13 +1520,13 @@ var Widget = class extends Base_default {
         updateDate: new Date(Date.now() + await this.updateInterval())
       }, /* @__PURE__ */ h("wstack", null, /* @__PURE__ */ h("wspacer", {
         length: 10
-      }), /* @__PURE__ */ h(ColumnCenter, null, /* @__PURE__ */ h(Circle, {
+      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h(Circle, {
         width: 140,
         height: 140,
         data: {chart1, chart2, chart3}
       })), /* @__PURE__ */ h("wspacer", {
         length: 20
-      }), /* @__PURE__ */ h(ColumnCenter, null, /* @__PURE__ */ h(StackCell, {
+      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h(StackCell, {
         url: this.logo,
         label: this.account.title,
         value: ".",

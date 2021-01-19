@@ -5,17 +5,17 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：1/18/2021
+ * 更新时间：1/19/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1610968739127
+// @编译时间 1611037837737
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-
+    
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {
@@ -1157,12 +1157,28 @@ var RenderError = async (text) => {
 };
 var Base_default = Base;
 
-// src/pages/JDDou.tsx
+// src/Component/RowCeneter/index.tsx
 var RowCenter = ({children, ...props}) => {
   return /* @__PURE__ */ h("wstack", {
     ...props
   }, /* @__PURE__ */ h("wspacer", null), children, /* @__PURE__ */ h("wspacer", null));
 };
+var RowCeneter_default = RowCenter;
+
+// src/Component/StackLine/index.tsx
+var StackLine = (props) => {
+  return /* @__PURE__ */ h("wstack", {
+    background: props.borderColor
+  }, /* @__PURE__ */ h(RowCeneter_default, {
+    flexDirection: props.flexDirection
+  }, /* @__PURE__ */ h("wstack", {
+    height: 1,
+    width: 1
+  })));
+};
+var StackLine_default = StackLine;
+
+// src/pages/JDDou.tsx
 var canvasSize = 258;
 var smallCircle = 60;
 var canvas = new DrawContext();
@@ -1240,6 +1256,7 @@ var Label = ({label, value, color, labelColor}) => {
   }), /* @__PURE__ */ h("wspacer", {
     length: 5
   }), /* @__PURE__ */ h("wtext", {
+    font: 12,
     textColor: color
   }, value));
 };
@@ -1285,11 +1302,11 @@ var Widget = class extends Base_default {
         if (index === 0) {
           await this.jdWebView();
         } else {
-          await this.showAlertCatchInput("账号设置", "京东账号 Ck", {
-            userName: "昵称",
-            cookie: "Cookie"
-          }, "JDCK");
+          await this.showAlertCatchInput("账号设置", "京东账号 Ck", {userName: "昵称", cookie: "Cookie"}, "JDCK");
         }
+      });
+      this.registerAction("圆形背景", async () => {
+        return this.showAlertCatchInput("圆形背景", "中心圆背景", {light: "白天", dark: "夜间"}, "centerCircle");
       });
     };
     this.componentDidMount = async () => {
@@ -1388,11 +1405,9 @@ var Widget = class extends Base_default {
       drawCenterCircle(0, "#c3cdF2", jdNum);
       drawCenterCircle(jdNum, "#DD8AB7", incomeBean);
       drawCenterCircle(jdNum + incomeBean, "#FBBFA7", expenseBean);
-      await drawCenterText(Device.isUsingDarkAppearance() ? "#1C1C1C" : "#F4F4F4", {
-        color: this.fontColor,
-        text: "京豆",
-        value: this.userInfo.base.jdNum
-      });
+      const {light, dark} = await getSetting("centerCircle") || {};
+      const centerCircleColor = Device.isUsingDarkAppearance() ? dark || "#1C1C1C" : light || "#F4F4F4";
+      await drawCenterText(centerCircleColor, {color: this.fontColor, text: "京豆", value: this.userInfo.base.jdNum});
     };
     this.fetchBaseInfo = async () => {
       const url1 = "https://ms.jr.jd.com/gw/generic/uc/h5/m/mySubsidyBalance";
@@ -1485,17 +1500,21 @@ var Widget = class extends Base_default {
       const contentImg = canvas.getImage();
       return /* @__PURE__ */ h("wbox", {
         background: await this.getBackgroundImage() || this.backgroundColor,
-        updateDate: new Date(Date.now() + await this.updateInterval())
+        updateDate: new Date(Date.now() + await this.updateInterval()),
+        padding: [0, 0, 0, 0]
       }, /* @__PURE__ */ h("wstack", {
         href: "https://home.m.jd.com/myJd/home.action",
         verticalAlign: "center"
-      }, /* @__PURE__ */ h(RowCenter, {
+      }, /* @__PURE__ */ h(RowCeneter_default, {
         flexDirection: "column"
       }, /* @__PURE__ */ h("wimage", {
         src: contentImg,
-        width: 140,
-        height: 140
-      })), /* @__PURE__ */ h("wspacer", null), config.widgetFamily === "medium" && /* @__PURE__ */ h("wstack", {
+        width: 150,
+        height: 150
+      })), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(StackLine_default, {
+        borderColor: "#e8e8e8",
+        flexDirection: "column"
+      }), /* @__PURE__ */ h("wspacer", null), config.widgetFamily === "medium" && /* @__PURE__ */ h("wstack", {
         flexDirection: "column",
         verticalAlign: "center"
       }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(Avatar, {

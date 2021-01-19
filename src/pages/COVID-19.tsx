@@ -1,7 +1,6 @@
-import {FC} from 'react';
 import Base from '@app/Base';
-import {WstackProps} from '@app/types/widget';
 import {request, useSetting} from '@app/lib/help';
+import RowCenter from '@app/Component/RowCeneter';
 
 interface locationType {
   administrativeArea: string;
@@ -75,16 +74,6 @@ interface covid_19NewsItem {
 
 const addumFont = 12;
 const viewColor = '#000';
-/**横向居中组件*/
-const RowCenter: FC<WstackProps> = ({children, ...props}) => {
-  return (
-    <wstack {...props}>
-      <wspacer />
-      {children}
-      <wspacer />
-    </wstack>
-  );
-};
 
 class Widget extends Base {
   name = '疫情数据';

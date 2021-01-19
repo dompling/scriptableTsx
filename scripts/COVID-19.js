@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：1/18/2021
+ * 更新时间：1/19/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1610968441509
+// @编译时间 1611037837737
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1155,14 +1155,17 @@ var Base = class {
 };
 var Base_default = Base;
 
-// src/pages/COVID-19.tsx
-var addumFont = 12;
-var viewColor = "#000";
+// src/Component/RowCeneter/index.tsx
 var RowCenter = ({children, ...props}) => {
   return /* @__PURE__ */ h("wstack", {
     ...props
   }, /* @__PURE__ */ h("wspacer", null), children, /* @__PURE__ */ h("wspacer", null));
 };
+var RowCeneter_default = RowCenter;
+
+// src/pages/COVID-19.tsx
+var addumFont = 12;
+var viewColor = "#000";
 var Widget = class extends Base_default {
   constructor() {
     super(...arguments);
@@ -1233,7 +1236,7 @@ var Widget = class extends Base_default {
       return /* @__PURE__ */ h("wstack", {
         flexDirection: "column",
         background: data.bg
-      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
+      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
         font: addumFont,
         textColor: viewColor
       }, "较上日"), /* @__PURE__ */ h("wtext", {
@@ -1241,11 +1244,11 @@ var Widget = class extends Base_default {
         textColor: data.color
       }, data.addnum)), /* @__PURE__ */ h("wspacer", {
         length: 2
-      }), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
+      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
         textColor: data.color
       }, data.value)), /* @__PURE__ */ h("wspacer", {
         length: 2
-      }), /* @__PURE__ */ h(RowCenter, null, /* @__PURE__ */ h("wtext", {
+      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
         font: addumFont,
         textColor: viewColor
       }, data.tabText)), /* @__PURE__ */ h("wspacer", null));
