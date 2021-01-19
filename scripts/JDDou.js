@@ -9,13 +9,13 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611037837737
+// @编译时间 1611042288368
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-    
+
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {
@@ -1165,19 +1165,6 @@ var RowCenter = ({children, ...props}) => {
 };
 var RowCeneter_default = RowCenter;
 
-// src/Component/StackLine/index.tsx
-var StackLine = (props) => {
-  return /* @__PURE__ */ h("wstack", {
-    background: props.borderColor
-  }, /* @__PURE__ */ h(RowCeneter_default, {
-    flexDirection: props.flexDirection
-  }, /* @__PURE__ */ h("wstack", {
-    height: 1,
-    width: 1
-  })));
-};
-var StackLine_default = StackLine;
-
 // src/pages/JDDou.tsx
 var canvasSize = 258;
 var smallCircle = 60;
@@ -1505,16 +1492,13 @@ var Widget = class extends Base_default {
       }, /* @__PURE__ */ h("wstack", {
         href: "https://home.m.jd.com/myJd/home.action",
         verticalAlign: "center"
-      }, /* @__PURE__ */ h(RowCeneter_default, {
+      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCeneter_default, {
         flexDirection: "column"
       }, /* @__PURE__ */ h("wimage", {
         src: contentImg,
         width: 150,
         height: 150
-      })), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(StackLine_default, {
-        borderColor: "#e8e8e8",
-        flexDirection: "column"
-      }), /* @__PURE__ */ h("wspacer", null), config.widgetFamily === "medium" && /* @__PURE__ */ h("wstack", {
+      })), /* @__PURE__ */ h("wspacer", null), config.widgetFamily === "medium" && /* @__PURE__ */ h("wstack", {
         flexDirection: "column",
         verticalAlign: "center"
       }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(Avatar, {
@@ -1529,7 +1513,7 @@ var Widget = class extends Base_default {
         labelColor: "#f7de65",
         label: "creditcard.circle",
         value: `${this.userInfo.base.levelName}(${this.userInfo.base.userLevel})`
-      }), /* @__PURE__ */ h("wspacer", null))));
+      }), /* @__PURE__ */ h("wspacer", null)), /* @__PURE__ */ h("wspacer", null)));
     };
   }
   async actionSettings() {

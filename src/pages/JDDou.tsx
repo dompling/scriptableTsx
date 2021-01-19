@@ -2,7 +2,6 @@ import {FC} from 'react';
 import Base, {RenderError} from '@app/Base';
 import {request, showNotification, useSetting} from '@app/lib/help';
 import RowCenter from '@app/Component/RowCeneter';
-import StackLine from '@app/Component/StackLine';
 
 const canvasSize = 258;
 const smallCircle = 60;
@@ -422,11 +421,10 @@ class Widget extends Base {
         padding={[0, 0, 0, 0]}
       >
         <wstack href={'https://home.m.jd.com/myJd/home.action'} verticalAlign={'center'}>
+          <wspacer />
           <RowCenter flexDirection={'column'}>
             <wimage src={contentImg} width={150} height={150} />
           </RowCenter>
-          <wspacer />
-          <StackLine borderColor={'#e8e8e8'} flexDirection={'column'} />
           <wspacer />
           {config.widgetFamily === 'medium' && (
             <wstack flexDirection={'column'} verticalAlign={'center'}>
@@ -449,6 +447,7 @@ class Widget extends Base {
               <wspacer />
             </wstack>
           )}
+          <wspacer />
         </wstack>
       </wbox>
     );
