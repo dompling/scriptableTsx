@@ -176,9 +176,9 @@ class Widget extends Base {
 
   componentDidMount = async () => {
     const ckIndex = args.widgetParameter;
-    const cookies = await getSetting<any[]>('cookies');
+    const cookies = await getSetting<any[]>('Cookies');
     this.cookie = await getSetting('JDCK');
-    if (cookies) this.cookie = cookies[ckIndex];
+    if (cookies && cookies[ckIndex]) this.cookie = cookies[ckIndex];
     this.userInfo = await this.fetchUserInfo();
     this.timerKeys = this.getDay(1);
     await this.getAmountData();

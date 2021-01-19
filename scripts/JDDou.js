@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611045609873
+// @编译时间 1611046950713
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1295,9 +1295,9 @@ var Widget = class extends Base_default {
     };
     this.componentDidMount = async () => {
       const ckIndex = args.widgetParameter;
-      const cookies = await getSetting("cookies");
+      const cookies = await getSetting("Cookies");
       this.cookie = await getSetting("JDCK");
-      if (cookies)
+      if (cookies && cookies[ckIndex])
         this.cookie = cookies[ckIndex];
       this.userInfo = await this.fetchUserInfo();
       this.timerKeys = this.getDay(1);
