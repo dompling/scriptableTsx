@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611042288368
+// @编译时间 1611045040609
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1336,6 +1336,28 @@ var Widget = class extends Base_default {
         console.log(`${this.name}: cookie获取成功，请关闭窗口！`);
       }
     };
+    this.actionSettings = async () => {
+      try {
+        const table = new UITable();
+        await this._loadJDCk();
+        if (!this.CookiesData.length)
+          throw new Error("BoxJS 数据读取失败");
+        this.CookiesData.map((t, index) => {
+          const r = new UITableRow();
+          r.addText(`parameter：${index}    ${t.userName}`);
+          r.onSelect = () => setSetting("JDCK", t, true);
+          table.addRow(r);
+        });
+        await setSetting("Cookies", this.CookiesData);
+        await table.present(false);
+      } catch (e) {
+        await showNotification({
+          title: this.name,
+          body: "BoxJS 数据读取失败，请点击通知查看教程",
+          openURL: "https://chavyleung.gitbook.io/boxjs/awesome/videos"
+        });
+      }
+    };
     this._loadJDCk = async () => {
       try {
         const CookiesData = await this.getBoxJsCache("CookiesJD");
@@ -1515,28 +1537,6 @@ var Widget = class extends Base_default {
         value: `${this.userInfo.base.levelName}(${this.userInfo.base.userLevel})`
       }), /* @__PURE__ */ h("wspacer", null)), /* @__PURE__ */ h("wspacer", null)));
     };
-  }
-  async actionSettings() {
-    try {
-      const table = new UITable();
-      await this._loadJDCk();
-      if (!this.CookiesData.length)
-        throw new Error("BoxJS 数据读取失败");
-      this.CookiesData.map((t, index) => {
-        const r = new UITableRow();
-        r.addText(`parameter：${index}    ${t.userName}`);
-        r.onSelect = () => setSetting("JDCK", t, true);
-        table.addRow(r);
-      });
-      await setSetting("Cookies", this.CookiesData);
-      await table.present(false);
-    } catch (e) {
-      await showNotification({
-        title: this.name,
-        body: "BoxJS 数据读取失败，请点击通知查看教程",
-        openURL: "https://chavyleung.gitbook.io/boxjs/awesome/videos"
-      });
-    }
   }
   getDay(dayNumber) {
     const data = [];

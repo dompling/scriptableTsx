@@ -215,7 +215,7 @@ class Widget extends Base {
     }
   };
 
-  async actionSettings() {
+  actionSettings = async () => {
     try {
       const table = new UITable();
       await this._loadJDCk();
@@ -236,7 +236,7 @@ class Widget extends Base {
         openURL: 'https://chavyleung.gitbook.io/boxjs/awesome/videos',
       });
     }
-  }
+  };
 
   // 加载京东 Ck 节点列表
   _loadJDCk = async () => {
