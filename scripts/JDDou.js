@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611046950713
+// @编译时间 1611047371216
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1228,9 +1228,8 @@ var drawCenterText = async (color, textConfig) => {
   canvas.drawTextInRect(`${textConfig.value}`, rect2);
 };
 var Label = ({label, value, color, labelColor}) => {
-  return /* @__PURE__ */ h("wstack", {
-    verticalAlign: "center",
-    padding: [0, 0, 0, 20]
+  return /* @__PURE__ */ h(RowCeneter_default, {
+    verticalAlign: "center"
   }, /* @__PURE__ */ h("wimage", {
     filter: labelColor,
     src: label,
@@ -1520,9 +1519,9 @@ var Widget = class extends Base_default {
       })), /* @__PURE__ */ h("wspacer", null), config.widgetFamily === "medium" && /* @__PURE__ */ h("wstack", {
         flexDirection: "column",
         verticalAlign: "center"
-      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(Avatar, {
+      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h(Avatar, {
         url: this.userInfo.base.headImageUrl
-      }), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(Label, {
+      })), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(Label, {
         color: this.fontColor,
         labelColor: "#f95e4c",
         label: "person.circle",

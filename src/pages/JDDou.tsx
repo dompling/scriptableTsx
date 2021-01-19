@@ -107,13 +107,13 @@ const Label: FC<{
   labelColor: string;
 }> = ({label, value, color, labelColor}) => {
   return (
-    <wstack verticalAlign={'center'} padding={[0, 0, 0, 20]}>
+    <RowCenter verticalAlign={'center'}>
       <wimage filter={labelColor} src={label} width={15} height={15} borderRadius={4} />
       <wspacer length={5} />
       <wtext font={12} textColor={color}>
         {value}
       </wtext>
-    </wstack>
+    </RowCenter>
   );
 };
 
@@ -428,7 +428,9 @@ class Widget extends Base {
           {config.widgetFamily === 'medium' && (
             <wstack flexDirection={'column'} verticalAlign={'center'}>
               <wspacer />
-              <Avatar url={this.userInfo.base.headImageUrl} />
+              <RowCenter>
+                <Avatar url={this.userInfo.base.headImageUrl} />
+              </RowCenter>
               <wspacer />
               <Label
                 color={this.fontColor}
