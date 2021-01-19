@@ -65,7 +65,6 @@ const drawCenterText = async (
   color: string,
   textConfig: {
     color: string;
-    text: string;
     value: string;
   },
 ) => {
@@ -92,11 +91,11 @@ const drawCenterText = async (
   const size = 100;
   canvas.setFont(Font.title2());
   canvas.setTextColor(new Color(textConfig.color, 1));
-  const rect = new Rect(point - size / 2 + 5, point, size, size / 2);
-  canvas.setTextAlignedCenter();
-  canvas.drawTextInRect(textConfig.text, rect);
+  // const rect = new Rect(point - size / 2 + 5, point, size, size / 2);
+  // canvas.setTextAlignedCenter();
+  // canvas.drawTextInRect(textConfig.text, rect);
 
-  const rect2 = new Rect(point - size / 2 + 10, point + size / 4, size, size / 2);
+  const rect2 = new Rect(point - size / 2 + 5, point + 4, size, size / 2);
   canvas.setFont(Font.title1());
   canvas.drawTextInRect(`${textConfig.value}`, rect2);
 };
@@ -297,7 +296,7 @@ class Widget extends Base {
     drawCenterCircle(jdNum + incomeBean, '#FBBFA7', expenseBean);
     const {light, dark} = (await getSetting<{light: string; dark: string}>('centerCircle')) || {};
     const centerCircleColor = Device.isUsingDarkAppearance() ? dark || '#1C1C1C' : light || '#F4F4F4';
-    await drawCenterText(centerCircleColor, {color: this.fontColor, text: '京豆', value: this.userInfo.base.jdNum});
+    await drawCenterText(centerCircleColor, {color: this.fontColor, value: this.userInfo.base.jdNum});
   };
 
   fetchBaseInfo = async () => {

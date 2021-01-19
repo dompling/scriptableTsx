@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611045040609
+// @编译时间 1611045609873
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1223,10 +1223,7 @@ var drawCenterText = async (color, textConfig) => {
   const size = 100;
   canvas.setFont(Font.title2());
   canvas.setTextColor(new Color(textConfig.color, 1));
-  const rect = new Rect(point - size / 2 + 5, point, size, size / 2);
-  canvas.setTextAlignedCenter();
-  canvas.drawTextInRect(textConfig.text, rect);
-  const rect2 = new Rect(point - size / 2 + 10, point + size / 4, size, size / 2);
+  const rect2 = new Rect(point - size / 2 + 5, point + 4, size, size / 2);
   canvas.setFont(Font.title1());
   canvas.drawTextInRect(`${textConfig.value}`, rect2);
 };
@@ -1416,7 +1413,7 @@ var Widget = class extends Base_default {
       drawCenterCircle(jdNum + incomeBean, "#FBBFA7", expenseBean);
       const {light, dark} = await getSetting("centerCircle") || {};
       const centerCircleColor = Device.isUsingDarkAppearance() ? dark || "#1C1C1C" : light || "#F4F4F4";
-      await drawCenterText(centerCircleColor, {color: this.fontColor, text: "京豆", value: this.userInfo.base.jdNum});
+      await drawCenterText(centerCircleColor, {color: this.fontColor, value: this.userInfo.base.jdNum});
     };
     this.fetchBaseInfo = async () => {
       const url1 = "https://ms.jr.jd.com/gw/generic/uc/h5/m/mySubsidyBalance";
