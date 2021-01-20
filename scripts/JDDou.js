@@ -9,13 +9,13 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611112884830
+// @编译时间 1611129506306
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-    
+
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {
@@ -1213,10 +1213,12 @@ var drawCenterCircle = (start, color, degree) => {
   }
 };
 var drawCenterText = async (color, textConfig) => {
-  const circleSize = 140;
-  const circleRect = new Rect(canvasSize / 2 - circleSize + 74, canvasSize / 2 - circleSize + 74, circleSize, circleSize);
-  canvas.setFillColor(new Color(color, 1));
-  canvas.fillEllipse(circleRect);
+  if (color) {
+    const circleSize = 140;
+    const circleRect = new Rect(canvasSize / 2 - circleSize + 74, canvasSize / 2 - circleSize + 74, circleSize, circleSize);
+    canvas.setFillColor(new Color(color, 1));
+    canvas.fillEllipse(circleRect);
+  }
   const img = (await request({
     url: "https://gitee.com/scriptableJS/Scriptable/raw/master/JDDou/jddnew.png",
     method: "GET",
@@ -1226,7 +1228,6 @@ var drawCenterText = async (color, textConfig) => {
   const imgSize = 52;
   canvas.drawImageInRect(img, new Rect(point - imgSize / 2, point - imgSize / 1.3, imgSize, imgSize));
   const size = 100;
-  canvas.setFont(Font.title2());
   canvas.setTextColor(new Color(textConfig.color, 1));
   const rect2 = new Rect(point - size / 2 + 5, point + 15, size, size / 2);
   canvas.setFont(Font.title1());
@@ -1416,8 +1417,8 @@ var Widget = class extends Base_default {
       drawCenterCircle(jdNum, "#DD8AB7", incomeBean);
       drawCenterCircle(jdNum + incomeBean, "#FBBFA7", expenseBean);
       const {light, dark} = await getSetting("centerCircle") || {};
-      const centerCircleColor = Device.isUsingDarkAppearance() ? dark || "#1C1C1C" : light || "#F4F4F4";
-      await drawCenterText(centerCircleColor, {color: this.fontColor, value: this.userInfo.base.jdNum});
+      const centerCircleColor = Device.isUsingDarkAppearance() ? dark : light;
+      await drawCenterText(centerCircleColor || "", {color: this.fontColor, value: this.userInfo.base.jdNum});
     };
     this.fetchBaseInfo = async () => {
       const url1 = "https://ms.jr.jd.com/gw/generic/uc/h5/m/mySubsidyBalance";

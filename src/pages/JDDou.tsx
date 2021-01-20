@@ -68,15 +68,17 @@ const drawCenterText = async (
     value: string;
   },
 ) => {
-  const circleSize = 140;
-  const circleRect = new Rect(
-    canvasSize / 2 - circleSize + 74,
-    canvasSize / 2 - circleSize + 74,
-    circleSize,
-    circleSize,
-  );
-  canvas.setFillColor(new Color(color, 1));
-  canvas.fillEllipse(circleRect);
+  if (color) {
+    const circleSize = 140;
+    const circleRect = new Rect(
+      canvasSize / 2 - circleSize + 74,
+      canvasSize / 2 - circleSize + 74,
+      circleSize,
+      circleSize,
+    );
+    canvas.setFillColor(new Color(color, 1));
+    canvas.fillEllipse(circleRect);
+  }
 
   const img = (
     await request<Image>({
@@ -89,7 +91,7 @@ const drawCenterText = async (
   const imgSize = 52;
   canvas.drawImageInRect(img, new Rect(point - imgSize / 2, point - imgSize / 1.3, imgSize, imgSize));
   const size = 100;
-  canvas.setFont(Font.title2());
+  // canvas.setFont(Font.title2());
   canvas.setTextColor(new Color(textConfig.color, 1));
   // const rect = new Rect(point - size / 2 + 5, point, size, size / 2);
   // canvas.setTextAlignedCenter();
@@ -295,8 +297,8 @@ class Widget extends Base {
     drawCenterCircle(jdNum, '#DD8AB7', incomeBean);
     drawCenterCircle(jdNum + incomeBean, '#FBBFA7', expenseBean);
     const {light, dark} = (await getSetting<{light: string; dark: string}>('centerCircle')) || {};
-    const centerCircleColor = Device.isUsingDarkAppearance() ? dark || '#1C1C1C' : light || '#F4F4F4';
-    await drawCenterText(centerCircleColor, {color: this.fontColor, value: this.userInfo.base.jdNum});
+    const centerCircleColor = Device.isUsingDarkAppearance() ? dark : light;
+    await drawCenterText(centerCircleColor || '', {color: this.fontColor, value: this.userInfo.base.jdNum});
   };
 
   fetchBaseInfo = async () => {
