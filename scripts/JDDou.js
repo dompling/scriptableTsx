@@ -9,13 +9,13 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611105606652
+// @编译时间 1611107474489
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-    
+
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {
@@ -751,6 +751,9 @@ function h(type, props, ...children) {
       break;
   }
 }
+function Fragment({children}) {
+  return children;
+}
 function flatteningArr(arr) {
   return [].concat(...arr.map((item) => {
     return Array.isArray(item) ? flatteningArr(item) : item;
@@ -1221,16 +1224,16 @@ var drawCenterText = async (color, textConfig) => {
   })).data;
   const point = canvasSize / 2;
   const imgSize = 52;
-  canvas.drawImageInRect(img, new Rect(point - imgSize / 2, point - imgSize, imgSize, imgSize));
+  canvas.drawImageInRect(img, new Rect(point - imgSize / 2, point - imgSize / 1.3, imgSize, imgSize));
   const size = 100;
   canvas.setFont(Font.title2());
   canvas.setTextColor(new Color(textConfig.color, 1));
-  const rect2 = new Rect(point - size / 2 + 5, point + 4, size, size / 2);
+  const rect2 = new Rect(point - size / 2 + 5, point + 15, size, size / 2);
   canvas.setFont(Font.title1());
   canvas.drawTextInRect(`${textConfig.value}`, rect2);
 };
 var Label = ({label, value, color, labelColor}) => {
-  return /* @__PURE__ */ h(RowCeneter_default, {
+  return /* @__PURE__ */ h("wstack", {
     verticalAlign: "center"
   }, /* @__PURE__ */ h("wimage", {
     filter: labelColor,
@@ -1518,22 +1521,30 @@ var Widget = class extends Base_default {
         src: contentImg,
         width: 150,
         height: 150
-      })), /* @__PURE__ */ h("wspacer", null), config.widgetFamily === "medium" && /* @__PURE__ */ h("wstack", {
+      })), config.widgetFamily === "medium" && /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wspacer", {
+        length: 5
+      }), /* @__PURE__ */ h("wstack", {
         flexDirection: "column",
         verticalAlign: "center"
       }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h(Avatar, {
         url: this.userInfo.base.headImageUrl
-      })), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(Label, {
+      })), /* @__PURE__ */ h("wspacer", {
+        length: 10
+      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wstack", {
+        flexDirection: "column"
+      }, /* @__PURE__ */ h(Label, {
         color: this.fontColor,
         labelColor: "#f95e4c",
         label: "person.circle",
         value: this.userInfo.base.nickname
-      }), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(Label, {
+      }), /* @__PURE__ */ h("wspacer", {
+        length: 10
+      }), /* @__PURE__ */ h(Label, {
         color: this.fontColor,
         labelColor: "#f7de65",
         label: "creditcard.circle",
         value: `${this.userInfo.base.levelName}(${this.userInfo.base.userLevel})`
-      }), /* @__PURE__ */ h("wspacer", null)), /* @__PURE__ */ h("wspacer", null)));
+      }))), /* @__PURE__ */ h("wspacer", null))), /* @__PURE__ */ h("wspacer", null)));
     };
   }
   getDay(dayNumber) {

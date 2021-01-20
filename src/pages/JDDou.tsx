@@ -87,7 +87,7 @@ const drawCenterText = async (
   ).data as Image;
   const point = canvasSize / 2;
   const imgSize = 52;
-  canvas.drawImageInRect(img, new Rect(point - imgSize / 2, point - imgSize, imgSize, imgSize));
+  canvas.drawImageInRect(img, new Rect(point - imgSize / 2, point - imgSize / 1.3, imgSize, imgSize));
   const size = 100;
   canvas.setFont(Font.title2());
   canvas.setTextColor(new Color(textConfig.color, 1));
@@ -95,7 +95,7 @@ const drawCenterText = async (
   // canvas.setTextAlignedCenter();
   // canvas.drawTextInRect(textConfig.text, rect);
 
-  const rect2 = new Rect(point - size / 2 + 5, point + 4, size, size / 2);
+  const rect2 = new Rect(point - size / 2 + 5, point + 15, size, size / 2);
   canvas.setFont(Font.title1());
   canvas.drawTextInRect(`${textConfig.value}`, rect2);
 };
@@ -107,13 +107,13 @@ const Label: FC<{
   labelColor: string;
 }> = ({label, value, color, labelColor}) => {
   return (
-    <RowCenter verticalAlign={'center'}>
+    <wstack verticalAlign={'center'}>
       <wimage filter={labelColor} src={label} width={15} height={15} borderRadius={4} />
       <wspacer length={5} />
       <wtext font={12} textColor={color}>
         {value}
       </wtext>
-    </RowCenter>
+    </wstack>
   );
 };
 
@@ -424,29 +424,36 @@ class Widget extends Base {
           <RowCenter flexDirection={'column'}>
             <wimage src={contentImg} width={150} height={150} />
           </RowCenter>
-          <wspacer />
+
           {config.widgetFamily === 'medium' && (
-            <wstack flexDirection={'column'} verticalAlign={'center'}>
-              <wspacer />
-              <RowCenter>
-                <Avatar url={this.userInfo.base.headImageUrl} />
-              </RowCenter>
-              <wspacer />
-              <Label
-                color={this.fontColor}
-                labelColor={'#f95e4c'}
-                label={'person.circle'}
-                value={this.userInfo.base.nickname}
-              />
-              <wspacer />
-              <Label
-                color={this.fontColor}
-                labelColor={'#f7de65'}
-                label={'creditcard.circle'}
-                value={`${this.userInfo.base.levelName}(${this.userInfo.base.userLevel})`}
-              />
-              <wspacer />
-            </wstack>
+            <>
+              <wspacer length={5} />
+              <wstack flexDirection={'column'} verticalAlign={'center'}>
+                <wspacer />
+                <RowCenter>
+                  <Avatar url={this.userInfo.base.headImageUrl} />
+                </RowCenter>
+                <wspacer length={10} />
+                <RowCenter>
+                  <wstack flexDirection={'column'}>
+                    <Label
+                      color={this.fontColor}
+                      labelColor={'#f95e4c'}
+                      label={'person.circle'}
+                      value={this.userInfo.base.nickname}
+                    />
+                    <wspacer length={10} />
+                    <Label
+                      color={this.fontColor}
+                      labelColor={'#f7de65'}
+                      label={'creditcard.circle'}
+                      value={`${this.userInfo.base.levelName}(${this.userInfo.base.userLevel})`}
+                    />
+                  </wstack>
+                </RowCenter>
+                <wspacer />
+              </wstack>
+            </>
           )}
           <wspacer />
         </wstack>
