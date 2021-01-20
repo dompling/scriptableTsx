@@ -33,6 +33,9 @@ class Base {
   componentWillMountBefore = async (): Promise<void> => {
     this.backgroundKey = `${this.en}_background`;
     const {getSetting} = useSetting(this.en);
+    const {getStorage} = useStorage('boxjs');
+    this.prefix = (await getStorage<string>('prefix')) || this.prefix;
+
     const fontColorLight = (await getSetting<string>('fontColorLight')) || this.fontColor;
     const fontColorDark = (await getSetting<string>('fontColorDark')) || this.fontColor;
     this.fontColor = Device.isUsingDarkAppearance() ? fontColorDark : fontColorLight;
@@ -126,22 +129,6 @@ class Base {
         await this.setImage(null, this.backgroundKey);
       },
     },
-    ...(this.useBoxJS
-      ? [
-          {
-            title: 'BoxJS',
-            func: async () => {
-              const {getStorage, setStorage} = useStorage('boxjs');
-              const boxjs: string = getStorage<string>('prefix') || this.prefix;
-              const {texts} = await showModal({
-                title: 'BoxJS设置',
-                inputItems: [{placeholder: 'BoxJS域名', text: boxjs}],
-              });
-              await setStorage('prefix', texts[0]);
-            },
-          },
-        ]
-      : []),
   ];
 
   actions: actionsProps[] = [
@@ -175,6 +162,20 @@ class Base {
     {
       title: '基础设置',
       func: async (): Promise<void> => {
+        if (this.useBoxJS) {
+          this.baseActions.push({
+            title: 'BoxJS',
+            func: async () => {
+              const {getStorage, setStorage} = useStorage('boxjs');
+              const boxjs: string = getStorage<string>('prefix') || this.prefix;
+              const {texts} = await showModal({
+                title: 'BoxJS设置',
+                inputItems: [{placeholder: 'BoxJS域名', text: boxjs}],
+              });
+              await setStorage('prefix', texts[0]);
+            },
+          });
+        }
         await this.showActionSheet('基础设置', this.baseActions);
       },
     },

@@ -86,6 +86,7 @@ class Widget extends Base {
   location: locationType | undefined;
   baseUrl = `https://api.inews.qq.com/newsqa/v1/query/pubished/daily/list`;
   news: covid_19NewsItem[] | undefined;
+  useBoxJS = false;
 
   componentWillMount = async () => {
     this.registerAction('地区拼音', async () => {

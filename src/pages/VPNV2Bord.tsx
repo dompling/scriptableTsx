@@ -208,6 +208,7 @@ class Widget extends Base {
   color2 = ['#ff54fa', '#fad126'];
   color3 = ['#28cfb3', '#72d7cc'];
   cookies: {[key: string]: string} = {};
+  useBoxJS = false;
 
   dataSource = {
     restData: '0',
