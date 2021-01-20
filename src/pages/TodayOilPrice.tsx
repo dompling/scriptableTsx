@@ -154,13 +154,13 @@ class Widget extends Base {
   content = (data: oilRes) => {
     return (
       <wstack flexDirection="column" verticalAlign="center">
-        <RowCenter>
+        <RowCenter flexDirection={'column'}>
           <wtext textAlign="center" textColor={this.fontColor} font={title}>
             {data.cate.replace('汽油', '')}
           </wtext>
         </RowCenter>
         <wspacer length={10} />
-        <RowCenter>
+        <RowCenter flexDirection={'column'}>
           <wtext textColor={this.fontColor} font={12} textAlign="center">
             {data.value.replace('/升', '')}
           </wtext>

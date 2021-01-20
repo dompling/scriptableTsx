@@ -435,11 +435,11 @@ class Widget extends Base {
       >
         <wstack>
           <wspacer length={10} />
-          <RowCenter>
+          <RowCenter flexDirection={'column'}>
             <Circle width={140} height={140} data={{chart1, chart2, chart3}} />
           </RowCenter>
           <wspacer length={20} />
-          <RowCenter>
+          <RowCenter flexDirection={'column'}>
             <StackCell url={this.logo} label={this.account.title} value={'.'} fontColor={this.fontColor} />
             <wspacer length={10} />
             <StackCell color={this.color3} label={'重置'} value={todayData} fontColor={this.fontColor} />

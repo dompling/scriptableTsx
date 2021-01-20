@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611105606652
+// @编译时间 1611112884830
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1239,7 +1239,9 @@ var Widget = class extends Base_default {
       return /* @__PURE__ */ h("wstack", {
         flexDirection: "column",
         background: data.bg
-      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
+      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCeneter_default, {
+        flexDirection: "column"
+      }, /* @__PURE__ */ h("wtext", {
         font: addumFont,
         textColor: viewColor
       }, "较上日"), /* @__PURE__ */ h("wtext", {
@@ -1247,11 +1249,15 @@ var Widget = class extends Base_default {
         textColor: data.color
       }, data.addnum)), /* @__PURE__ */ h("wspacer", {
         length: 2
-      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
+      }), /* @__PURE__ */ h(RowCeneter_default, {
+        flexDirection: "column"
+      }, /* @__PURE__ */ h("wtext", {
         textColor: data.color
       }, data.value)), /* @__PURE__ */ h("wspacer", {
         length: 2
-      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
+      }), /* @__PURE__ */ h(RowCeneter_default, {
+        flexDirection: "column"
+      }, /* @__PURE__ */ h("wtext", {
         font: addumFont,
         textColor: viewColor
       }, data.tabText)), /* @__PURE__ */ h("wspacer", null));

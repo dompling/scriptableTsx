@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611105606652
+// @编译时间 1611112884830
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1523,13 +1523,17 @@ var Widget = class extends Base_default {
         updateDate: new Date(Date.now() + await this.updateInterval())
       }, /* @__PURE__ */ h("wstack", null, /* @__PURE__ */ h("wspacer", {
         length: 10
-      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h(Circle, {
+      }), /* @__PURE__ */ h(RowCeneter_default, {
+        flexDirection: "column"
+      }, /* @__PURE__ */ h(Circle, {
         width: 140,
         height: 140,
         data: {chart1, chart2, chart3}
       })), /* @__PURE__ */ h("wspacer", {
         length: 20
-      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h(StackCell, {
+      }), /* @__PURE__ */ h(RowCeneter_default, {
+        flexDirection: "column"
+      }, /* @__PURE__ */ h(StackCell, {
         url: this.logo,
         label: this.account.title,
         value: ".",

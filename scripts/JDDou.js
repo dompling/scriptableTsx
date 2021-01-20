@@ -9,13 +9,13 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611107474489
+// @编译时间 1611112884830
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-
+    
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {

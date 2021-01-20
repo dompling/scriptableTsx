@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611105606652
+// @编译时间 1611112884830
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1709,13 +1709,17 @@ var Widget = class extends Base_default {
       return /* @__PURE__ */ h("wstack", {
         flexDirection: "column",
         verticalAlign: "center"
-      }, /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
+      }, /* @__PURE__ */ h(RowCeneter_default, {
+        flexDirection: "column"
+      }, /* @__PURE__ */ h("wtext", {
         textAlign: "center",
         textColor: this.fontColor,
         font: title
       }, data.cate.replace("汽油", ""))), /* @__PURE__ */ h("wspacer", {
         length: 10
-      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
+      }), /* @__PURE__ */ h(RowCeneter_default, {
+        flexDirection: "column"
+      }, /* @__PURE__ */ h("wtext", {
         textColor: this.fontColor,
         font: 12,
         textAlign: "center"
