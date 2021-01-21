@@ -1344,8 +1344,6 @@ var Widget = class extends Base_default {
     };
   }
 };
-
-
 EndAwait(() => new Widget().init());
 
 await __topLevelAwait__();
