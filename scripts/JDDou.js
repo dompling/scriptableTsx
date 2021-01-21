@@ -5,17 +5,17 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：1/20/2021
+ * 更新时间：1/21/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611129506306
+// @编译时间 1611199879000
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-
+    
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {
@@ -502,8 +502,7 @@ async function setTransparentBackground(tips) {
       crop.y = phone[key];
       break;
   }
-  const imgCrop = cropImage(img, new Rect(crop.x, crop.y, crop.w, crop.h));
-  return imgCrop;
+  return cropImage(img, new Rect(crop.x, crop.y, crop.w, crop.h));
 }
 
 // src/lib/jsx-runtime.ts

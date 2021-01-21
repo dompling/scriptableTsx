@@ -1023,6 +1023,21 @@ export async function setTransparentBackground(tips?: string): Promise<Image | u
       break;
   }
 
-  const imgCrop = cropImage(img, new Rect(crop.x, crop.y, crop.w, crop.h));
-  return imgCrop;
+  return cropImage(img, new Rect(crop.x, crop.y, crop.w, crop.h));
+}
+
+export function getRandomArrayElements<T = any>(arr: T[], count: number): T[] {
+  const shuffled = arr.slice(0);
+  let i = arr.length,
+    min = i - count,
+    temp: T,
+    index: number;
+  min = min > 0 ? min : 0;
+  while (i-- > min) {
+    index = Math.floor((i + 1) * Math.random());
+    temp = shuffled[index];
+    shuffled[index] = shuffled[i];
+    shuffled[i] = temp;
+  }
+  return shuffled.slice(min);
 }

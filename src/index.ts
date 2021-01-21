@@ -1,1 +1,1 @@
-import './pages/JDDou';
+import './pages/BiliBili';

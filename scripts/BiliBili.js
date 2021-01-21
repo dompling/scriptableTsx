@@ -1,6 +1,6 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: purple; icon-glyph: paper-plane;
+// icon-color: purple; icon-glyph: tv;
 
 /**
  * 作者: 2Ya
@@ -117,7 +117,7 @@ function useSetting(settingFilename) {
     const settings = JSON.parse(json) || {};
     return settings[key];
   };
-  const setSetting2 = async (key, value, notify = true) => {
+  const setSetting = async (key, value, notify = true) => {
     const fileExists = await isFileExists();
     if (!fileExists) {
       await fileManager.writeString(settingsPath, JSON.stringify({
@@ -135,7 +135,7 @@ function useSetting(settingFilename) {
       await showNotification({title: "消息提示", body: "设置保存成功,稍后刷新组件"});
     return settings;
   };
-  return {getSetting: getSetting2, setSetting: setSetting2};
+  return {getSetting: getSetting2, setSetting};
 }
 async function request(args2) {
   const {
@@ -503,6 +503,18 @@ async function setTransparentBackground(tips) {
       break;
   }
   return cropImage(img, new Rect(crop.x, crop.y, crop.w, crop.h));
+}
+function getRandomArrayElements(arr, count) {
+  const shuffled = arr.slice(0);
+  let i = arr.length, min = i - count, temp, index;
+  min = min > 0 ? min : 0;
+  while (i-- > min) {
+    index = Math.floor((i + 1) * Math.random());
+    temp = shuffled[index];
+    shuffled[index] = shuffled[i];
+    shuffled[i] = temp;
+  }
+  return shuffled.slice(min);
 }
 
 // src/lib/jsx-runtime.ts
@@ -919,7 +931,7 @@ var Base = class {
       {
         title: "刷新时间",
         func: async () => {
-          const {getSetting: getSetting2, setSetting: setSetting2} = useSetting(this.en);
+          const {getSetting: getSetting2, setSetting} = useSetting(this.en);
           const updateInterval = await getSetting2("updateInterval") || "";
           const {texts} = await showModal({
             title: "刷新时间",
@@ -930,7 +942,7 @@ var Base = class {
               }
             ]
           });
-          await setSetting2("updateInterval", texts);
+          await setSetting("updateInterval", texts);
         }
       },
       {
@@ -971,7 +983,7 @@ var Base = class {
     };
     this.setLightAndDark = async (title, desc, key) => {
       try {
-        const {getSetting: getSetting2, setSetting: setSetting2} = useSetting(this.en);
+        const {getSetting: getSetting2, setSetting} = useSetting(this.en);
         const light = `${key}Light`, dark = `${key}Dark`;
         const lightText = await getSetting2(light) || "";
         const darkText = await getSetting2(dark) || "";
@@ -985,8 +997,8 @@ var Base = class {
         const id = await a.presentAlert();
         if (id === -1)
           return;
-        await setSetting2(light, a.textFieldValue(0), false);
-        await setSetting2(dark, a.textFieldValue(1));
+        await setSetting(light, a.textFieldValue(0), false);
+        await setSetting(dark, a.textFieldValue(1));
       } catch (e) {
         console.log(e);
       }
@@ -1090,8 +1102,8 @@ var Base = class {
         Object.keys(opt).forEach((key) => {
           settings[key] = boxJSData[opt[key]] || "";
         });
-        const {setSetting: setSetting2} = useSetting(this.en);
-        await setSetting2(this.BOX_CATCH_KEY, settings, false);
+        const {setSetting} = useSetting(this.en);
+        await setSetting(this.BOX_CATCH_KEY, settings, false);
         await showNotification({
           title: this.name,
           body: "缓存读取:" + JSON.stringify(settings),
@@ -1108,7 +1120,7 @@ var Base = class {
       }
     };
     this.showAlertCatchInput = async (title, content, opt, useKey) => {
-      const {getSetting: getSetting2, setSetting: setSetting2} = useSetting(this.en);
+      const {getSetting: getSetting2, setSetting} = useSetting(this.en);
       const catchValue = await getSetting2(useKey || this.BOX_CATCH_KEY) || {};
       const settings = catchValue;
       const inputItems = Object.keys(opt).map((key) => {
@@ -1119,7 +1131,7 @@ var Base = class {
         settings[key] = texts[index];
       });
       if (confirm) {
-        await setSetting2(useKey || this.BOX_CATCH_KEY, settings);
+        await setSetting(useKey || this.BOX_CATCH_KEY, settings);
         return settings;
       }
     };
@@ -1154,12 +1166,25 @@ var Base = class {
     return ctx.getImage();
   }
 };
-var RenderError = async (text) => {
-  return /* @__PURE__ */ h("wbox", null, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wtext", {
-    textAlign: "center"
-  }, text), /* @__PURE__ */ h("wspacer", null));
-};
 var Base_default = Base;
+
+// src/Component/Header/indext.tsx
+var Header = ({textColor, title, icon, children}) => {
+  return /* @__PURE__ */ h("wstack", {
+    verticalAlign: "center"
+  }, /* @__PURE__ */ h("wimage", {
+    src: icon,
+    borderRadius: 3,
+    width: 15,
+    height: 15
+  }), /* @__PURE__ */ h("wspacer", {
+    length: 5
+  }), /* @__PURE__ */ h("wtext", {
+    textColor,
+    font: 12
+  }, title), /* @__PURE__ */ h("wspacer", null), children);
+};
+var indext_default = Header;
 
 // src/Component/RowCeneter/index.tsx
 var RowCenter = ({children, ...props}) => {
@@ -1169,451 +1194,155 @@ var RowCenter = ({children, ...props}) => {
 };
 var RowCeneter_default = RowCenter;
 
-// src/pages/VPNV2Bord.tsx
-var en = "VPNV2Bord";
-var getChartConfig = (data, color, value, fontColor) => {
-  console.log(data);
-  const template1 = `
-{
-  "type": "radialGauge",
-  "data": {
-    "datasets": [
-      {
-        "data": [${parseFloat(data[0])}],
-        "borderWidth": 0,
-        "backgroundColor": getGradientFillHelper('vertical', ${JSON.stringify(color[0])}),
-      }
-    ]
-  },
-  "options": {
-      centerPercentage: 86,
-      rotation: Math.PI / 2,
-      centerArea: {
-        displayText: false,
-      },
-      options:{
-      	trackColor: '#f4f4f4',
-      }
-  }
+// src/Component/Stack3DLine/index.tsx
+var topDrawing = new DrawContext();
+topDrawing.size = new Size(642, 100);
+topDrawing.opaque = false;
+topDrawing.respectScreenScale = true;
+function fillRect(drawing, rect, color) {
+  const path = new Path();
+  path.addRoundedRect(rect, 0, 0);
+  drawing.addPath(path);
+  drawing.setFillColor(new Color(color, 1));
+  drawing.fillPath();
 }
-      `;
-  const template2 = `
-{
-  "type": "radialGauge",
-  "data": {
-    "datasets": [
-      {
-       "data": [${parseFloat(data[1])}],
-        "borderWidth": 0,
-        "backgroundColor": getGradientFillHelper('vertical', ${JSON.stringify(color[1])}),
-      }
-    ]
-  },
-  "options": {
-      layout: {
-          padding: {
-              left: 47,
-              right: 47,
-              top: 47,
-              bottom: 47
-          }
-      },
-      options:{
-      	trackColor: '#f4f4f4',
-      },
-      centerPercentage: 80,
-      rotation: Math.PI / 2,
-      centerArea: {
-        displayText: false,
-      }
-  }
+function drawLine(drawing, rect, color, scale) {
+  const x1 = Math.round(rect.x + scale * 1.5);
+  const y1 = rect.y - scale;
+  const x2 = Math.round(rect.width + scale * 1.5);
+  const point1 = new Point(x1, y1);
+  const point2 = new Point(x2, y1);
+  const path = new Path();
+  path.move(point1);
+  path.addLine(point2);
+  drawing.addPath(path);
+  drawing.setStrokeColor(new Color(color, 1));
+  drawing.setLineWidth(60 / (40 + 15 * scale));
+  drawing.strokePath();
 }
-      `;
-  const template3 = `
-{
-  "type": "radialGauge",
-  "data": {
-    "datasets": [
-      {
-        "data": [${parseFloat(data[2])}],
-        "borderWidth": 0,
-        "backgroundColor": getGradientFillHelper('vertical', ${JSON.stringify(color[2])}),
-      }
-    ]
-  },
-  "options": {
-      layout: {
-          padding: {
-              left: 94,
-              right: 94,
-              top: 94,
-              bottom: 94
-          }
-      },
-      options:{
-      	trackColor: '#f4f4f4',
-      },
-      centerPercentage: 70,
-      rotation: Math.PI / 2,
-      centerArea: {
-        displayText: true,
-        fontColor: '${fontColor}',
-        fontSize: 20,
-        text:(value)=>{
-          return '${value}';
-        }
-      }
+var Stack3DLine = ({borderColor, rect, height = 30}) => {
+  const rectLine = rect || new Rect(0, 70, 610, 26);
+  fillRect(topDrawing, rectLine, borderColor);
+  for (let i = 0; i < 40; i++) {
+    drawLine(topDrawing, rectLine, borderColor, i);
   }
-}
-      `;
-  console.log(template1);
-  console.log(template2);
-  console.log(template3);
-  return {template1, template2, template3};
-};
-var Circle = (props) => {
   return /* @__PURE__ */ h("wstack", {
-    padding: [10, 10, 10, 10],
-    background: props.data.chart3,
-    verticalAlign: "center",
-    width: props.width,
-    height: props.height
-  }, /* @__PURE__ */ h("wstack", {
-    background: props.data.chart2,
-    verticalAlign: "center",
-    width: props.width,
-    height: props.height
-  }, /* @__PURE__ */ h("wstack", {
-    background: props.data.chart1,
-    verticalAlign: "center",
-    width: props.width,
-    height: props.height
+    background: topDrawing.getImage()
+  }, /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wstack", {
+    height,
+    width: 1
   })));
 };
-var gradient = (color) => {
-  const linear = new LinearGradient();
-  linear.colors = color.map((item) => new Color(item, 1));
-  linear.locations = [0, 0.5];
-  return linear;
-};
-var StackCell = (data) => {
+var Stack3DLine_default = Stack3DLine;
+
+// src/pages/BiliBili.tsx
+var RowCell = (props) => {
+  const {cover, url, title, pub_time, pub_index} = props.data;
   return /* @__PURE__ */ h("wstack", {
-    verticalAlign: "center"
-  }, data.url ? /* @__PURE__ */ h("wimage", {
-    src: data.url,
-    width: 16,
-    height: 16,
-    borderRadius: 8
-  }) : /* @__PURE__ */ h("wstack", {
-    background: gradient(data.color || []),
-    width: 16,
-    height: 16,
-    borderRadius: 8
-  }), /* @__PURE__ */ h("wspacer", {
+    href: url,
+    background: cover,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#e8e8e8",
+    flexDirection: "column",
+    width: 89,
+    height: 105
+  }, /* @__PURE__ */ h("wspacer", {
     length: 5
-  }), /* @__PURE__ */ h("wtext", {
-    font: data.size,
-    textColor: data.fontColor
-  }, data.label), data.value && /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wspacer", {
+  }), /* @__PURE__ */ h("wstack", null, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wstack", {
+    background: new Color("#000", 0.3),
+    borderRadius: 4,
+    padding: [0, 5, 0, 5]
+  }, /* @__PURE__ */ h("wtext", {
+    textColor: "#fff",
+    font: 12
+  }, pub_index)), /* @__PURE__ */ h("wspacer", {
     length: 5
-  }), /* @__PURE__ */ h("wtext", {
-    textColor: data.fontColor,
-    font: data.size
-  }, data.value || ""), /* @__PURE__ */ h("wspacer", null)));
-};
-var FooterCell = (data) => {
-  return /* @__PURE__ */ h("wstack", {
-    flexDirection: "column"
-  }, /* @__PURE__ */ h(RowCeneter_default, {
-    flexDirection: "row"
+  })), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wstack", {
+    background: new Color("#000", 0.3)
   }, /* @__PURE__ */ h("wstack", {
-    background: gradient(data.color),
-    width: 10,
-    height: 10,
-    borderRadius: 5
-  })), /* @__PURE__ */ h("wspacer", {
-    length: 2
-  }), /* @__PURE__ */ h(RowCeneter_default, {
-    flexDirection: "row"
+    flexDirection: "column",
+    padding: [10, 5, 10, 5]
   }, /* @__PURE__ */ h("wtext", {
-    textAlign: "center",
-    textColor: data.fontColor,
-    font: 8
-  }, data.value)), /* @__PURE__ */ h("wspacer", {
-    length: 2
-  }), /* @__PURE__ */ h(RowCeneter_default, {
-    flexDirection: "row"
-  }, /* @__PURE__ */ h("wtext", {
-    textAlign: "center",
-    textColor: data.fontColor,
-    font: 8
-  }, data.label)));
+    maxLine: 1,
+    textColor: "#fff",
+    font: 12
+  }, title), /* @__PURE__ */ h("wtext", {
+    textColor: new Color("#fff", 0.7),
+    font: 10
+  }, "更新：", pub_time)), /* @__PURE__ */ h("wspacer", null)));
 };
-var {getSetting, setSetting} = useSetting(en);
+var format = new DateFormatter();
+format.dateFormat = "M-d";
+var today = format.string(new Date());
+var {getSetting} = useSetting("BiliBili");
 var Widget = class extends Base_default {
   constructor() {
     super(...arguments);
-    this.name = "V2模板机场";
-    this.en = en;
-    this.logo = "https://raw.githubusercontent.com/58xinian/icon/master/glados_animation.gif";
-    this.color1 = ["#ef0a6a", "#b6359c"];
-    this.color2 = ["#ff54fa", "#fad126"];
-    this.color3 = ["#28cfb3", "#72d7cc"];
-    this.cookies = {};
+    this.name = "今日番剧";
+    this.en = "BiliBili";
+    this.logo = "https://www.bilibili.com/favicon.ico?v=1";
     this.useBoxJS = false;
-    this.dataSource = {
-      restData: "0",
-      usedData: "0",
-      totalData: "0",
-      todayData: "0"
-    };
-    this.account = {
-      url: "",
-      icon: "",
-      title: "机场名",
-      email: "",
-      password: ""
-    };
+    this.dataSource = [];
     this.componentWillMount = async () => {
-      this.registerAction("删除机场", this.delSubscribe);
-      this.registerAction("新增机场", this.addSubscribe);
-      this.registerAction("机场列表", this.listSubscribe);
-      const index = args.widgetParameter ? parseInt(args.widgetParameter) : void 0;
-      const data = await getSetting("subscribe") || [];
-      let account;
-      if (typeof index !== "undefined" && data[index]) {
-        account = data[index];
-      } else {
-        account = await getSetting("account") || this.account;
-      }
-      if (!account.url && data[0])
-        account = data[0];
-      account.icon = account.icon || this.logo;
-      this.account = account;
+      this.registerAction("分割颜色", async () => {
+        return this.showAlertCatchInput("分割颜色", "分割线颜色", {light: "白天", dark: "夜间"}, "line");
+      });
     };
     this.componentDidMount = async () => {
-      try {
-        await this.login(`${this.account.url}/api/v1/passport/auth/login`);
-        await this.getSubscribe(`${this.account.url}/api/v1/user/getSubscribe`);
-      } catch (e) {
-        console.log("❌检测账号和配置是否有误：" + e);
-      }
-      await this.createChart({w: 360, h: 360});
-    };
-    this.addSubscribe = async () => {
-      const options = {
-        title: "机场名称",
-        url: "登陆域名",
-        icon: "图标",
-        email: "邮箱账号",
-        password: "密码"
-      };
-      const dataSource = await getSetting("subscribe") || [];
-      const account = await this.showAlertCatchInput("新增订阅", "订阅的登陆地址域名请自行寻找，以/api/v1/passport/auth/login结尾", options, "add");
-      if (account) {
-        dataSource.push(account);
-        await setSetting("subscribe", dataSource, false);
-      }
-    };
-    this.login = async (url) => {
-      const data = {email: this.account.email, password: this.account.password};
-      let params = Object.keys(data).map((key) => `${key}=${encodeURIComponent(data[key])}`);
-      params = params.join("&");
-      const response = await request({url, method: "POST", data: params});
-      if (response.data.errors)
-        return console.log(JSON.stringify(response.data));
-      response.cookies.forEach((item) => {
-        this.cookies[item.name] = item.value;
-      });
-    };
-    this.getSubscribe = async (url) => {
-      let cookie = Object.keys(this.cookies).map((key) => `${key}=${this.cookies[key]}`);
-      cookie = cookie.join("; ");
-      const response = await request({
-        url,
+      const req = await request({
+        url: `https://bangumi.bilibili.com/web_api/timeline_global?time=${today}`,
         method: "GET",
-        header: {cookie, referer: `${this.account.url}/`, "accept-language": "zh-CN,zh;q=0.9"}
+        useCache: true
       });
-      if (response.data.errors)
-        return console.log(JSON.stringify(response.data));
-      response.cookies.forEach((item) => {
-        this.cookies[item.name] = item.value;
-      });
-      const subscribe = response.data.data;
-      this.dataSource.totalData = `${subscribe.transfer_enable}`;
-      this.dataSource.usedData = `${subscribe.d + subscribe.u}`;
-      this.dataSource.restData = `${subscribe.transfer_enable - (subscribe.d + subscribe.u)}`;
-      this.dataSource.todayData = `${subscribe.reset_day}`;
-    };
-    this.createChart = async (size) => {
-      const dateFormat = new DateFormatter();
-      dateFormat.dateFormat = "YYYYMMddHH";
-      const date = new Date();
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      const days = new Date(year, month, 0).getDate();
-      const today = dateFormat.string(new Date());
-      const {restData, usedData, todayData, totalData} = this.dataSource;
-      const total = parseFloat(totalData) || 1;
-      const data3 = Math.floor((1 - parseInt(todayData) / days) * 100);
-      const data2 = Math.floor(parseInt(usedData) / total * 100);
-      const data1 = Math.floor(parseInt(restData) / total * 100);
-      const data = [data1 || 0, data2 || 0, data3 || 0];
-      this.dataSource.todayData = `${todayData}天后`;
-      this.dataSource.usedData = this.formatFileSize(parseInt(usedData));
-      this.dataSource.restData = this.formatFileSize(parseInt(restData));
-      const {template1, template2, template3} = getChartConfig(data, [this.color1, this.color2, this.color3], this.dataSource.restData, this.fontColor);
-      const getUrl = (chart) => {
-        return `https://quickchart.io/chart?w=${size.w}&h=${size.h}&f=png&c=${encodeURIComponent(chart)}&today=${today}`;
-      };
-      this.chart1 = getUrl(template1);
-      this.chart2 = getUrl(template2);
-      this.chart3 = getUrl(template3);
-    };
-    this.renderSmall = async () => {
-      const {chart1, chart2, chart3} = this;
-      const {todayData, restData, usedData} = this.dataSource;
-      return /* @__PURE__ */ h("wbox", {
-        padding: [0, 0, 0, 0],
-        background: await this.getBackgroundImage() || this.backgroundColor,
-        updateDate: new Date(Date.now() + await this.updateInterval())
-      }, /* @__PURE__ */ h("wstack", {
-        padding: [10, 5, 10, 10],
-        verticalAlign: "center"
-      }, /* @__PURE__ */ h(StackCell, {
-        url: this.account.icon,
-        label: this.account.title,
-        size: 12,
-        fontColor: this.fontColor
-      }), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(StackCell, {
-        url: "arrow.clockwise",
-        label: todayData,
-        size: 12,
-        fontColor: this.fontColor
-      })), /* @__PURE__ */ h(RowCeneter_default, {
-        flexDirection: "row"
-      }, /* @__PURE__ */ h(Circle, {
-        width: 80,
-        height: 80,
-        data: {chart1, chart2, chart3}
-      })), /* @__PURE__ */ h("wstack", null, /* @__PURE__ */ h(FooterCell, {
-        fontColor: this.fontColor,
-        color: this.color1,
-        label: "剩余",
-        value: restData
-      }), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(FooterCell, {
-        fontColor: this.fontColor,
-        color: this.color2,
-        label: "累计",
-        value: usedData
-      })));
+      const response = req.data;
+      if (response.code === 0 && response.result.length > 0) {
+        const dataSource = response.result;
+        this.dataSource = (dataSource.find((item) => item.date === today) || {}).seasons || [];
+      }
+      let size = 0;
+      if (config.widgetFamily === "medium")
+        size = 3;
+      if (config.widgetFamily === "large")
+        size = 6;
+      this.dataSource = getRandomArrayElements(this.dataSource, size);
+      this.dataSource = this.dataSource.length > 3 ? [this.dataSource.splice(0, 3), this.dataSource] : [this.dataSource];
     };
     this.render = async () => {
-      const {chart1, chart2, chart3} = this;
-      const {todayData, restData, usedData} = this.dataSource;
-      console.log(this.dataSource);
-      if (config.widgetFamily === "large")
-        return RenderError("暂不支持");
-      if (config.widgetFamily === "small")
-        return this.renderSmall();
+      let lineColor = await getSetting("line");
+      if (lineColor) {
+        lineColor = Device.isUsingDarkAppearance() ? lineColor.dark : lineColor.light;
+      } else {
+        lineColor = "#e8e8e8";
+      }
       return /* @__PURE__ */ h("wbox", {
-        padding: [0, 0, 0, 0],
         background: await this.getBackgroundImage() || this.backgroundColor,
         updateDate: new Date(Date.now() + await this.updateInterval())
-      }, /* @__PURE__ */ h("wstack", null, /* @__PURE__ */ h("wspacer", {
+      }, /* @__PURE__ */ h(indext_default, {
+        icon: this.logo,
+        title: this.name,
+        textColor: this.fontColor
+      }), /* @__PURE__ */ h("wspacer", {
         length: 10
-      }), /* @__PURE__ */ h(RowCeneter_default, {
+      }), config.widgetFamily === "large" && /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(Stack3DLine_default, {
+        borderColor: lineColor,
+        height: 10
+      }), /* @__PURE__ */ h("wspacer", {
+        length: 10
+      })), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wstack", {
         flexDirection: "column"
-      }, /* @__PURE__ */ h(Circle, {
-        width: 140,
-        height: 140,
-        data: {chart1, chart2, chart3}
-      })), /* @__PURE__ */ h("wspacer", {
-        length: 20
-      }), /* @__PURE__ */ h(RowCeneter_default, {
-        flexDirection: "column"
-      }, /* @__PURE__ */ h(StackCell, {
-        url: this.logo,
-        label: this.account.title,
-        value: ".",
-        fontColor: this.fontColor
-      }), /* @__PURE__ */ h("wspacer", {
-        length: 10
-      }), /* @__PURE__ */ h(StackCell, {
-        color: this.color3,
-        label: "重置",
-        value: todayData,
-        fontColor: this.fontColor
-      }), /* @__PURE__ */ h("wspacer", {
-        length: 10
-      }), /* @__PURE__ */ h(StackCell, {
-        color: this.color2,
-        label: "累计",
-        value: usedData,
-        fontColor: this.fontColor
-      }), /* @__PURE__ */ h("wspacer", {
-        length: 10
-      }), /* @__PURE__ */ h(StackCell, {
-        color: this.color1,
-        label: "剩余",
-        value: restData,
-        fontColor: this.fontColor
-      })), /* @__PURE__ */ h("wspacer", null)));
+      }, this.dataSource.map((item, sIndex) => {
+        return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wstack", null, item.map((season, index) => /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(RowCell, {
+          data: season
+        }), index !== item.length ? /* @__PURE__ */ h("wspacer", {
+          length: 10
+        }) : item.length !== 3 ? /* @__PURE__ */ h("wspacer", null) : ""))), sIndex !== this.dataSource.length && /* @__PURE__ */ h("wspacer", {
+          length: 10
+        }));
+      }))), config.widgetFamily === "large" && /* @__PURE__ */ h(Stack3DLine_default, {
+        borderColor: lineColor
+      }), /* @__PURE__ */ h("wspacer", null));
     };
-  }
-  async listSubscribe() {
-    try {
-      const table = new UITable();
-      const dataSource = await getSetting("subscribe") || [];
-      dataSource.map((t, index) => {
-        const r = new UITableRow();
-        r.addText(`parameter：${index}  机场名：${t.title}     订阅：${t.url}`);
-        r.onSelect = () => setSetting("account", t);
-        table.addRow(r);
-      });
-      await table.present(false);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  async delSubscribe() {
-    try {
-      const table = new UITable();
-      const dataSource = await getSetting("subscribe") || [];
-      dataSource.map((t, index) => {
-        const r = new UITableRow();
-        r.addText(`❌   机场名：${t.title}     订阅：${t.url}`);
-        r.onSelect = async () => {
-          dataSource.splice(index, 1);
-          await setSetting("subscribe", dataSource, false);
-          await showNotification({title: this.name, body: `删除${t.title}机场成功`});
-        };
-        table.addRow(r);
-      });
-      await table.present(false);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  formatFileSize(fileSize) {
-    let temp;
-    if (fileSize < 1024 * 1024) {
-      temp = fileSize / 1024;
-      temp = temp.toFixed(2);
-      return temp + "KB";
-    } else if (fileSize < 1024 * 1024 * 1024) {
-      temp = fileSize / (1024 * 1024);
-      temp = temp.toFixed(2);
-      return temp + "MB";
-    } else if (fileSize < 1024 * 1024 * 1024 * 1024) {
-      temp = fileSize / (1024 * 1024 * 1024);
-      temp = temp.toFixed(2);
-      return temp + "GB";
-    } else {
-      temp = fileSize / (1024 * 1024 * 1024 * 1024);
-      temp = temp.toFixed(2);
-      return temp + "TB";
-    }
   }
 };
 
