@@ -122,7 +122,7 @@ class Widget extends Base {
         )}
         <RowCenter>
           <wstack flexDirection={'column'}>
-            {this.dataSource.map((item: SeasonProps[], sIndex: number) => {
+            {this.dataSource.map((item: SeasonProps[]) => {
               return (
                 <>
                   <wstack>
@@ -133,13 +133,13 @@ class Widget extends Base {
                       </>
                     ))}
                   </wstack>
-                  {sIndex !== this.dataSource.length && <wspacer length={10} />}
+                  {config.widgetFamily === 'large' && <Stack3DLine borderColor={lineColor} height={20} />}
+                  <wspacer />
                 </>
               );
             })}
           </wstack>
         </RowCenter>
-        {config.widgetFamily === 'large' && <Stack3DLine borderColor={lineColor} />}
         <wspacer />
       </wbox>
     );

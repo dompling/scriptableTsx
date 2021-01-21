@@ -9,13 +9,13 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1611199879000
+// @编译时间 1611212615153
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-    
+
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {
@@ -1331,17 +1331,16 @@ var Widget = class extends Base_default {
         length: 10
       })), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wstack", {
         flexDirection: "column"
-      }, this.dataSource.map((item, sIndex) => {
+      }, this.dataSource.map((item) => {
         return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wstack", null, item.map((season, index) => /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(RowCell, {
           data: season
         }), index !== item.length ? /* @__PURE__ */ h("wspacer", {
           length: 10
-        }) : item.length !== 3 ? /* @__PURE__ */ h("wspacer", null) : ""))), sIndex !== this.dataSource.length && /* @__PURE__ */ h("wspacer", {
-          length: 10
-        }));
-      }))), config.widgetFamily === "large" && /* @__PURE__ */ h(Stack3DLine_default, {
-        borderColor: lineColor
-      }), /* @__PURE__ */ h("wspacer", null));
+        }) : item.length !== 3 ? /* @__PURE__ */ h("wspacer", null) : ""))), config.widgetFamily === "large" && /* @__PURE__ */ h(Stack3DLine_default, {
+          borderColor: lineColor,
+          height: 20
+        }), /* @__PURE__ */ h("wspacer", null));
+      }))), /* @__PURE__ */ h("wspacer", null));
     };
   }
 };
