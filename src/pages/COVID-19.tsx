@@ -190,7 +190,7 @@ class Widget extends Base {
     return (
       <wstack flexDirection={'column'} background={data.bg}>
         <wspacer />
-        <RowCenter flexDirection={'column'}>
+        <RowCenter>
           <wtext font={addumFont} textColor={viewColor}>
             较上日
           </wtext>
@@ -199,11 +199,11 @@ class Widget extends Base {
           </wtext>
         </RowCenter>
         <wspacer length={2} />
-        <RowCenter flexDirection={'column'}>
+        <RowCenter>
           <wtext textColor={data.color}>{data.value}</wtext>
         </RowCenter>
         <wspacer length={2} />
-        <RowCenter flexDirection={'column'}>
+        <RowCenter>
           <wtext font={addumFont} textColor={viewColor}>
             {data.tabText}
           </wtext>
