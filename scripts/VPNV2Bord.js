@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：2/1/2021
+ * 更新时间：3/18/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1612168036358
+// @编译时间 1616059370987
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -135,7 +135,12 @@ function useSetting(settingFilename) {
       await showNotification({title: "消息提示", body: "设置保存成功,稍后刷新组件"});
     return settings;
   };
-  return {getSetting: getSetting2, setSetting: setSetting2};
+  const clear = async (notify = true) => {
+    await fileManager.writeString(settingsPath, JSON.stringify({}));
+    if (notify)
+      await showNotification({title: "消息提示", body: "设置保存成功,稍后刷新组件"});
+  };
+  return {getSetting: getSetting2, setSetting: setSetting2, clear};
 }
 async function request(args2) {
   const {
@@ -293,36 +298,6 @@ function hash(string) {
     hash2 |= 0;
   }
   return `hash_${hash2}`;
-}
-async function showPreviewOptions(render) {
-  const selectIndex = await showActionSheet({
-    title: "预览组件",
-    desc: "测试桌面组件在各种尺寸下的显示效果",
-    itemList: ["小尺寸", "中尺寸", "大尺寸", "全部尺寸"]
-  });
-  switch (selectIndex) {
-    case 0:
-      config.widgetFamily = "small";
-      await (await render()).presentSmall();
-      break;
-    case 1:
-      config.widgetFamily = "medium";
-      await (await render()).presentMedium();
-      break;
-    case 2:
-      config.widgetFamily = "large";
-      await (await render()).presentLarge();
-      break;
-    case 3:
-      config.widgetFamily = "small";
-      await (await render()).presentSmall();
-      config.widgetFamily = "medium";
-      await (await render()).presentMedium();
-      config.widgetFamily = "large";
-      await (await render()).presentLarge();
-      break;
-  }
-  return selectIndex;
 }
 async function setTransparentBackground(tips) {
   const phoneSizea = {
@@ -844,81 +819,46 @@ var Base = class {
       const updateInterval = await getSetting2("updateInterval") || "30";
       return parseInt(updateInterval) * 1e3 * 60;
     };
-    this.baseActions = [
-      {
-        title: "字体颜色",
-        func: async () => {
-          await this.setLightAndDark("字体颜色", "Hex 颜色", "fontColor");
-        }
-      },
-      {
-        title: "背景设置",
-        func: async () => {
-          const actions = [
-            {
-              title: "白天图",
-              func: async () => {
-                const image = await Photos.fromLibrary();
-                if (!await this.verifyImage(image))
-                  return;
-                await this.setImage(image, `${this.backgroundKey}_light`);
-              }
-            },
-            {
-              title: "夜间图",
-              func: async () => {
-                const image = await Photos.fromLibrary();
-                if (!await this.verifyImage(image))
-                  return;
-                await this.setImage(image, `${this.backgroundKey}_night`);
-              }
-            },
-            {
-              title: "透明度",
-              func: async () => {
-                return this.setLightAndDark("透明度", false, "opacity");
-              }
-            },
-            {
-              title: "背景色",
-              func: async () => {
-                return this.setLightAndDark("背景色", false, "backgroundColor");
-              }
-            }
-          ];
-          await this.showActionSheet("背景设置", actions);
-        }
-      },
-      {
-        title: "透明背景",
-        func: async () => {
-          const image = await setTransparentBackground();
-          image && await this.setImage(image, this.backgroundKey);
-        }
-      },
-      {
-        title: "清空背景",
-        func: async () => {
-          await this.setImage(null, `${this.backgroundKey}_light`);
-          await this.setImage(null, `${this.backgroundKey}_night`);
-          await this.setImage(null, this.backgroundKey);
-        }
-      }
-    ];
-    this.actions = [
+    this.widgetAction = [
       {
         title: "预览组件",
-        func: async () => {
+        onClick: async () => {
           const render = async () => {
             await this.componentDidMount();
             return this.render();
           };
-          await showPreviewOptions(render);
+          const onClick = async (item) => {
+            const size = item.val || "small";
+            config.widgetFamily = size;
+            const w = await render();
+            const fnc = size.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase());
+            w && await w[`present${fnc}`]();
+          };
+          const preview = [
+            {
+              title: "小尺寸",
+              val: "small",
+              onClick
+            },
+            {
+              title: "中尺寸",
+              val: "medium",
+              onClick
+            },
+            {
+              title: "大尺寸",
+              val: "large",
+              onClick
+            }
+          ];
+          const table = new UITable();
+          await this.showActionSheet(table, "预览效果", preview);
+          await table.present();
         }
       },
       {
         title: "刷新时间",
-        func: async () => {
+        onClick: async () => {
           const {getSetting: getSetting2, setSetting: setSetting2} = useSetting(this.en);
           const updateInterval = await getSetting2("updateInterval") || "";
           const {texts} = await showModal({
@@ -932,28 +872,74 @@ var Base = class {
           });
           await setSetting2("updateInterval", texts);
         }
+      }
+    ];
+    this.baseActions = [
+      {
+        title: "字体颜色",
+        val: "白天 | 夜间",
+        onClick: async () => {
+          await this.setLightAndDark("字体颜色", "Hex 颜色", "fontColor");
+        }
       },
       {
-        title: "基础设置",
-        func: async () => {
-          if (this.useBoxJS) {
-            this.baseActions.push({
-              title: "BoxJS",
-              func: async () => {
-                const {getStorage: getStorage2, setStorage: setStorage2} = useStorage("boxjs");
-                const boxjs = getStorage2("prefix") || this.prefix;
-                const {texts} = await showModal({
-                  title: "BoxJS设置",
-                  inputItems: [{placeholder: "BoxJS域名", text: boxjs}]
-                });
-                await setStorage2("prefix", texts[0]);
+        title: "背景设置",
+        val: "白天图 | 夜间图 | 背景色",
+        onClick: async () => {
+          const actions = [
+            {
+              title: "白天图",
+              onClick: async () => {
+                const image = await Photos.fromLibrary();
+                if (!await this.verifyImage(image))
+                  return;
+                await this.setImage(image, `${this.backgroundKey}_light`);
               }
-            });
-          }
-          await this.showActionSheet("基础设置", this.baseActions);
+            },
+            {
+              title: "夜间图",
+              onClick: async () => {
+                const image = await Photos.fromLibrary();
+                if (!await this.verifyImage(image))
+                  return;
+                await this.setImage(image, `${this.backgroundKey}_night`);
+              }
+            },
+            {
+              title: "透明度",
+              onClick: async () => {
+                return this.setLightAndDark("透明度", false, "opacity");
+              }
+            },
+            {
+              title: "背景色",
+              onClick: async () => {
+                return this.setLightAndDark("背景色", false, "backgroundColor");
+              }
+            }
+          ];
+          const table = new UITable();
+          await this.showActionSheet(table, "背景设置", actions);
+          await table.present();
+        }
+      },
+      {
+        title: "透明背景",
+        onClick: async () => {
+          const image = await setTransparentBackground();
+          image && await this.setImage(image, this.backgroundKey);
+        }
+      },
+      {
+        title: "清空背景",
+        onClick: async () => {
+          await this.setImage(null, `${this.backgroundKey}_light`);
+          await this.setImage(null, `${this.backgroundKey}_night`);
+          await this.setImage(null, this.backgroundKey);
         }
       }
     ];
+    this.actions = [];
     this.getBackgroundColor = (color) => {
       const colors = color.split(",");
       if (colors.length > 0) {
@@ -1052,19 +1038,71 @@ var Base = class {
       }
       return result;
     };
-    this.registerAction = (title, func) => {
-      this.actions.splice(1, 0, {title, func});
+    this.registerAction = (title, onClick) => {
+      this.actions.splice(1, 0, {title, onClick});
     };
-    this.showActionSheet = async (title, actions) => {
-      const selectIndex = await showActionSheet({
-        title,
-        itemList: actions.map((item) => item.title)
+    this.preferences = async (table, arr, outfit) => {
+      const header = new UITableRow();
+      const heading = header.addText(outfit);
+      heading.titleFont = Font.mediumSystemFont(17);
+      heading.centerAligned();
+      table.addRow(header);
+      arr.forEach((item) => {
+        const row = new UITableRow();
+        const rowTitle = row.addText(item.title);
+        rowTitle.widthWeight = 0.5;
+        rowTitle.titleFont = Font.systemFont(16);
+        if (item.val) {
+          const valText = row.addText(`${item.val}`.toUpperCase());
+          valText.widthWeight = 0.5;
+          valText.rightAligned();
+          valText.titleColor = Color.blue();
+          valText.titleFont = Font.mediumSystemFont(16);
+        }
+        row.dismissOnSelect = false;
+        if (item.onClick)
+          row.onSelect = () => item.onClick(item);
+        table.addRow(row);
       });
-      const actionItem = actions.find((_, index) => selectIndex === index);
-      actionItem && await actionItem.func();
+      table.reload();
+    };
+    this.showActionSheet = async (table, title, actions) => {
+      await this.preferences(table, actions, title);
     };
     this.showMenu = async () => {
-      await this.showActionSheet(this.name, this.actions);
+      const table = new UITable();
+      table.showSeparators = true;
+      table.removeAllRows();
+      const topRow = new UITableRow();
+      topRow.height = 60;
+      const leftText = topRow.addButton("Github");
+      leftText.widthWeight = 0.3;
+      leftText.onTap = async () => {
+        await Safari.openInApp("https://github.com/dompling/Scriptable");
+      };
+      const centerRow = topRow.addImageAtURL("https://s3.ax1x.com/2021/03/16/6y4oJ1.png");
+      centerRow.widthWeight = 0.4;
+      centerRow.centerAligned();
+      centerRow.onTap = async () => {
+        await Safari.open("https://t.me/Scriptable_JS");
+      };
+      const rightText = topRow.addButton("重置所有");
+      rightText.widthWeight = 0.3;
+      rightText.rightAligned();
+      rightText.onTap = async () => {
+        const options = ["取消", "重置"];
+        const message = "该操作不可逆，会清空所有组件配置！重置后请重新打开设置菜单。";
+        const index = await this.generateAlert(message, options);
+        if (index === 0)
+          return;
+        const {clear} = useSetting(this.en);
+        return clear();
+      };
+      table.addRow(topRow);
+      await this.preferences(table, this.widgetAction, "组件预览");
+      await this.preferences(table, this.actions, "组件设置");
+      await this.preferences(table, this.baseActions, "主题设置");
+      await table.present();
     };
     this.getBoxJsCache = async (key) => {
       try {

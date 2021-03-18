@@ -1,5 +1,4 @@
 import {
-  showActionSheet,
   showPreviewOptions,
   showNotification,
   useStorage,
@@ -12,7 +11,8 @@ import {
 
 interface actionsProps {
   title: string;
-  func: any;
+  onClick: any;
+  val?: string;
 }
 
 const FILE_MGR_LOCAL: FileManager = fm();
@@ -71,80 +71,46 @@ class Base {
     return parseInt(updateInterval) * 1000 * 60;
   };
 
-  baseActions: actionsProps[] = [
-    {
-      title: '字体颜色',
-      func: async (): Promise<void> => {
-        await this.setLightAndDark('字体颜色', 'Hex 颜色', 'fontColor');
-      },
-    },
-    {
-      title: '背景设置',
-      func: async (): Promise<void> => {
-        const actions: actionsProps[] = [
-          {
-            title: '白天图',
-            func: async (): Promise<void> => {
-              const image: Image = await Photos.fromLibrary();
-              if (!(await this.verifyImage(image))) return;
-              await this.setImage(image, `${this.backgroundKey}_light`);
-            },
-          },
-          {
-            title: '夜间图',
-            func: async (): Promise<void> => {
-              const image: Image = await Photos.fromLibrary();
-              if (!(await this.verifyImage(image))) return;
-              await this.setImage(image, `${this.backgroundKey}_night`);
-            },
-          },
-          {
-            title: '透明度',
-            func: async (): Promise<void> => {
-              return this.setLightAndDark('透明度', false, 'opacity');
-            },
-          },
-          {
-            title: '背景色',
-            func: async () => {
-              return this.setLightAndDark('背景色', false, 'backgroundColor');
-            },
-          },
-        ];
-        await this.showActionSheet('背景设置', actions);
-      },
-    },
-    {
-      title: '透明背景',
-      func: async (): Promise<void> => {
-        const image = await setTransparentBackground();
-        image && (await this.setImage(image, this.backgroundKey));
-      },
-    },
-    {
-      title: '清空背景',
-      func: async (): Promise<void> => {
-        await this.setImage(null, `${this.backgroundKey}_light`);
-        await this.setImage(null, `${this.backgroundKey}_night`);
-        await this.setImage(null, this.backgroundKey);
-      },
-    },
-  ];
-
-  actions: actionsProps[] = [
+  widgetAction: actionsProps[] = [
     {
       title: '预览组件',
-      func: async (): Promise<void> => {
+      onClick: async (): Promise<void> => {
         const render = async () => {
           await this.componentDidMount();
           return this.render();
         };
-        await showPreviewOptions(render);
+        const onClick = async (item: actionsProps) => {
+          const size = item.val || 'small';
+          config.widgetFamily = size;
+          const w: any = await render();
+          const fnc = size.toLowerCase().replace(/( |^)[a-z]/g, L => L.toUpperCase());
+          w && (await w[`present${fnc}`]());
+        };
+        const preview = [
+          {
+            title: '小尺寸',
+            val: 'small',
+            onClick,
+          },
+          {
+            title: '中尺寸',
+            val: 'medium',
+            onClick,
+          },
+          {
+            title: '大尺寸',
+            val: 'large',
+            onClick,
+          },
+        ];
+        const table = new UITable();
+        await this.showActionSheet(table, '预览效果', preview);
+        await table.present();
       },
     },
     {
       title: '刷新时间',
-      func: async (): Promise<void> => {
+      onClick: async (): Promise<void> => {
         const {getSetting, setSetting} = useSetting(this.en);
         const updateInterval: string = (await getSetting<string>('updateInterval')) || '';
         const {texts} = await showModal({
@@ -159,27 +125,73 @@ class Base {
         await setSetting('updateInterval', texts);
       },
     },
+  ];
+
+  baseActions: actionsProps[] = [
     {
-      title: '基础设置',
-      func: async (): Promise<void> => {
-        if (this.useBoxJS) {
-          this.baseActions.push({
-            title: 'BoxJS',
-            func: async () => {
-              const {getStorage, setStorage} = useStorage('boxjs');
-              const boxjs: string = getStorage<string>('prefix') || this.prefix;
-              const {texts} = await showModal({
-                title: 'BoxJS设置',
-                inputItems: [{placeholder: 'BoxJS域名', text: boxjs}],
-              });
-              await setStorage('prefix', texts[0]);
+      title: '字体颜色',
+      val: '白天 | 夜间',
+      onClick: async (): Promise<void> => {
+        await this.setLightAndDark('字体颜色', 'Hex 颜色', 'fontColor');
+      },
+    },
+    {
+      title: '背景设置',
+      val: '白天图 | 夜间图 | 背景色',
+      onClick: async (): Promise<void> => {
+        const actions: actionsProps[] = [
+          {
+            title: '白天图',
+            onClick: async (): Promise<void> => {
+              const image: Image = await Photos.fromLibrary();
+              if (!(await this.verifyImage(image))) return;
+              await this.setImage(image, `${this.backgroundKey}_light`);
             },
-          });
-        }
-        await this.showActionSheet('基础设置', this.baseActions);
+          },
+          {
+            title: '夜间图',
+            onClick: async (): Promise<void> => {
+              const image: Image = await Photos.fromLibrary();
+              if (!(await this.verifyImage(image))) return;
+              await this.setImage(image, `${this.backgroundKey}_night`);
+            },
+          },
+          {
+            title: '透明度',
+            onClick: async (): Promise<void> => {
+              return this.setLightAndDark('透明度', false, 'opacity');
+            },
+          },
+          {
+            title: '背景色',
+            onClick: async () => {
+              return this.setLightAndDark('背景色', false, 'backgroundColor');
+            },
+          },
+        ];
+        const table = new UITable();
+        await this.showActionSheet(table, '背景设置', actions);
+        await table.present();
+      },
+    },
+    {
+      title: '透明背景',
+      onClick: async (): Promise<void> => {
+        const image = await setTransparentBackground();
+        image && (await this.setImage(image, this.backgroundKey));
+      },
+    },
+    {
+      title: '清空背景',
+      onClick: async (): Promise<void> => {
+        await this.setImage(null, `${this.backgroundKey}_light`);
+        await this.setImage(null, `${this.backgroundKey}_night`);
+        await this.setImage(null, this.backgroundKey);
       },
     },
   ];
+
+  actions: actionsProps[] = [];
 
   getBackgroundColor = (color: string): string | LinearGradient => {
     const colors = color.split(',');
@@ -317,22 +329,73 @@ class Base {
     return ctx.getImage();
   }
 
-  registerAction = (title: string, func: () => Promise<void>): any => {
-    this.actions.splice(1, 0, {title, func} as actionsProps);
+  registerAction = (title: string, onClick: () => Promise<void>): any => {
+    this.actions.splice(1, 0, {title, onClick} as actionsProps);
   };
 
-  showActionSheet = async (title: string, actions: actionsProps[]): Promise<void> => {
-    const selectIndex = await showActionSheet({
-      title,
-      itemList: actions.map(item => item.title),
+  preferences = async (table: UITable, arr: Record<string, any>[], outfit: string): Promise<void> => {
+    const header = new UITableRow();
+    const heading = header.addText(outfit);
+    heading.titleFont = Font.mediumSystemFont(17);
+    heading.centerAligned();
+    table.addRow(header);
+    arr.forEach(item => {
+      const row = new UITableRow();
+      const rowTitle = row.addText(item.title);
+      rowTitle.widthWeight = 0.5;
+      rowTitle.titleFont = Font.systemFont(16);
+      if (item.val) {
+        const valText = row.addText(`${item.val}`.toUpperCase());
+        valText.widthWeight = 0.5;
+        valText.rightAligned();
+        valText.titleColor = Color.blue();
+        valText.titleFont = Font.mediumSystemFont(16);
+      }
+      row.dismissOnSelect = false;
+      if (item.onClick) row.onSelect = () => item.onClick(item);
+      table.addRow(row);
     });
-    const actionItem: actionsProps | undefined = actions.find((_, index: number) => selectIndex === index);
-    actionItem && (await actionItem.func());
+    table.reload();
+  };
+
+  showActionSheet = async (table: UITable, title: string, actions: actionsProps[]): Promise<void> => {
+    await this.preferences(table, actions, title);
   };
 
   // 显示菜单
   showMenu = async (): Promise<void> => {
-    await this.showActionSheet(this.name, this.actions);
+    const table = new UITable();
+    table.showSeparators = true;
+    table.removeAllRows();
+    const topRow = new UITableRow();
+    topRow.height = 60;
+    const leftText = topRow.addButton('Github');
+    leftText.widthWeight = 0.3;
+    leftText.onTap = async () => {
+      await Safari.openInApp('https://github.com/dompling/Scriptable');
+    };
+    const centerRow = topRow.addImageAtURL('https://s3.ax1x.com/2021/03/16/6y4oJ1.png');
+    centerRow.widthWeight = 0.4;
+    centerRow.centerAligned();
+    centerRow.onTap = async () => {
+      await Safari.open('https://t.me/Scriptable_JS');
+    };
+    const rightText = topRow.addButton('重置所有');
+    rightText.widthWeight = 0.3;
+    rightText.rightAligned();
+    rightText.onTap = async () => {
+      const options = ['取消', '重置'];
+      const message = '该操作不可逆，会清空所有组件配置！重置后请重新打开设置菜单。';
+      const index = await this.generateAlert(message, options);
+      if (index === 0) return;
+      const {clear} = useSetting(this.en);
+      return clear();
+    };
+    table.addRow(topRow);
+    await this.preferences(table, this.widgetAction, '组件预览');
+    await this.preferences(table, this.actions, '组件设置');
+    await this.preferences(table, this.baseActions, '主题设置');
+    await table.present();
   };
 
   getBoxJsCache = async (key?: string): Promise<string | boolean | any> => {

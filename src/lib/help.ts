@@ -402,7 +402,12 @@ export function useSetting(settingFilename?: string) {
     return settings;
   };
 
-  return {getSetting, setSetting};
+  const clear = async (notify = true) => {
+    await fileManager.writeString(settingsPath, JSON.stringify({}));
+    if (notify) await showNotification({title: '消息提示', body: '设置保存成功,稍后刷新组件'});
+  };
+
+  return {getSetting, setSetting, clear};
 }
 
 /**

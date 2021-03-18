@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：2/1/2021
+ * 更新时间：3/18/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1612168036358
+// @编译时间 1616059370987
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -135,7 +135,12 @@ function useSetting(settingFilename) {
       await showNotification({title: "消息提示", body: "设置保存成功,稍后刷新组件"});
     return settings;
   };
-  return {getSetting: getSetting2, setSetting: setSetting2};
+  const clear = async (notify = true) => {
+    await fileManager.writeString(settingsPath, JSON.stringify({}));
+    if (notify)
+      await showNotification({title: "消息提示", body: "设置保存成功,稍后刷新组件"});
+  };
+  return {getSetting: getSetting2, setSetting: setSetting2, clear};
 }
 async function request(args2) {
   const {
@@ -293,36 +298,6 @@ function hash(string) {
     hash2 |= 0;
   }
   return `hash_${hash2}`;
-}
-async function showPreviewOptions(render) {
-  const selectIndex = await showActionSheet({
-    title: "预览组件",
-    desc: "测试桌面组件在各种尺寸下的显示效果",
-    itemList: ["小尺寸", "中尺寸", "大尺寸", "全部尺寸"]
-  });
-  switch (selectIndex) {
-    case 0:
-      config.widgetFamily = "small";
-      await (await render()).presentSmall();
-      break;
-    case 1:
-      config.widgetFamily = "medium";
-      await (await render()).presentMedium();
-      break;
-    case 2:
-      config.widgetFamily = "large";
-      await (await render()).presentLarge();
-      break;
-    case 3:
-      config.widgetFamily = "small";
-      await (await render()).presentSmall();
-      config.widgetFamily = "medium";
-      await (await render()).presentMedium();
-      config.widgetFamily = "large";
-      await (await render()).presentLarge();
-      break;
-  }
-  return selectIndex;
 }
 async function setTransparentBackground(tips) {
   const phoneSizea = {
@@ -844,81 +819,46 @@ var Base = class {
       const updateInterval = await getSetting2("updateInterval") || "30";
       return parseInt(updateInterval) * 1e3 * 60;
     };
-    this.baseActions = [
-      {
-        title: "字体颜色",
-        func: async () => {
-          await this.setLightAndDark("字体颜色", "Hex 颜色", "fontColor");
-        }
-      },
-      {
-        title: "背景设置",
-        func: async () => {
-          const actions = [
-            {
-              title: "白天图",
-              func: async () => {
-                const image = await Photos.fromLibrary();
-                if (!await this.verifyImage(image))
-                  return;
-                await this.setImage(image, `${this.backgroundKey}_light`);
-              }
-            },
-            {
-              title: "夜间图",
-              func: async () => {
-                const image = await Photos.fromLibrary();
-                if (!await this.verifyImage(image))
-                  return;
-                await this.setImage(image, `${this.backgroundKey}_night`);
-              }
-            },
-            {
-              title: "透明度",
-              func: async () => {
-                return this.setLightAndDark("透明度", false, "opacity");
-              }
-            },
-            {
-              title: "背景色",
-              func: async () => {
-                return this.setLightAndDark("背景色", false, "backgroundColor");
-              }
-            }
-          ];
-          await this.showActionSheet("背景设置", actions);
-        }
-      },
-      {
-        title: "透明背景",
-        func: async () => {
-          const image = await setTransparentBackground();
-          image && await this.setImage(image, this.backgroundKey);
-        }
-      },
-      {
-        title: "清空背景",
-        func: async () => {
-          await this.setImage(null, `${this.backgroundKey}_light`);
-          await this.setImage(null, `${this.backgroundKey}_night`);
-          await this.setImage(null, this.backgroundKey);
-        }
-      }
-    ];
-    this.actions = [
+    this.widgetAction = [
       {
         title: "预览组件",
-        func: async () => {
+        onClick: async () => {
           const render = async () => {
             await this.componentDidMount();
             return this.render();
           };
-          await showPreviewOptions(render);
+          const onClick = async (item) => {
+            const size = item.val || "small";
+            config.widgetFamily = size;
+            const w = await render();
+            const fnc = size.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase());
+            w && await w[`present${fnc}`]();
+          };
+          const preview = [
+            {
+              title: "小尺寸",
+              val: "small",
+              onClick
+            },
+            {
+              title: "中尺寸",
+              val: "medium",
+              onClick
+            },
+            {
+              title: "大尺寸",
+              val: "large",
+              onClick
+            }
+          ];
+          const table = new UITable();
+          await this.showActionSheet(table, "预览效果", preview);
+          await table.present();
         }
       },
       {
         title: "刷新时间",
-        func: async () => {
+        onClick: async () => {
           const {getSetting: getSetting2, setSetting: setSetting2} = useSetting(this.en);
           const updateInterval = await getSetting2("updateInterval") || "";
           const {texts} = await showModal({
@@ -932,28 +872,74 @@ var Base = class {
           });
           await setSetting2("updateInterval", texts);
         }
+      }
+    ];
+    this.baseActions = [
+      {
+        title: "字体颜色",
+        val: "白天 | 夜间",
+        onClick: async () => {
+          await this.setLightAndDark("字体颜色", "Hex 颜色", "fontColor");
+        }
       },
       {
-        title: "基础设置",
-        func: async () => {
-          if (this.useBoxJS) {
-            this.baseActions.push({
-              title: "BoxJS",
-              func: async () => {
-                const {getStorage: getStorage2, setStorage: setStorage2} = useStorage("boxjs");
-                const boxjs = getStorage2("prefix") || this.prefix;
-                const {texts} = await showModal({
-                  title: "BoxJS设置",
-                  inputItems: [{placeholder: "BoxJS域名", text: boxjs}]
-                });
-                await setStorage2("prefix", texts[0]);
+        title: "背景设置",
+        val: "白天图 | 夜间图 | 背景色",
+        onClick: async () => {
+          const actions = [
+            {
+              title: "白天图",
+              onClick: async () => {
+                const image = await Photos.fromLibrary();
+                if (!await this.verifyImage(image))
+                  return;
+                await this.setImage(image, `${this.backgroundKey}_light`);
               }
-            });
-          }
-          await this.showActionSheet("基础设置", this.baseActions);
+            },
+            {
+              title: "夜间图",
+              onClick: async () => {
+                const image = await Photos.fromLibrary();
+                if (!await this.verifyImage(image))
+                  return;
+                await this.setImage(image, `${this.backgroundKey}_night`);
+              }
+            },
+            {
+              title: "透明度",
+              onClick: async () => {
+                return this.setLightAndDark("透明度", false, "opacity");
+              }
+            },
+            {
+              title: "背景色",
+              onClick: async () => {
+                return this.setLightAndDark("背景色", false, "backgroundColor");
+              }
+            }
+          ];
+          const table = new UITable();
+          await this.showActionSheet(table, "背景设置", actions);
+          await table.present();
+        }
+      },
+      {
+        title: "透明背景",
+        onClick: async () => {
+          const image = await setTransparentBackground();
+          image && await this.setImage(image, this.backgroundKey);
+        }
+      },
+      {
+        title: "清空背景",
+        onClick: async () => {
+          await this.setImage(null, `${this.backgroundKey}_light`);
+          await this.setImage(null, `${this.backgroundKey}_night`);
+          await this.setImage(null, this.backgroundKey);
         }
       }
     ];
+    this.actions = [];
     this.getBackgroundColor = (color) => {
       const colors = color.split(",");
       if (colors.length > 0) {
@@ -1052,19 +1038,71 @@ var Base = class {
       }
       return result;
     };
-    this.registerAction = (title, func) => {
-      this.actions.splice(1, 0, {title, func});
+    this.registerAction = (title, onClick) => {
+      this.actions.splice(1, 0, {title, onClick});
     };
-    this.showActionSheet = async (title, actions) => {
-      const selectIndex = await showActionSheet({
-        title,
-        itemList: actions.map((item) => item.title)
+    this.preferences = async (table, arr, outfit) => {
+      const header = new UITableRow();
+      const heading = header.addText(outfit);
+      heading.titleFont = Font.mediumSystemFont(17);
+      heading.centerAligned();
+      table.addRow(header);
+      arr.forEach((item) => {
+        const row = new UITableRow();
+        const rowTitle = row.addText(item.title);
+        rowTitle.widthWeight = 0.5;
+        rowTitle.titleFont = Font.systemFont(16);
+        if (item.val) {
+          const valText = row.addText(`${item.val}`.toUpperCase());
+          valText.widthWeight = 0.5;
+          valText.rightAligned();
+          valText.titleColor = Color.blue();
+          valText.titleFont = Font.mediumSystemFont(16);
+        }
+        row.dismissOnSelect = false;
+        if (item.onClick)
+          row.onSelect = () => item.onClick(item);
+        table.addRow(row);
       });
-      const actionItem = actions.find((_, index) => selectIndex === index);
-      actionItem && await actionItem.func();
+      table.reload();
+    };
+    this.showActionSheet = async (table, title, actions) => {
+      await this.preferences(table, actions, title);
     };
     this.showMenu = async () => {
-      await this.showActionSheet(this.name, this.actions);
+      const table = new UITable();
+      table.showSeparators = true;
+      table.removeAllRows();
+      const topRow = new UITableRow();
+      topRow.height = 60;
+      const leftText = topRow.addButton("Github");
+      leftText.widthWeight = 0.3;
+      leftText.onTap = async () => {
+        await Safari.openInApp("https://github.com/dompling/Scriptable");
+      };
+      const centerRow = topRow.addImageAtURL("https://s3.ax1x.com/2021/03/16/6y4oJ1.png");
+      centerRow.widthWeight = 0.4;
+      centerRow.centerAligned();
+      centerRow.onTap = async () => {
+        await Safari.open("https://t.me/Scriptable_JS");
+      };
+      const rightText = topRow.addButton("重置所有");
+      rightText.widthWeight = 0.3;
+      rightText.rightAligned();
+      rightText.onTap = async () => {
+        const options = ["取消", "重置"];
+        const message = "该操作不可逆，会清空所有组件配置！重置后请重新打开设置菜单。";
+        const index = await this.generateAlert(message, options);
+        if (index === 0)
+          return;
+        const {clear} = useSetting(this.en);
+        return clear();
+      };
+      table.addRow(topRow);
+      await this.preferences(table, this.widgetAction, "组件预览");
+      await this.preferences(table, this.actions, "组件设置");
+      await this.preferences(table, this.baseActions, "主题设置");
+      await table.present();
     };
     this.getBoxJsCache = async (key) => {
       try {
@@ -1277,10 +1315,11 @@ var Widget = class extends Base_default {
     this.en = "JDDou";
     this.cookie = {};
     this.CookiesData = [];
-    this.userInfo = {base: {}};
+    this.JDDataSource = {};
     this.timerKeys = [];
     this.incomeBean = 0;
     this.expenseBean = 0;
+    this.beanNum = 0;
     this.jintie = 0;
     this.gangben = 0;
     this.componentWillMount = async () => {
@@ -1303,7 +1342,8 @@ var Widget = class extends Base_default {
       this.cookie = await getSetting("JDCK");
       if (cookies && cookies[ckIndex])
         this.cookie = cookies[ckIndex];
-      this.userInfo = await this.fetchUserInfo();
+      this.JDDataSource = await this.fetchJDDataSource();
+      this.beanNum = parseInt(this.JDDataSource.assetInfo.beanNum || "0");
       this.timerKeys = this.getDay(1);
       await this.getAmountData();
       await this.fetchBaseInfo();
@@ -1405,10 +1445,10 @@ var Widget = class extends Base_default {
         value: `${this.gangben}`
       });
       const expen = Math.abs(this.expenseBean);
-      const total = this.userInfo.base.jdNum + this.incomeBean + expen;
+      const total = this.beanNum + this.incomeBean + expen;
       const incomeBean = Math.floor(Math.floor(this.incomeBean / total * 100) * 3.6);
       const expenseBean = Math.floor(Math.floor(expen / total * 100) * 3.6);
-      const jdNum = Math.floor(Math.floor(this.userInfo.base.jdNum / total * 100) * 3.6);
+      const jdNum = Math.floor(Math.floor(this.beanNum / total * 100) * 3.6);
       console.log(jdNum);
       console.log(incomeBean);
       console.log(expenseBean);
@@ -1417,7 +1457,7 @@ var Widget = class extends Base_default {
       drawCenterCircle(jdNum + incomeBean, "#FBBFA7", expenseBean);
       const {light, dark} = await getSetting("centerCircle") || {};
       const centerCircleColor = Device.isUsingDarkAppearance() ? dark : light;
-      await drawCenterText(centerCircleColor || "", {color: this.fontColor, value: this.userInfo.base.jdNum});
+      await drawCenterText(centerCircleColor || "", {color: this.fontColor, value: `${this.beanNum}`});
     };
     this.fetchBaseInfo = async () => {
       const url1 = "https://ms.jr.jd.com/gw/generic/uc/h5/m/mySubsidyBalance";
@@ -1436,21 +1476,12 @@ var Widget = class extends Base_default {
         this.gangben = data2.gbBalance;
       }
     };
-    this.fetchUserInfo = async () => {
-      const options = {
-        headers: {
-          Accept: "application/json,text/plain, */*",
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Accept-Encoding": "gzip, deflate, br",
-          "Accept-Language": "zh-cn",
-          Connection: "keep-alive",
-          Cookie: this.cookie.cookie,
-          Referer: "https://wqs.jd.com/my/jingdou/my.shtml?sceneval=2",
-          "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
-        }
+    this.fetchJDDataSource = async () => {
+      const headers = {
+        cookie: this.cookie.cookie
       };
-      const url = "https://wq.jd.com/user/info/QueryJDUserInfo?sceneval=2";
-      return (await request({url, method: "POST", header: options.headers})).data;
+      const url = "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion";
+      return ((await request({url, header: headers})).data || {}).data;
     };
     this.getAmountData = async () => {
       let i = 0, page = 1;
@@ -1508,6 +1539,7 @@ var Widget = class extends Base_default {
       if (config.widgetFamily === "large")
         return RenderError("暂不支持");
       const contentImg = canvas.getImage();
+      const baseInfo = this.JDDataSource.userInfo.baseInfo;
       return /* @__PURE__ */ h("wbox", {
         background: await this.getBackgroundImage() || this.backgroundColor,
         updateDate: new Date(Date.now() + await this.updateInterval()),
@@ -1527,7 +1559,7 @@ var Widget = class extends Base_default {
         flexDirection: "column",
         verticalAlign: "center"
       }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h(Avatar, {
-        url: this.userInfo.base.headImageUrl
+        url: baseInfo.headImageUrl
       })), /* @__PURE__ */ h("wspacer", {
         length: 10
       }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wstack", {
@@ -1536,14 +1568,14 @@ var Widget = class extends Base_default {
         color: this.fontColor,
         labelColor: "#f95e4c",
         label: "person.circle",
-        value: this.userInfo.base.nickname
+        value: baseInfo.nickname
       }), /* @__PURE__ */ h("wspacer", {
         length: 10
       }), /* @__PURE__ */ h(Label, {
         color: this.fontColor,
         labelColor: "#f7de65",
         label: "creditcard.circle",
-        value: `${this.userInfo.base.levelName}(${this.userInfo.base.userLevel})`
+        value: `${baseInfo.levelName}(${baseInfo.userLevel})`
       }))), /* @__PURE__ */ h("wspacer", null))), /* @__PURE__ */ h("wspacer", null)));
     };
   }

@@ -154,10 +154,11 @@ class Widget extends Base {
   en = 'JDDou';
   cookie: any = {};
   CookiesData: any[] = [];
-  userInfo: any = {base: {}};
+  JDDataSource: any = {};
   timerKeys: string[] = [];
   incomeBean = 0;
   expenseBean = 0;
+  beanNum = 0;
   jintie = 0;
   gangben = 0;
 
@@ -181,7 +182,8 @@ class Widget extends Base {
     const cookies = await getSetting<any[]>('Cookies');
     this.cookie = await getSetting('JDCK');
     if (cookies && cookies[ckIndex]) this.cookie = cookies[ckIndex];
-    this.userInfo = await this.fetchUserInfo();
+    this.JDDataSource = await this.fetchJDDataSource();
+    this.beanNum = parseInt(this.JDDataSource.assetInfo.beanNum || '0');
     this.timerKeys = this.getDay(1);
     await this.getAmountData();
     await this.fetchBaseInfo();
@@ -286,10 +288,10 @@ class Widget extends Base {
       value: `${this.gangben}`,
     });
     const expen = Math.abs(this.expenseBean);
-    const total = this.userInfo.base.jdNum + this.incomeBean + expen;
+    const total = this.beanNum + this.incomeBean + expen;
     const incomeBean = Math.floor(Math.floor((this.incomeBean / total) * 100) * 3.6);
     const expenseBean = Math.floor(Math.floor((expen / total) * 100) * 3.6);
-    const jdNum = Math.floor(Math.floor((this.userInfo.base.jdNum / total) * 100) * 3.6);
+    const jdNum = Math.floor(Math.floor((this.beanNum / total) * 100) * 3.6);
     console.log(jdNum);
     console.log(incomeBean);
     console.log(expenseBean);
@@ -298,7 +300,7 @@ class Widget extends Base {
     drawCenterCircle(jdNum + incomeBean, '#FBBFA7', expenseBean);
     const {light, dark} = (await getSetting<{light: string; dark: string}>('centerCircle')) || {};
     const centerCircleColor = Device.isUsingDarkAppearance() ? dark : light;
-    await drawCenterText(centerCircleColor || '', {color: this.fontColor, value: this.userInfo.base.jdNum});
+    await drawCenterText(centerCircleColor || '', {color: this.fontColor, value: `${this.beanNum}`});
   };
 
   fetchBaseInfo = async () => {
@@ -322,22 +324,12 @@ class Widget extends Base {
     }
   };
 
-  fetchUserInfo = async () => {
-    const options = {
-      headers: {
-        Accept: 'application/json,text/plain, */*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'zh-cn',
-        Connection: 'keep-alive',
-        Cookie: this.cookie.cookie,
-        Referer: 'https://wqs.jd.com/my/jingdou/my.shtml?sceneval=2',
-        'User-Agent':
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
-      },
+  fetchJDDataSource = async () => {
+    const headers = {
+      cookie: this.cookie.cookie,
     };
-    const url = 'https://wq.jd.com/user/info/QueryJDUserInfo?sceneval=2';
-    return (await request<any>({url, method: 'POST', header: options.headers})).data;
+    const url = 'https://me-api.jd.com/user_new/info/GetJDUserInfoUnion';
+    return ((await request<any>({url, header: headers})).data || {}).data;
   };
 
   getAmountData = async () => {
@@ -415,6 +407,7 @@ class Widget extends Base {
   render = async (): Promise<unknown> => {
     if (config.widgetFamily === 'large') return RenderError('暂不支持');
     const contentImg = canvas.getImage();
+    const baseInfo = this.JDDataSource.userInfo.baseInfo;
     return (
       <wbox
         background={(await this.getBackgroundImage()) || this.backgroundColor}
@@ -433,7 +426,7 @@ class Widget extends Base {
               <wstack flexDirection={'column'} verticalAlign={'center'}>
                 <wspacer />
                 <RowCenter>
-                  <Avatar url={this.userInfo.base.headImageUrl} />
+                  <Avatar url={baseInfo.headImageUrl} />
                 </RowCenter>
                 <wspacer length={10} />
                 <RowCenter>
@@ -442,14 +435,14 @@ class Widget extends Base {
                       color={this.fontColor}
                       labelColor={'#f95e4c'}
                       label={'person.circle'}
-                      value={this.userInfo.base.nickname}
+                      value={baseInfo.nickname}
                     />
                     <wspacer length={10} />
                     <Label
                       color={this.fontColor}
                       labelColor={'#f7de65'}
                       label={'creditcard.circle'}
-                      value={`${this.userInfo.base.levelName}(${this.userInfo.base.userLevel})`}
+                      value={`${baseInfo.levelName}(${baseInfo.userLevel})`}
                     />
                   </wstack>
                 </RowCenter>
