@@ -10,9 +10,11 @@ type KeyMap<KEY extends null | undefined | string | symbol | number> = Record<No
 
 class GenrateView {
   public static listWidget: ListWidget;
+
   static setListWidget(listWidget: ListWidget): void {
     this.listWidget = listWidget;
   }
+
   // 根组件
   static async wbox(props: WboxProps, ...children: Children<ListWidget>) {
     const {background, spacing, href, updateDate, padding, onClick} = props;
@@ -35,6 +37,7 @@ class GenrateView {
     }
     return this.listWidget;
   }
+
   // 容器组件
   static wstack(props: WstackProps, ...children: Children<WidgetStack>) {
     return async (
@@ -95,6 +98,7 @@ class GenrateView {
       await addChildren(widgetStack, children);
     };
   }
+
   // 图片组件
   static wimage(props: WimageProps) {
     return async (
@@ -168,6 +172,7 @@ class GenrateView {
       }
     };
   }
+
   // 占位空格组件
   static wspacer(props: WspacerProps) {
     return async (
@@ -185,6 +190,7 @@ class GenrateView {
       }
     };
   }
+
   // 文字组件
   static wtext(props: WtextProps, ...children: string[]) {
     return async (
@@ -243,6 +249,7 @@ class GenrateView {
       }
     };
   }
+
   // 日期组件
   static wdate(props: WdateProps) {
     return async (
@@ -313,8 +320,6 @@ class GenrateView {
   }
 }
 
-const listWidget = new ListWidget();
-GenrateView.setListWidget(listWidget);
 export function h(
   type: WidgetType | (() => () => void),
   props?: WidgetProps,
@@ -322,34 +327,35 @@ export function h(
 ): Promise<unknown> | unknown {
   props = props || {};
 
+  const listWidget = new ListWidget();
+  GenrateView.setListWidget(listWidget);
   // 由于 Fragment 的存在，children 可能为多维数组混合，先把它展平
   const _children = flatteningArr(children as unknown[]) as typeof children;
 
   switch (type) {
     case 'wbox':
       return GenrateView.wbox(props as WboxProps, ...(_children as Children<Scriptable.Widget>));
-      break;
+
     case 'wdate':
       return GenrateView.wdate(props as WdateProps);
-      break;
+
     case 'wimage':
       return GenrateView.wimage(props as WimageProps);
-      break;
+
     case 'wspacer':
       return GenrateView.wspacer(props as WspacerProps);
-      break;
+
     case 'wstack':
       return GenrateView.wstack(props as WstackProps, ...(_children as Children<Scriptable.Widget>));
-      break;
+
     case 'wtext':
       return GenrateView.wtext(props as WtextProps, ...(_children as string[]));
-      break;
+
     default:
       // custom component
       return type instanceof Function
         ? ((type as unknown) as (props: WidgetProps) => Promise<Scriptable.Widget>)({children: _children, ...props})
         : null;
-      break;
   }
 }
 

@@ -1,5 +1,4 @@
 import {
-  showPreviewOptions,
   showNotification,
   useStorage,
   fm,
@@ -71,12 +70,17 @@ class Base {
     return parseInt(updateInterval) * 1000 * 60;
   };
 
+  isReview = false;
+
   widgetAction: actionsProps[] = [
     {
       title: '预览组件',
       onClick: async (): Promise<void> => {
         const render = async () => {
-          await this.componentDidMount();
+          if (!this.isReview) {
+            await this.componentDidMount();
+            this.isReview = true;
+          }
           return this.render();
         };
         const onClick = async (item: actionsProps) => {

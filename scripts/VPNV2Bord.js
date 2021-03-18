@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1616059370987
+// @编译时间 1616060815970
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -482,8 +482,8 @@ async function setTransparentBackground(tips) {
 
 // src/lib/jsx-runtime.ts
 var GenrateView = class {
-  static setListWidget(listWidget2) {
-    this.listWidget = listWidget2;
+  static setListWidget(listWidget) {
+    this.listWidget = listWidget;
   }
   static async wbox(props, ...children) {
     const {background, spacing, href, updateDate, padding, onClick} = props;
@@ -696,33 +696,26 @@ var GenrateView = class {
     };
   }
 };
-var listWidget = new ListWidget();
-GenrateView.setListWidget(listWidget);
 function h(type, props, ...children) {
   props = props || {};
+  const listWidget = new ListWidget();
+  GenrateView.setListWidget(listWidget);
   const _children = flatteningArr(children);
   switch (type) {
     case "wbox":
       return GenrateView.wbox(props, ..._children);
-      break;
     case "wdate":
       return GenrateView.wdate(props);
-      break;
     case "wimage":
       return GenrateView.wimage(props);
-      break;
     case "wspacer":
       return GenrateView.wspacer(props);
-      break;
     case "wstack":
       return GenrateView.wstack(props, ..._children);
-      break;
     case "wtext":
       return GenrateView.wtext(props, ..._children);
-      break;
     default:
       return type instanceof Function ? type({children: _children, ...props}) : null;
-      break;
   }
 }
 function Fragment({children}) {
@@ -819,12 +812,16 @@ var Base = class {
       const updateInterval = await getSetting2("updateInterval") || "30";
       return parseInt(updateInterval) * 1e3 * 60;
     };
+    this.isReview = false;
     this.widgetAction = [
       {
         title: "预览组件",
         onClick: async () => {
           const render = async () => {
-            await this.componentDidMount();
+            if (!this.isReview) {
+              await this.componentDidMount();
+              this.isReview = true;
+            }
             return this.render();
           };
           const onClick = async (item) => {
