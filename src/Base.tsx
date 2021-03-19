@@ -70,17 +70,12 @@ class Base {
     return parseInt(updateInterval) * 1000 * 60;
   };
 
-  isReview = false;
-
   widgetAction: actionsProps[] = [
     {
       title: '预览组件',
       onClick: async (): Promise<void> => {
         const render = async () => {
-          if (!this.isReview) {
-            await this.componentDidMount();
-            this.isReview = true;
-          }
+          await this.componentDidMount();
           return this.render();
         };
         const onClick = async (item: actionsProps) => {

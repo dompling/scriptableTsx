@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：3/18/2021
+ * 更新时间：3/19/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1616060815970
+// @编译时间 1616116097477
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -812,16 +812,12 @@ var Base = class {
       const updateInterval = await getSetting("updateInterval") || "30";
       return parseInt(updateInterval) * 1e3 * 60;
     };
-    this.isReview = false;
     this.widgetAction = [
       {
         title: "预览组件",
         onClick: async () => {
           const render = async () => {
-            if (!this.isReview) {
-              await this.componentDidMount();
-              this.isReview = true;
-            }
+            await this.componentDidMount();
             return this.render();
           };
           const onClick = async (item) => {
