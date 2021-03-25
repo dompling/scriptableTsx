@@ -12,6 +12,7 @@ interface actionsProps {
   title: string;
   onClick: any;
   val?: string;
+  dismissOnSelect?: boolean;
 }
 
 const FILE_MGR_LOCAL: FileManager = fm();
@@ -89,16 +90,19 @@ class Base {
           {
             title: '小尺寸',
             val: 'small',
+            dismissOnSelect: true,
             onClick,
           },
           {
             title: '中尺寸',
             val: 'medium',
+            dismissOnSelect: true,
             onClick,
           },
           {
             title: '大尺寸',
             val: 'large',
+            dismissOnSelect: true,
             onClick,
           },
         ];
@@ -340,6 +344,7 @@ class Base {
     table.addRow(header);
     arr.forEach(item => {
       const row = new UITableRow();
+      row.dismissOnSelect = !!item.dismissOnSelect;
       const rowTitle = row.addText(item.title);
       rowTitle.widthWeight = 0.5;
       rowTitle.titleFont = Font.systemFont(16);
@@ -349,6 +354,11 @@ class Base {
         valText.rightAligned();
         valText.titleColor = Color.blue();
         valText.titleFont = Font.mediumSystemFont(16);
+      } else {
+        const imgCell = UITableCell.imageAtURL('https://gitee.com/scriptableJS/Scriptable/raw/master/images/more.png');
+        imgCell.rightAligned();
+        imgCell.widthWeight = 0.5;
+        row.addCell(imgCell);
       }
       row.dismissOnSelect = false;
       if (item.onClick) row.onSelect = () => item.onClick(item);

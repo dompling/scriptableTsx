@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：3/19/2021
+ * 更新时间：3/25/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1616116097477
+// @编译时间 1616660304084
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -828,16 +828,19 @@ var Base = class {
             {
               title: "小尺寸",
               val: "small",
+              dismissOnSelect: true,
               onClick
             },
             {
               title: "中尺寸",
               val: "medium",
+              dismissOnSelect: true,
               onClick
             },
             {
               title: "大尺寸",
               val: "large",
+              dismissOnSelect: true,
               onClick
             }
           ];
@@ -1039,6 +1042,7 @@ var Base = class {
       table.addRow(header);
       arr.forEach((item) => {
         const row = new UITableRow();
+        row.dismissOnSelect = !!item.dismissOnSelect;
         const rowTitle = row.addText(item.title);
         rowTitle.widthWeight = 0.5;
         rowTitle.titleFont = Font.systemFont(16);
@@ -1048,6 +1052,11 @@ var Base = class {
           valText.rightAligned();
           valText.titleColor = Color.blue();
           valText.titleFont = Font.mediumSystemFont(16);
+        } else {
+          const imgCell = UITableCell.imageAtURL("https://gitee.com/scriptableJS/Scriptable/raw/master/images/more.png");
+          imgCell.rightAligned();
+          imgCell.widthWeight = 0.5;
+          row.addCell(imgCell);
         }
         row.dismissOnSelect = false;
         if (item.onClick)
