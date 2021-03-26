@@ -245,6 +245,7 @@ class Widget extends Base {
   _loadJDCk = async () => {
     try {
       const CookiesData = await this.getBoxJsCache('CookiesJD');
+      this.CookiesData = [];
       if (CookiesData) this.CookiesData = transforJSON(CookiesData);
       const CookieJD = await this.getBoxJsCache('CookieJD');
       if (CookieJD) {
