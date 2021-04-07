@@ -328,6 +328,7 @@ class Widget extends Base {
   fetchJDDataSource = async () => {
     const headers = {
       cookie: this.cookie.cookie,
+      'User-Agent': 'scriptable',
     };
     const url = 'https://me-api.jd.com/user_new/info/GetJDUserInfoUnion';
     return ((await request<any>({url, header: headers})).data || {}).data;

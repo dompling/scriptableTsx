@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：3/26/2021
+ * 更新时间：4/7/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1616739326326
+// @编译时间 1617759233368
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1481,7 +1481,8 @@ var Widget = class extends Base_default {
     };
     this.fetchJDDataSource = async () => {
       const headers = {
-        cookie: this.cookie.cookie
+        cookie: this.cookie.cookie,
+        "User-Agent": "scriptable"
       };
       const url = "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion";
       return ((await request({url, header: headers})).data || {}).data;
