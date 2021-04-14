@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：4/7/2021
+ * 更新时间：4/14/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1617759233368
+// @编译时间 1618368689391
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -812,48 +812,122 @@ var Base = class {
       const updateInterval = await getSetting2("updateInterval") || "30";
       return parseInt(updateInterval) * 1e3 * 60;
     };
+    this.previewClick = async (size) => {
+      try {
+        config.widgetFamily = size;
+        const render = async () => {
+          await this.componentDidMount();
+          return this.render();
+        };
+        const w = await render();
+        const fnc = size.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase());
+        w && await w[`present${fnc}`]();
+      } catch (e) {
+        console.log(e);
+      }
+    };
     this.widgetAction = [
       {
-        title: "预览组件",
+        title: "小尺寸",
+        val: "small",
+        dismissOnSelect: true,
+        onClick: () => this.previewClick("small"),
+        url: "https://z3.ax1x.com/2021/03/26/6v5wIP.png"
+      },
+      {
+        title: "中尺寸",
+        val: "medium",
+        dismissOnSelect: true,
+        onClick: () => this.previewClick("medium"),
+        url: "https://z3.ax1x.com/2021/03/26/6v5dat.png"
+      },
+      {
+        title: "大尺寸",
+        val: "large",
+        dismissOnSelect: true,
+        onClick: () => this.previewClick("large"),
+        url: "https://z3.ax1x.com/2021/03/26/6v5BPf.png"
+      }
+    ];
+    this.baseActions = [
+      {
+        title: "字体颜色",
+        val: "白天 | 夜间",
+        icon: {name: "sun.max.fill", color: "#d48806"},
         onClick: async () => {
-          const render = async () => {
-            await this.componentDidMount();
-            return this.render();
-          };
-          const onClick = async (item) => {
-            const size = item.val || "small";
-            config.widgetFamily = size;
-            const w = await render();
-            const fnc = size.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase());
-            w && await w[`present${fnc}`]();
-          };
-          const preview = [
+          await this.setLightAndDark("字体颜色", "Hex 颜色", "fontColor");
+        }
+      },
+      {
+        title: "背景设置",
+        icon: {name: "photo.on.rectangle", color: "#fa8c16"},
+        dismissOnSelect: true,
+        onClick: async () => {
+          const actions = [
             {
-              title: "小尺寸",
-              val: "small",
+              title: "白天图",
               dismissOnSelect: true,
-              onClick
+              icon: {name: "photo.on.rectangle", color: "#fa8c16"},
+              onClick: async () => {
+                const image = await Photos.fromLibrary();
+                if (!await this.verifyImage(image))
+                  return;
+                await this.setImage(image, `${this.backgroundKey}_light`);
+              }
             },
             {
-              title: "中尺寸",
-              val: "medium",
+              title: "夜间图",
+              icon: {name: "photo.fill.on.rectangle.fill", color: "#fa541c"},
               dismissOnSelect: true,
-              onClick
+              onClick: async () => {
+                const image = await Photos.fromLibrary();
+                if (!await this.verifyImage(image))
+                  return;
+                await this.setImage(image, `${this.backgroundKey}_night`);
+              }
             },
             {
-              title: "大尺寸",
-              val: "large",
-              dismissOnSelect: true,
-              onClick
+              title: "透明度",
+              icon: {name: "record.circle", color: "#722ed1"},
+              onClick: async () => {
+                return this.setLightAndDark("透明度", false, "opacity");
+              }
+            },
+            {
+              title: "背景色",
+              icon: {name: "photo", color: "#13c2c2"},
+              onClick: async () => {
+                return this.setLightAndDark("背景色", false, "backgroundColor");
+              }
             }
           ];
           const table = new UITable();
-          await this.showActionSheet(table, "预览效果", preview);
+          await this.showActionSheet(table, "背景设置", actions);
           await table.present();
         }
       },
       {
+        title: "透明背景",
+        icon: {name: "text.below.photo", color: "#faad14"},
+        onClick: async () => {
+          const image = await setTransparentBackground();
+          image && await this.setImage(image, this.backgroundKey);
+        }
+      },
+      {
+        title: "清空背景",
+        icon: {name: "clear", color: "#f5222d"},
+        onClick: async () => {
+          await this.setImage(null, `${this.backgroundKey}_light`);
+          await this.setImage(null, `${this.backgroundKey}_night`);
+          await this.setImage(null, this.backgroundKey);
+        }
+      }
+    ];
+    this.actions = [
+      {
         title: "刷新时间",
+        icon: {name: "arrow.clockwise", color: "#1890ff"},
         onClick: async () => {
           const {getSetting: getSetting2, setSetting: setSetting2} = useSetting(this.en);
           const updateInterval = await getSetting2("updateInterval") || "";
@@ -870,72 +944,6 @@ var Base = class {
         }
       }
     ];
-    this.baseActions = [
-      {
-        title: "字体颜色",
-        val: "白天 | 夜间",
-        onClick: async () => {
-          await this.setLightAndDark("字体颜色", "Hex 颜色", "fontColor");
-        }
-      },
-      {
-        title: "背景设置",
-        val: "白天图 | 夜间图 | 背景色",
-        onClick: async () => {
-          const actions = [
-            {
-              title: "白天图",
-              onClick: async () => {
-                const image = await Photos.fromLibrary();
-                if (!await this.verifyImage(image))
-                  return;
-                await this.setImage(image, `${this.backgroundKey}_light`);
-              }
-            },
-            {
-              title: "夜间图",
-              onClick: async () => {
-                const image = await Photos.fromLibrary();
-                if (!await this.verifyImage(image))
-                  return;
-                await this.setImage(image, `${this.backgroundKey}_night`);
-              }
-            },
-            {
-              title: "透明度",
-              onClick: async () => {
-                return this.setLightAndDark("透明度", false, "opacity");
-              }
-            },
-            {
-              title: "背景色",
-              onClick: async () => {
-                return this.setLightAndDark("背景色", false, "backgroundColor");
-              }
-            }
-          ];
-          const table = new UITable();
-          await this.showActionSheet(table, "背景设置", actions);
-          await table.present();
-        }
-      },
-      {
-        title: "透明背景",
-        onClick: async () => {
-          const image = await setTransparentBackground();
-          image && await this.setImage(image, this.backgroundKey);
-        }
-      },
-      {
-        title: "清空背景",
-        onClick: async () => {
-          await this.setImage(null, `${this.backgroundKey}_light`);
-          await this.setImage(null, `${this.backgroundKey}_night`);
-          await this.setImage(null, this.backgroundKey);
-        }
-      }
-    ];
-    this.actions = [];
     this.getBackgroundColor = (color) => {
       const colors = color.split(",");
       if (colors.length > 0) {
@@ -1034,8 +1042,75 @@ var Base = class {
       }
       return result;
     };
-    this.registerAction = (title, onClick) => {
-      this.actions.splice(1, 0, {title, onClick});
+    this.registerAction = (title, onClick, icon = {
+      name: "gear",
+      color: "#096dd9"
+    }) => {
+      const url = typeof icon === "string" ? icon : false;
+      const action = {title, onClick};
+      if (url) {
+        action.url = url;
+      } else {
+        action.icon = icon;
+      }
+      this.actions.splice(1, 0, action);
+    };
+    this.drawTableIcon = async (icon = "square.grid.2x2", color = "#e8e8e8", cornerWidth = 42) => {
+      const sfi = SFSymbol.named(icon);
+      sfi.applyFont(Font.mediumSystemFont(30));
+      const imgData = Data.fromPNG(sfi.image).toBase64String();
+      const html = `
+    <img id="sourceImg" src="data:image/png;base64,${imgData}" />
+    <img id="silhouetteImg" src="" />
+    <canvas id="mainCanvas" />
+    `;
+      const js = `
+    var canvas = document.createElement("canvas");
+    var sourceImg = document.getElementById("sourceImg");
+    var silhouetteImg = document.getElementById("silhouetteImg");
+    var ctx = canvas.getContext('2d');
+    var size = sourceImg.width > sourceImg.height ? sourceImg.width : sourceImg.height;
+    canvas.width = size;
+    canvas.height = size;
+    ctx.drawImage(sourceImg, (canvas.width - sourceImg.width) / 2, (canvas.height - sourceImg.height) / 2);
+    var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    var pix = imgData.data;
+    //convert the image into a silhouette
+    for (var i=0, n = pix.length; i < n; i+= 4){
+      //set red to 0
+      pix[i] = 255;
+      //set green to 0
+      pix[i+1] = 255;
+      //set blue to 0
+      pix[i+2] = 255;
+      //retain the alpha value
+      pix[i+3] = pix[i+3];
+    }
+    ctx.putImageData(imgData,0,0);
+    silhouetteImg.src = canvas.toDataURL();
+    output=canvas.toDataURL()
+    `;
+      const wv = new WebView();
+      await wv.loadHTML(html);
+      const base64Image = await wv.evaluateJavaScript(js);
+      const iconImage = await new Request(base64Image).loadImage();
+      const size = new Size(160, 160);
+      const ctx = new DrawContext();
+      ctx.opaque = false;
+      ctx.respectScreenScale = true;
+      ctx.size = size;
+      const path = new Path();
+      const rect = new Rect(0, 0, size.width, size.width);
+      path.addRoundedRect(rect, cornerWidth, cornerWidth);
+      path.closeSubpath();
+      ctx.setFillColor(new Color(color, 1));
+      ctx.addPath(path);
+      ctx.fillPath();
+      const rate = 36;
+      const iw = size.width - rate;
+      const x = (size.width - iw) / 2;
+      ctx.drawImageInRect(iconImage, new Rect(x, x, iw, iw));
+      return ctx.getImage();
     };
     this.preferences = async (table, arr, outfit) => {
       const header = new UITableRow();
@@ -1043,29 +1118,38 @@ var Base = class {
       heading.titleFont = Font.mediumSystemFont(17);
       heading.centerAligned();
       table.addRow(header);
-      arr.forEach((item) => {
+      for (const item of arr) {
         const row = new UITableRow();
         row.dismissOnSelect = !!item.dismissOnSelect;
+        if (item.url) {
+          const rowIcon = row.addImageAtURL(item.url);
+          rowIcon.widthWeight = 100;
+        } else {
+          const icon = item.icon || {};
+          const image = await this.drawTableIcon(icon.name, icon.color, item.cornerWidth);
+          const imageCell = row.addImage(image);
+          imageCell.widthWeight = 100;
+        }
         const rowTitle = row.addText(item.title);
-        rowTitle.widthWeight = 0.5;
+        rowTitle.widthWeight = 400;
         rowTitle.titleFont = Font.systemFont(16);
         if (item.val) {
           const valText = row.addText(`${item.val}`.toUpperCase());
-          valText.widthWeight = 0.5;
+          valText.widthWeight = 500;
           valText.rightAligned();
           valText.titleColor = Color.blue();
           valText.titleFont = Font.mediumSystemFont(16);
         } else {
           const imgCell = UITableCell.imageAtURL("https://gitee.com/scriptableJS/Scriptable/raw/master/images/more.png");
           imgCell.rightAligned();
-          imgCell.widthWeight = 0.5;
+          imgCell.widthWeight = 500;
           row.addCell(imgCell);
         }
         row.dismissOnSelect = false;
         if (item.onClick)
           row.onSelect = () => item.onClick(item);
         table.addRow(row);
-      });
+      }
       table.reload();
     };
     this.showActionSheet = async (table, title, actions) => {
