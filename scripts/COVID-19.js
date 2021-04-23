@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：4/14/2021
+ * 更新时间：4/23/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1618368689391
+// @编译时间 1619160578856
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {

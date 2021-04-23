@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：4/14/2021
+ * 更新时间：4/23/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1618368689391
+// @编译时间 1619160578856
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1748,7 +1748,7 @@ var Widget = class extends Base_default {
       this.baseActions = [
         {
           title: "颜色主题",
-          func: async () => {
+          onClick: async () => {
             const inputValue = {headerColor: "顶部油价背景", bodyColor: "加油站背景"};
             return this.showAlertCatchInput("颜色主题", "hex 颜色", inputValue, "oilBackground");
           }

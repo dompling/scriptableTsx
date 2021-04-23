@@ -53,7 +53,7 @@ class Widget extends Base {
     this.baseActions = [
       {
         title: '颜色主题',
-        func: async () => {
+        onClick: async () => {
           const inputValue = {headerColor: '顶部油价背景', bodyColor: '加油站背景'};
           return this.showAlertCatchInput('颜色主题', 'hex 颜色', inputValue, 'oilBackground');
         },

@@ -1,6 +1,6 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: purple; icon-glyph: yen-sign;
+// icon-color: purple; icon-glyph: tv;
 
 /**
  * 作者: 2Ya
@@ -107,7 +107,7 @@ function useSetting(settingFilename) {
     }
     return true;
   };
-  const getSetting2 = async (key) => {
+  const getSetting = async (key) => {
     const fileExists = await isFileExists();
     if (!fileExists)
       return null;
@@ -117,7 +117,7 @@ function useSetting(settingFilename) {
     const settings = JSON.parse(json) || {};
     return settings[key];
   };
-  const setSetting2 = async (key, value, notify = true) => {
+  const setSetting = async (key, value, notify = true) => {
     const fileExists = await isFileExists();
     if (!fileExists) {
       await fileManager.writeString(settingsPath, JSON.stringify({
@@ -140,7 +140,7 @@ function useSetting(settingFilename) {
     if (notify)
       await showNotification({title: "消息提示", body: "设置保存成功,稍后刷新组件"});
   };
-  return {getSetting: getSetting2, setSetting: setSetting2, clear};
+  return {getSetting, setSetting, clear};
 }
 async function request(args2) {
   const {
@@ -479,6 +479,18 @@ async function setTransparentBackground(tips) {
   }
   return cropImage(img, new Rect(crop.x, crop.y, crop.w, crop.h));
 }
+function getRandomArrayElements(arr, count) {
+  const shuffled = arr.slice(0);
+  let i = arr.length, min = i - count, temp, index;
+  min = min > 0 ? min : 0;
+  while (i-- > min) {
+    index = Math.floor((i + 1) * Math.random());
+    temp = shuffled[index];
+    shuffled[index] = shuffled[i];
+    shuffled[i] = temp;
+  }
+  return shuffled.slice(min);
+}
 
 // src/lib/jsx-runtime.ts
 var GenrateView = class {
@@ -780,17 +792,17 @@ var Base = class {
   constructor() {
     this.componentWillMountBefore = async () => {
       this.backgroundKey = `${this.en}_background`;
-      const {getSetting: getSetting2} = useSetting(this.en);
+      const {getSetting} = useSetting(this.en);
       const {getStorage: getStorage2} = useStorage("boxjs");
       this.prefix = await getStorage2("prefix") || this.prefix;
-      const fontColorLight = await getSetting2("fontColorLight") || this.fontColor;
-      const fontColorDark = await getSetting2("fontColorDark") || this.fontColor;
+      const fontColorLight = await getSetting("fontColorLight") || this.fontColor;
+      const fontColorDark = await getSetting("fontColorDark") || this.fontColor;
       this.fontColor = Device.isUsingDarkAppearance() ? fontColorDark : fontColorLight;
-      const backgroundColorLight = await getSetting2("backgroundColorLight") || "#fff";
-      const backgroundColorDark = await getSetting2("backgroundColorDark") || "#000";
+      const backgroundColorLight = await getSetting("backgroundColorLight") || "#fff";
+      const backgroundColorDark = await getSetting("backgroundColorDark") || "#000";
       this.backgroundColor = Device.isUsingDarkAppearance() ? this.getBackgroundColor(backgroundColorDark) : this.getBackgroundColor(backgroundColorLight);
-      const opacityLight = await getSetting2("opacityLight") || this.opacity;
-      const opacityDark = await getSetting2("opacityDark") || this.opacity;
+      const opacityLight = await getSetting("opacityLight") || this.opacity;
+      const opacityDark = await getSetting("opacityDark") || this.opacity;
       this.opacity = Device.isUsingDarkAppearance() ? opacityDark : opacityLight;
       typeof this.componentWillMount === "function" && await this.componentWillMount();
     };
@@ -808,8 +820,8 @@ var Base = class {
     this.fontColor = Device.isUsingDarkAppearance() ? "#fff" : "#000";
     this.opacity = Device.isUsingDarkAppearance() ? "0.7" : "0.4";
     this.updateInterval = async () => {
-      const {getSetting: getSetting2} = useSetting(this.en);
-      const updateInterval = await getSetting2("updateInterval") || "30";
+      const {getSetting} = useSetting(this.en);
+      const updateInterval = await getSetting("updateInterval") || "30";
       return parseInt(updateInterval) * 1e3 * 60;
     };
     this.previewClick = async (size) => {
@@ -929,8 +941,8 @@ var Base = class {
         title: "刷新时间",
         icon: {name: "arrow.clockwise", color: "#1890ff"},
         onClick: async () => {
-          const {getSetting: getSetting2, setSetting: setSetting2} = useSetting(this.en);
-          const updateInterval = await getSetting2("updateInterval") || "";
+          const {getSetting, setSetting} = useSetting(this.en);
+          const updateInterval = await getSetting("updateInterval") || "";
           const {texts} = await showModal({
             title: "刷新时间",
             inputItems: [
@@ -940,7 +952,7 @@ var Base = class {
               }
             ]
           });
-          await setSetting2("updateInterval", texts);
+          await setSetting("updateInterval", texts);
         }
       }
     ];
@@ -961,10 +973,10 @@ var Base = class {
     };
     this.setLightAndDark = async (title, desc, key) => {
       try {
-        const {getSetting: getSetting2, setSetting: setSetting2} = useSetting(this.en);
+        const {getSetting, setSetting} = useSetting(this.en);
         const light = `${key}Light`, dark = `${key}Dark`;
-        const lightText = await getSetting2(light) || "";
-        const darkText = await getSetting2(dark) || "";
+        const lightText = await getSetting(light) || "";
+        const darkText = await getSetting(dark) || "";
         const a = new Alert();
         a.title = "白天和夜间" + title;
         a.message = !desc ? "请自行去网站上搜寻颜色（Hex 颜色）" : desc;
@@ -975,8 +987,8 @@ var Base = class {
         const id = await a.presentAlert();
         if (id === -1)
           return;
-        await setSetting2(light, a.textFieldValue(0), false);
-        await setSetting2(dark, a.textFieldValue(1));
+        await setSetting(light, a.textFieldValue(0), false);
+        await setSetting(dark, a.textFieldValue(1));
       } catch (e) {
         console.log(e);
       }
@@ -1214,8 +1226,8 @@ var Base = class {
         Object.keys(opt).forEach((key) => {
           settings[key] = boxJSData[opt[key]] || "";
         });
-        const {setSetting: setSetting2} = useSetting(this.en);
-        await setSetting2(this.BOX_CATCH_KEY, settings, false);
+        const {setSetting} = useSetting(this.en);
+        await setSetting(this.BOX_CATCH_KEY, settings, false);
         await showNotification({
           title: this.name,
           body: "缓存读取:" + JSON.stringify(settings),
@@ -1232,8 +1244,8 @@ var Base = class {
       }
     };
     this.showAlertCatchInput = async (title, content, opt, useKey) => {
-      const {getSetting: getSetting2, setSetting: setSetting2} = useSetting(this.en);
-      const catchValue = await getSetting2(useKey || this.BOX_CATCH_KEY) || {};
+      const {getSetting, setSetting} = useSetting(this.en);
+      const catchValue = await getSetting(useKey || this.BOX_CATCH_KEY) || {};
       const settings = catchValue;
       const inputItems = Object.keys(opt).map((key) => {
         return {placeholder: opt[key], text: catchValue[key]};
@@ -1243,7 +1255,7 @@ var Base = class {
         settings[key] = texts[index];
       });
       if (confirm) {
-        await setSetting2(useKey || this.BOX_CATCH_KEY, settings);
+        await setSetting(useKey || this.BOX_CATCH_KEY, settings);
         return settings;
       }
     };
@@ -1278,11 +1290,6 @@ var Base = class {
     return ctx.getImage();
   }
 };
-var RenderError = async (text) => {
-  return /* @__PURE__ */ h("wbox", null, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wtext", {
-    textAlign: "center"
-  }, text), /* @__PURE__ */ h("wspacer", null));
-};
 var Base_default = Base;
 
 // src/Component/RowCeneter/index.tsx
@@ -1293,396 +1300,93 @@ var RowCenter = ({children, ...props}) => {
 };
 var RowCeneter_default = RowCenter;
 
-// src/pages/JDDou.tsx
-var canvasSize = 258;
-var smallCircle = 60;
-var canvas = new DrawContext();
-canvas.opaque = false;
-canvas.respectScreenScale = false;
-canvas.size = new Size(258, 258);
-var drawCircle = (x, y, color, textConfig, line = 4, size = smallCircle) => {
-  const circle = new Rect(x, y, size, size);
-  canvas.setStrokeColor(new Color(color, 1));
-  canvas.setLineWidth(line);
-  canvas.strokeEllipse(circle);
-  if (textConfig) {
-    canvas.setFont(Font.systemFont(12));
-    canvas.setTextColor(new Color(textConfig.color, 1));
-    const point = new Point(x + 18, y + 10);
-    canvas.drawText(textConfig.text, point);
-    const rect = new Rect(x + 10, y + 30, 40, 20);
-    canvas.setTextAlignedCenter();
-    canvas.drawTextInRect(`${textConfig.value}`, rect);
-  }
-};
-function sinDeg(deg) {
-  return Math.sin(deg * Math.PI / 180);
-}
-function cosDeg(deg) {
-  return Math.cos(deg * Math.PI / 180);
-}
-var drawCenterCircle = (start, color, degree) => {
-  canvas.setFillColor(new Color(color, 1));
-  for (let i = start; i < degree + start; i++) {
-    const x = canvasSize + 80 * sinDeg(i) - canvasSize / 2;
-    const y = canvasSize - 80 * cosDeg(i) - canvasSize / 2;
-    if (i === start) {
-      drawCircle(x, y, color, void 0, 12, 6);
-      i += 4;
-    } else if (i < degree + start - 2) {
-      const rect = new Rect(x, y, 8, 8);
-      canvas.fillEllipse(rect);
-    }
-  }
-};
-var drawCenterText = async (color, textConfig) => {
-  if (color) {
-    const circleSize = 140;
-    const circleRect = new Rect(canvasSize / 2 - circleSize + 74, canvasSize / 2 - circleSize + 74, circleSize, circleSize);
-    canvas.setFillColor(new Color(color, 1));
-    canvas.fillEllipse(circleRect);
-  }
-  const img = (await request({
-    url: "https://gitee.com/scriptableJS/Scriptable/raw/master/JDDou/jddnew.png",
-    method: "GET",
-    dataType: "image"
-  })).data;
-  const point = canvasSize / 2;
-  const imgSize = 52;
-  canvas.drawImageInRect(img, new Rect(point - imgSize / 2, point - imgSize / 1.3, imgSize, imgSize));
-  const size = 100;
-  canvas.setTextColor(new Color(textConfig.color, 1));
-  const rect2 = new Rect(point - size / 2 + 5, point + 15, size, size / 2);
-  canvas.setFont(Font.title1());
-  canvas.drawTextInRect(`${textConfig.value}`, rect2);
-};
-var Label = ({label, value, color, labelColor}) => {
+// src/pages/DdVideo.tsx
+var RowCell = (props) => {
+  const {href, img, title, update} = props.data;
   return /* @__PURE__ */ h("wstack", {
-    verticalAlign: "center"
-  }, /* @__PURE__ */ h("wimage", {
-    filter: labelColor,
-    src: label,
-    width: 15,
-    height: 15,
-    borderRadius: 4
-  }), /* @__PURE__ */ h("wspacer", {
-    length: 5
-  }), /* @__PURE__ */ h("wtext", {
-    font: 12,
-    textColor: color
-  }, value));
-};
-var Avatar = ({url}) => {
-  return /* @__PURE__ */ h("wimage", {
-    src: url || "https://img11.360buyimg.com/jdphoto/s120x120_jfs/t21160/90/706848746/2813/d1060df5/5b163ef9N4a3d7aa6.png",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    href,
+    background: img,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#f4f4f4"
-  });
+    borderColor: "#e8e8e8",
+    flexDirection: "column",
+    width: 91,
+    height: 108
+  }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wstack", {
+    background: new Color("#000", 0.3)
+  }, /* @__PURE__ */ h("wstack", {
+    flexDirection: "column",
+    padding: [10, 5, 10, 5]
+  }, /* @__PURE__ */ h("wtext", {
+    maxLine: 1,
+    textColor: "#fff",
+    font: 12
+  }, title), /* @__PURE__ */ h("wtext", {
+    maxLine: 1,
+    textColor: new Color("#fff", 0.7),
+    font: 10
+  }, update)), /* @__PURE__ */ h("wspacer", null)));
 };
-var transforJSON = (str) => {
-  if (typeof str === "string") {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      console.log(e);
-      return [];
-    }
-  }
-  console.log("It is not a string!");
-};
-var {getSetting, setSetting} = useSetting("JDDou");
+var format = new DateFormatter();
+format.dateFormat = "M-d";
+var today = format.string(new Date());
 var Widget = class extends Base_default {
   constructor() {
     super(...arguments);
-    this.name = "京东豆";
-    this.en = "JDDou";
-    this.cookie = {};
-    this.CookiesData = [];
-    this.JDDataSource = {};
-    this.timerKeys = [];
-    this.incomeBean = 0;
-    this.expenseBean = 0;
-    this.beanNum = 0;
-    this.jintie = 0;
-    this.gangben = 0;
-    this.componentWillMount = async () => {
-      this.registerAction("代理缓存", this.actionSettings);
-      this.registerAction("账号设置", async () => {
-        const index = await this.generateAlert("设置账号信息", ["网站登录", "手动输入"]);
-        if (index === 0) {
-          await this.jdWebView();
-        } else {
-          await this.showAlertCatchInput("账号设置", "京东账号 Ck", {userName: "昵称", cookie: "Cookie"}, "JDCK");
-        }
-      });
-      this.registerAction("圆形背景", async () => {
-        return this.showAlertCatchInput("圆形背景", "中心圆背景", {light: "白天", dark: "夜间"}, "centerCircle");
-      });
-    };
+    this.name = "低端影视";
+    this.en = "DDYs";
+    this.useBoxJS = false;
+    this.dataSource = [];
     this.componentDidMount = async () => {
-      const ckIndex = args.widgetParameter;
-      const cookies = await getSetting("Cookies");
-      this.cookie = await getSetting("JDCK");
-      if (cookies && cookies[ckIndex])
-        this.cookie = cookies[ckIndex];
-      this.JDDataSource = await this.fetchJDDataSource();
-      this.beanNum = parseInt(this.JDDataSource.assetInfo.beanNum || "0");
-      this.timerKeys = this.getDay(1);
-      await this.getAmountData();
-      await this.fetchBaseInfo();
-      await this.drawImg();
-    };
-    this.jdWebView = async () => {
-      const webView = new WebView();
-      const url = "https://mcr.jd.com/credit_home/pages/index.html?btPageType=BT&channelName=024";
-      await webView.loadURL(url);
-      await webView.present(false);
-      const req = new Request("https://ms.jr.jd.com/gw/generic/bt/h5/m/firstScreenNew");
-      req.method = "POST";
-      req.body = 'reqData={"clientType":"ios","clientVersion":"13.2.3","deviceId":"","environment":"3"}';
-      await req.loadJSON();
-      const cookies = req.response.cookies;
-      const account = {userName: "", cookie: ""};
-      const cookie = [];
-      cookies.forEach((item) => {
-        const value = `${item.name}=${item.value}`;
-        if (item.name === "pt_key")
-          cookie.push(value);
-        if (item.name === "pt_pin") {
-          account.userName = item.value;
-          cookie.push(value);
-        }
+      const req = await request({
+        url: `http://api.sodion.net/api_v1/grap/ddrk?time=${today}`,
+        method: "GET",
+        useCache: true
       });
-      account.cookie = cookie.join("; ");
-      if (account.cookie) {
-        await setSetting("JDCK", account, false);
-        await showNotification({title: this.name, body: "cookie获取成功，请关闭窗口！"});
-        console.log(`${this.name}: cookie获取成功，请关闭窗口！`);
-      }
-    };
-    this.actionSettings = async () => {
-      try {
-        const table = new UITable();
-        await this._loadJDCk();
-        if (!this.CookiesData.length)
-          throw new Error("BoxJS 数据读取失败");
-        this.CookiesData.map((t, index) => {
-          const r = new UITableRow();
-          r.addText(`parameter：${index}    ${t.userName}`);
-          r.onSelect = () => setSetting("JDCK", t, true);
-          table.addRow(r);
-        });
-        await setSetting("Cookies", this.CookiesData);
-        await table.present(false);
-      } catch (e) {
-        await showNotification({
-          title: this.name,
-          body: "BoxJS 数据读取失败，请点击通知查看教程",
-          openURL: "https://chavyleung.gitbook.io/boxjs/awesome/videos"
-        });
-      }
-    };
-    this._loadJDCk = async () => {
-      try {
-        const CookiesData = await this.getBoxJsCache("CookiesJD");
-        this.CookiesData = [];
-        if (CookiesData)
-          this.CookiesData = transforJSON(CookiesData);
-        const CookieJD = await this.getBoxJsCache("CookieJD");
-        if (CookieJD) {
-          const userName = CookieJD.match(/pt_pin=(.+?);/)[1];
-          const ck1 = {cookie: CookieJD, userName};
-          this.CookiesData.push(ck1);
-        }
-        const Cookie2JD = await this.getBoxJsCache("CookieJD2");
-        if (Cookie2JD) {
-          const userName = Cookie2JD.match(/pt_pin=(.+?);/)[1];
-          const ck2 = {cookie: Cookie2JD, userName};
-          this.CookiesData.push(ck2);
-        }
-        return true;
-      } catch (e) {
-        console.log(e);
-        this.CookiesData = [];
-        return false;
-      }
-    };
-    this.drawImg = async () => {
-      drawCircle(5, 5, "#DD8AB7", {
-        color: this.fontColor,
-        text: "收入",
-        value: `${this.incomeBean}`
-      });
-      drawCircle(193, 5, "#FBBFA7", {
-        color: this.fontColor,
-        text: "支出",
-        value: `${this.expenseBean}`
-      });
-      drawCircle(5, 193, "#A4E0de", {
-        color: this.fontColor,
-        text: "津贴",
-        value: `${this.jintie}`
-      });
-      drawCircle(193, 193, "#D1C0A5", {
-        color: this.fontColor,
-        text: "钢镚",
-        value: `${this.gangben}`
-      });
-      const expen = Math.abs(this.expenseBean);
-      const total = this.beanNum + this.incomeBean + expen;
-      const incomeBean = Math.floor(Math.floor(this.incomeBean / total * 100) * 3.6);
-      const expenseBean = Math.floor(Math.floor(expen / total * 100) * 3.6);
-      const jdNum = Math.floor(Math.floor(this.beanNum / total * 100) * 3.6);
-      console.log(jdNum);
-      console.log(incomeBean);
-      console.log(expenseBean);
-      drawCenterCircle(0, "#c3cdF2", jdNum);
-      drawCenterCircle(jdNum, "#DD8AB7", incomeBean);
-      drawCenterCircle(jdNum + incomeBean, "#FBBFA7", expenseBean);
-      const {light, dark} = await getSetting("centerCircle") || {};
-      const centerCircleColor = Device.isUsingDarkAppearance() ? dark : light;
-      await drawCenterText(centerCircleColor || "", {color: this.fontColor, value: `${this.beanNum}`});
-    };
-    this.fetchBaseInfo = async () => {
-      const url1 = "https://ms.jr.jd.com/gw/generic/uc/h5/m/mySubsidyBalance";
-      const req1 = new Request(url1);
-      const Referer = "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&";
-      req1.headers = {cookie: this.cookie.cookie, Referer};
-      const data1 = await req1.loadJSON();
-      if (data1.resultCode === 0) {
-        this.jintie = data1.resultData.data.balance;
-      }
-      const url2 = "https://coin.jd.com/m/gb/getBaseInfo.html";
-      const req2 = new Request(url2);
-      req2.headers = {cookie: this.cookie.cookie, Referer};
-      const data2 = await req2.loadJSON();
-      if (data2.gbBalance) {
-        this.gangben = data2.gbBalance;
-      }
-    };
-    this.fetchJDDataSource = async () => {
-      const headers = {
-        cookie: this.cookie.cookie,
-        "User-Agent": "scriptable"
-      };
-      const url = "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion";
-      return ((await request({url, header: headers})).data || {}).data;
-    };
-    this.getAmountData = async () => {
-      let i = 0, page = 1;
-      do {
-        const response = await this.getJingBeanBalanceDetail(page);
-        console.log(`第${page}页：${response.code === "0" ? "请求成功" : "请求失败"}`);
-        if (response.code === "3") {
-          i = 1;
-          console.log(response);
-        }
-        if (response && response.code === "0") {
-          page++;
-          const detailList = response.jingDetailList;
-          if (detailList && detailList.length > 0) {
-            for (const item of detailList) {
-              const dates = item.date.split(" ");
-              if (this.timerKeys.indexOf(dates[0]) > -1) {
-                if (this.timerKeys[0] === dates[0]) {
-                  const amount = Number(item.amount);
-                  if (amount > 0)
-                    this.incomeBean += amount;
-                  if (amount < 0)
-                    this.expenseBean += amount;
-                }
-              } else {
-                i = 1;
-                break;
-              }
-            }
-          }
-        }
-      } while (i === 0);
-    };
-    this.getJingBeanBalanceDetail = async (page) => {
-      const options = {
-        url: `https://bean.m.jd.com/beanDetail/detail.json`,
-        body: `page=${page}`,
-        headers: {
-          "X-Requested-With": `XMLHttpRequest`,
-          Connection: `keep-alive`,
-          "Accept-Encoding": `gzip, deflate, br`,
-          "Content-Type": `application/x-www-form-urlencoded; charset=UTF-8`,
-          Origin: `https://bean.m.jd.com`,
-          "User-Agent": `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15`,
-          Cookie: this.cookie.cookie,
-          Host: `bean.m.jd.com`,
-          Referer: `https://bean.m.jd.com/beanDetail/index.action?resourceValue=bean`,
-          "Accept-Language": `zh-cn`,
-          Accept: `application/json, text/javascript, */*; q=0.01`
-        }
-      };
-      return (await request({url: options.url, method: "POST", data: options.body, header: options.headers})).data;
+      let size = 0;
+      if (config.widgetFamily === "medium")
+        size = 3;
+      if (config.widgetFamily === "large")
+        size = 6;
+      const dataSource = getRandomArrayElements(req.data, size);
+      this.dataSource = dataSource.length > 3 ? [dataSource.splice(0, 3), dataSource] : [dataSource];
     };
     this.render = async () => {
-      if (config.widgetFamily === "large")
-        return RenderError("暂不支持");
-      const contentImg = canvas.getImage();
-      const baseInfo = this.JDDataSource.userInfo.baseInfo;
       return /* @__PURE__ */ h("wbox", {
         background: await this.getBackgroundImage() || this.backgroundColor,
-        updateDate: new Date(Date.now() + await this.updateInterval()),
-        padding: [0, 0, 0, 0]
-      }, /* @__PURE__ */ h("wstack", {
-        href: "https://home.m.jd.com/myJd/home.action",
-        verticalAlign: "center"
-      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCeneter_default, {
-        flexDirection: "column"
-      }, /* @__PURE__ */ h("wimage", {
-        src: contentImg,
-        width: 150,
-        height: 150
-      })), config.widgetFamily === "medium" && /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wspacer", {
-        length: 5
-      }), /* @__PURE__ */ h("wstack", {
+        updateDate: new Date(Date.now() + await this.updateInterval())
+      }, /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wstack", {
         flexDirection: "column",
         verticalAlign: "center"
-      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h(Avatar, {
-        url: baseInfo.headImageUrl
-      })), /* @__PURE__ */ h("wspacer", {
-        length: 10
-      }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wstack", {
-        flexDirection: "column"
-      }, /* @__PURE__ */ h(Label, {
-        color: this.fontColor,
-        labelColor: "#f95e4c",
-        label: "person.circle",
-        value: baseInfo.nickname
+      }, this.dataSource.map((item, key) => {
+        return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wstack", null, item.map((season, index) => /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(RowCell, {
+          data: season
+        }), item.length - 1 !== index && /* @__PURE__ */ h("wspacer", null)))), key !== item.length - 1 && /* @__PURE__ */ h("wspacer", null));
+      }))), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wstack", {
+        verticalAlign: "center"
+      }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wimage", {
+        src: "https://vip1.loli.net/2020/04/28/nFYo8RsaT72v3y5.png",
+        width: 75,
+        height: 15
       }), /* @__PURE__ */ h("wspacer", {
         length: 10
-      }), /* @__PURE__ */ h(Label, {
-        color: this.fontColor,
-        labelColor: "#f7de65",
-        label: "creditcard.circle",
-        value: `${baseInfo.levelName}(${baseInfo.userLevel})`
-      }))), /* @__PURE__ */ h("wspacer", null))), /* @__PURE__ */ h("wspacer", null)));
+      }), /* @__PURE__ */ h("wimage", {
+        src: "arrow.clockwise",
+        width: 10,
+        height: 10,
+        opacity: 0.5
+      }), /* @__PURE__ */ h("wspacer", {
+        length: 10
+      }), /* @__PURE__ */ h("wtext", {
+        font: 12,
+        textAlign: "right",
+        opacity: 0.5
+      }, this.nowTime())));
     };
   }
-  getDay(dayNumber) {
-    const data = [];
-    let i = dayNumber;
-    do {
-      const today = new Date();
-      const year = today.getFullYear();
-      const targetday_milliseconds = today.getTime() - 1e3 * 60 * 60 * 24 * i;
-      today.setTime(targetday_milliseconds);
-      let month = today.getMonth() + 1;
-      month = month >= 10 ? month : `0${month}`;
-      let day = today.getDate();
-      day = day >= 10 ? day : `0${day}`;
-      data.push(`${year}-${month}-${day}`);
-      i--;
-    } while (i >= 0);
-    return data;
+  nowTime() {
+    const date = new Date();
+    return date.toLocaleTimeString("chinese", {hour12: false});
   }
 };
 
