@@ -457,7 +457,7 @@ class Base {
         row.addCell(imgCell);
       }
       row.dismissOnSelect = false;
-      if (item.onClick) row.onSelect = () => item.onClick(item);
+      if (item.onClick) row.onSelect = () => item.onClick(item, row);
       table.addRow(row);
     }
     table.reload();

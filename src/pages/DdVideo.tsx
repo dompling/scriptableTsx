@@ -1,6 +1,6 @@
 import {FC} from 'react';
 import Base, {actionsProps} from '@app/Base';
-import {request, getRandomArrayElements, useSetting} from '@app/lib/help';
+import {request, getRandomArrayElements, useSetting, showNotification} from '@app/lib/help';
 import RowCenter from '@app/Component/RowCeneter';
 
 interface SeasonProps {
@@ -101,10 +101,12 @@ class Widget extends Base {
       const title = item.title.split(' ')[0];
       return {
         title: item.title,
-        onClick: () => {
-          if (collect.indexOf(title) > -1) return;
+        onClick: (_: any, row: any) => {
+          if (collect.length === 6) return showNotification({title: '关注数已经达到最大，请去关注列表清除'});
           collect.push(title);
           setSetting('collect', collect.slice(-6));
+          table.removeRow(row);
+          table.reload();
         },
         icon: {name: 'video.badge.plus'},
       } as actionsProps;
@@ -118,16 +120,15 @@ class Widget extends Base {
     const table = new UITable();
     const {getSetting, setSetting} = useSetting(this.en);
     const collect = (await getSetting<string[]>('collect')) || [];
-    const actions: actionsProps[] = collect.map(item => {
+    const actions: actionsProps[] = collect.map((item, index) => {
       return {
         title: item,
-        dismissOnSelect: true,
-        onClick: async () => {
-          const collect = (await getSetting<string[]>('collect')) || [];
-          await setSetting(
-            'collect',
-            collect.filter(title => title !== item),
-          );
+        // dismissOnSelect: true,
+        onClick: async (_: any, row: any) => {
+          collect.splice(index, 1);
+          await setSetting('collect', collect);
+          table.removeRow(row);
+          table.reload();
         },
         icon: {name: 'delete.right', color: '#ff4d4f'},
       } as actionsProps;

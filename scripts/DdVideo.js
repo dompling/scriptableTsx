@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1619167937207
+// @编译时间 1619168854696
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1147,7 +1147,7 @@ var Base = class {
         }
         row.dismissOnSelect = false;
         if (item.onClick)
-          row.onSelect = () => item.onClick(item);
+          row.onSelect = () => item.onClick(item, row);
         table.addRow(row);
       }
       table.reload();
@@ -1373,11 +1373,13 @@ var Widget = class extends Base_default {
         const title = item.title.split(" ")[0];
         return {
           title: item.title,
-          onClick: () => {
-            if (collect.indexOf(title) > -1)
-              return;
+          onClick: (_, row) => {
+            if (collect.length === 6)
+              return showNotification({title: "关注数已经达到最大，请去关注列表清除"});
             collect.push(title);
             setSetting("collect", collect.slice(-6));
+            table.removeRow(row);
+            table.reload();
           },
           icon: {name: "video.badge.plus"}
         };
@@ -1390,13 +1392,14 @@ var Widget = class extends Base_default {
       const table = new UITable();
       const {getSetting, setSetting} = useSetting(this.en);
       const collect = await getSetting("collect") || [];
-      const actions = collect.map((item) => {
+      const actions = collect.map((item, index) => {
         return {
           title: item,
-          dismissOnSelect: true,
-          onClick: async () => {
-            const collect2 = await getSetting("collect") || [];
-            await setSetting("collect", collect2.filter((title) => title !== item));
+          onClick: async (_, row) => {
+            collect.splice(index, 1);
+            await setSetting("collect", collect);
+            table.removeRow(row);
+            table.reload();
           },
           icon: {name: "delete.right", color: "#ff4d4f"}
         };
