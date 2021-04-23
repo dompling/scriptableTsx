@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1619160578856
+// @编译时间 1619170056159
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1159,7 +1159,7 @@ var Base = class {
         }
         row.dismissOnSelect = false;
         if (item.onClick)
-          row.onSelect = () => item.onClick(item);
+          row.onSelect = () => item.onClick(item, row);
         table.addRow(row);
       }
       table.reload();

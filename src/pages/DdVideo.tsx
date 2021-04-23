@@ -1,6 +1,6 @@
 import {FC} from 'react';
 import Base, {actionsProps} from '@app/Base';
-import {request, getRandomArrayElements, useSetting, showNotification} from '@app/lib/help';
+import {request, useSetting, showNotification} from '@app/lib/help';
 import RowCenter from '@app/Component/RowCeneter';
 
 interface SeasonProps {
