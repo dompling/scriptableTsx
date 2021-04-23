@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1619168854696
+// @编译时间 1619168903012
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1373,11 +1373,12 @@ var Widget = class extends Base_default {
         const title = item.title.split(" ")[0];
         return {
           title: item.title,
-          onClick: (_, row) => {
-            if (collect.length === 6)
+          onClick: async (_, row) => {
+            const collect2 = await getSetting("collect") || [];
+            if (collect2.length === 6)
               return showNotification({title: "关注数已经达到最大，请去关注列表清除"});
-            collect.push(title);
-            setSetting("collect", collect.slice(-6));
+            collect2.push(title);
+            await setSetting("collect", collect2.slice(-6));
             table.removeRow(row);
             table.reload();
           },

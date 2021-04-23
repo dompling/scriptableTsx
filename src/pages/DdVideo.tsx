@@ -101,10 +101,11 @@ class Widget extends Base {
       const title = item.title.split(' ')[0];
       return {
         title: item.title,
-        onClick: (_: any, row: any) => {
+        onClick: async (_: any, row: any) => {
+          const collect = (await getSetting<string[]>('collect')) || [];
           if (collect.length === 6) return showNotification({title: '关注数已经达到最大，请去关注列表清除'});
           collect.push(title);
-          setSetting('collect', collect.slice(-6));
+          await setSetting('collect', collect.slice(-6));
           table.removeRow(row);
           table.reload();
         },
