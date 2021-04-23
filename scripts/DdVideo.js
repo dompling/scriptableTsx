@@ -9,13 +9,13 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1619160578856
+// @编译时间 1619167674012
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-    
+
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {
@@ -478,18 +478,6 @@ async function setTransparentBackground(tips) {
       break;
   }
   return cropImage(img, new Rect(crop.x, crop.y, crop.w, crop.h));
-}
-function getRandomArrayElements(arr, count) {
-  const shuffled = arr.slice(0);
-  let i = arr.length, min = i - count, temp, index;
-  min = min > 0 ? min : 0;
-  while (i-- > min) {
-    index = Math.floor((i + 1) * Math.random());
-    temp = shuffled[index];
-    shuffled[index] = shuffled[i];
-    shuffled[i] = temp;
-  }
-  return shuffled.slice(min);
 }
 
 // src/lib/jsx-runtime.ts
@@ -1311,7 +1299,7 @@ var RowCell = (props) => {
     borderColor: "#e8e8e8",
     flexDirection: "column",
     width: 91,
-    height: 108
+    height: 118
   }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wstack", {
     background: new Color("#000", 0.3)
   }, /* @__PURE__ */ h("wstack", {
@@ -1337,19 +1325,85 @@ var Widget = class extends Base_default {
     this.en = "DDYs";
     this.useBoxJS = false;
     this.dataSource = [];
+    this.componentWillMount = async () => {
+      this.registerAction("监控列表", this.delCollectTable, {
+        name: "folder.badge.minus",
+        color: "#ff4d4f"
+      });
+      this.registerAction("低端影视", this.collectTable, {
+        name: "folder.badge.plus",
+        color: "#bae637"
+      });
+    };
     this.componentDidMount = async () => {
       const req = await request({
         url: `http://api.sodion.net/api_v1/grap/ddrk?time=${today}`,
         method: "GET",
-        useCache: true
+        useCache: false
       });
-      let size = 0;
+      const dataSource = req.data;
+      const {getSetting} = useSetting(this.en);
+      const collect = await getSetting("collect") || [];
+      const collectDataSource = [];
+      const _dataSource = [];
+      dataSource.forEach((item) => {
+        if (collect.indexOf(item.title.split(" ")[0]) !== -1) {
+          collectDataSource.push(item);
+        } else {
+          _dataSource.push(item);
+        }
+      });
+      const collectLen = collectDataSource.length;
+      const data = collectLen < 6 ? [...collectDataSource, ..._dataSource.splice(0, 6 - collectLen)] : collectDataSource;
       if (config.widgetFamily === "medium")
-        size = 3;
+        this.dataSource = [data.splice(0, 3)];
       if (config.widgetFamily === "large")
-        size = 6;
-      const dataSource = getRandomArrayElements(req.data, size);
-      this.dataSource = dataSource.length > 3 ? [dataSource.splice(0, 3), dataSource] : [dataSource];
+        this.dataSource = [data.splice(0, 3), data];
+    };
+    this.collectTable = async () => {
+      const req = await request({
+        url: `http://api.sodion.net/api_v1/grap/ddrk`,
+        method: "GET"
+      });
+      let dataSource = req.data;
+      const {getSetting, setSetting} = useSetting(this.en);
+      const collect = await getSetting("collect") || [];
+      dataSource = dataSource.filter((item) => collect.indexOf(item.title.split(" ")[0]) === -1);
+      const actions = dataSource.map((item) => {
+        return {
+          title: item.title,
+          onClick: () => {
+            collect.push(item.title.split(" ")[0]);
+            setSetting("collect", collect.slice(-6));
+          },
+          icon: {name: "video.badge.plus"}
+        };
+      });
+      const table = new UITable();
+      await this.showActionSheet(table, "低端影视每日更新（最多监控 6 部）", actions);
+      await table.present();
+    };
+    this.delCollectTable = async () => {
+      const table = new UITable();
+      const {getSetting, setSetting} = useSetting(this.en);
+      const collect = await getSetting("collect") || [];
+      const actions = collect.map((item) => {
+        return {
+          title: item,
+          dismissOnSelect: true,
+          onClick: async () => {
+            const collect2 = await getSetting("collect") || [];
+            await setSetting("collect", collect2.filter((title) => title !== item));
+          },
+          icon: {name: "delete.right", color: "#ff4d4f"}
+        };
+      });
+      try {
+        await this.showActionSheet(table, "删除关注", actions);
+        await table.present();
+      } catch (e) {
+        console.log(e);
+      }
     };
     this.render = async () => {
       return /* @__PURE__ */ h("wbox", {
@@ -1361,8 +1415,10 @@ var Widget = class extends Base_default {
       }, this.dataSource.map((item, key) => {
         return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wstack", null, item.map((season, index) => /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(RowCell, {
           data: season
-        }), item.length - 1 !== index && /* @__PURE__ */ h("wspacer", null)))), key !== item.length - 1 && /* @__PURE__ */ h("wspacer", null));
-      }))), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wstack", {
+        }), item.length - 1 !== index && /* @__PURE__ */ h("wspacer", null)))), key !== this.dataSource.length - 1 && /* @__PURE__ */ h("wspacer", null));
+      }))), /* @__PURE__ */ h("wspacer", {
+        length: 5
+      }), /* @__PURE__ */ h("wstack", {
         verticalAlign: "center"
       }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wimage", {
         src: "https://vip1.loli.net/2020/04/28/nFYo8RsaT72v3y5.png",

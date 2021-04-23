@@ -8,7 +8,7 @@ import {
   request,
 } from '@app/lib/help';
 
-interface actionsProps {
+export interface actionsProps {
   title: string;
   onClick: any;
   val?: string;
