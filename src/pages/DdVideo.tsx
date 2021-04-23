@@ -109,7 +109,7 @@ class Widget extends Base {
           table.removeRow(row);
           table.reload();
         },
-        icon: {name: 'video.badge.plus'},
+        icon: {name: 'video.badge.plus', color: '#bae637'},
       } as actionsProps;
     });
     const table = new UITable();

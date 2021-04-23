@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1619168903012
+// @编译时间 1619169626214
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1382,7 +1382,7 @@ var Widget = class extends Base_default {
             table.removeRow(row);
             table.reload();
           },
-          icon: {name: "video.badge.plus"}
+          icon: {name: "video.badge.plus", color: "#bae637"}
         };
       });
       const table = new UITable();
