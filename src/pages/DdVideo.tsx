@@ -167,13 +167,13 @@ class Widget extends Base {
                       </>
                     ))}
                   </wstack>
-                  {key !== this.dataSource.length - 1 && <wspacer />}
+                  {key !== this.dataSource.length - 1 && <wspacer length={20} />}
                 </>
               );
             })}
           </wstack>
         </RowCenter>
-        <wspacer length={5} />
+        <wspacer length={10} />
         <wstack verticalAlign="center">
           <wspacer />
           <wimage src={'https://vip1.loli.net/2020/04/28/nFYo8RsaT72v3y5.png'} width={75} height={15} />

@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1619169626214
+// @编译时间 1619169737379
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1422,9 +1422,11 @@ var Widget = class extends Base_default {
       }, this.dataSource.map((item, key) => {
         return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h("wstack", null, item.map((season, index) => /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(RowCell, {
           data: season
-        }), item.length - 1 !== index && /* @__PURE__ */ h("wspacer", null)))), key !== this.dataSource.length - 1 && /* @__PURE__ */ h("wspacer", null));
+        }), item.length - 1 !== index && /* @__PURE__ */ h("wspacer", null)))), key !== this.dataSource.length - 1 && /* @__PURE__ */ h("wspacer", {
+          length: 20
+        }));
       }))), /* @__PURE__ */ h("wspacer", {
-        length: 5
+        length: 10
       }), /* @__PURE__ */ h("wstack", {
         verticalAlign: "center"
       }, /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wimage", {
