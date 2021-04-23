@@ -98,10 +98,12 @@ class Widget extends Base {
     const collect = (await getSetting<string[]>('collect')) || [];
     dataSource = dataSource.filter(item => collect.indexOf(item.title.split(' ')[0]) === -1);
     const actions: actionsProps[] = dataSource.map(item => {
+      const title = item.title.split(' ')[0];
       return {
         title: item.title,
         onClick: () => {
-          collect.push(item.title.split(' ')[0]);
+          if (collect.indexOf(title) > -1) return;
+          collect.push(title);
           setSetting('collect', collect.slice(-6));
         },
         icon: {name: 'video.badge.plus'},

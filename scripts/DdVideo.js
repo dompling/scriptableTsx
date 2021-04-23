@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1619167674012
+// @编译时间 1619167937207
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1370,10 +1370,13 @@ var Widget = class extends Base_default {
       const collect = await getSetting("collect") || [];
       dataSource = dataSource.filter((item) => collect.indexOf(item.title.split(" ")[0]) === -1);
       const actions = dataSource.map((item) => {
+        const title = item.title.split(" ")[0];
         return {
           title: item.title,
           onClick: () => {
-            collect.push(item.title.split(" ")[0]);
+            if (collect.indexOf(title) > -1)
+              return;
+            collect.push(title);
             setSetting("collect", collect.slice(-6));
           },
           icon: {name: "video.badge.plus"}
