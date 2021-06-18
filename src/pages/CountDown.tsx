@@ -197,23 +197,25 @@ const CreateCalendar: FC<{color: string; data: any[]}> = ({color, data}) => {
           </>
         ))}
       </RowCenter>
-      <wspacer length={5} />
-      {data.map(dataItem => {
-        return (
-          <>
-            <RowCenter>
-              {dataItem.map((item: any, index: number) => {
-                return (
-                  <>
-                    <CreateCalendarItem color={color} text={`${item.date.getDate()}`} data={item} />
-                    {index !== dataItem.length - 1 && <wspacer />}
-                  </>
-                );
-              })}
-            </RowCenter>
-          </>
-        );
-      })}
+      <RowCenter flexDirection={'column'}>
+        {data.map((dataItem, dataKey: number) => {
+          return (
+            <>
+              <RowCenter>
+                {dataItem.map((item: any, index: number) => {
+                  return (
+                    <>
+                      <CreateCalendarItem color={color} text={`${item.date.getDate()}`} data={item} />
+                      {index !== dataItem.length - 1 && <wspacer />}
+                    </>
+                  );
+                })}
+              </RowCenter>
+              {dataKey !== data.length - 1 && <wspacer />}
+            </>
+          );
+        })}
+      </RowCenter>
     </RowCenter>
   );
 };
@@ -293,15 +295,18 @@ class Widget extends Base {
 
   componentDidMount = async () => {
     const {getSetting} = useSetting(this.en);
-    const time = (((await getSetting<{time: string}>('work')) || {}).time || '17:30:00').split(':');
+    let time: any = ((await getSetting<{time: string}>('work')) || {}).time;
     $calendar = await getCalendarJs();
-    const day = this.date.getDay();
-    if (day > 0 && day < 6) {
-      const event: any = {};
-      event.title = '下班时间';
-      this.date.setHours(parseInt(time[0]), parseInt(time[1]), parseInt(time[2]));
-      event.time = this.date;
-      $eventsBtn.push(event);
+    if (time) {
+      time = time.split(':');
+      const day = this.date.getDay();
+      if (day > 0 && day < 6) {
+        const event: any = {};
+        event.title = '下班时间';
+        this.date.setHours(parseInt(time[0]), parseInt(time[1]), parseInt(time[2]));
+        event.time = this.date;
+        $eventsBtn.push(event);
+      }
     }
     $eventsBtn.push(...(await getNextCalendarEvent()));
     await this.createCalendar();

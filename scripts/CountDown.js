@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：4/23/2021
+ * 更新时间：6/18/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1619170056159
+// @编译时间 1623981839951
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1463,17 +1463,17 @@ var CreateCalendar = ({color, data}) => {
   }, /* @__PURE__ */ h(RowCeneter_default, null, weeks.map((week, index) => /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(CreateCalendarItem, {
     color,
     text: week
-  }), index !== weeks.length - 1 && /* @__PURE__ */ h("wspacer", null)))), /* @__PURE__ */ h("wspacer", {
-    length: 5
-  }), data.map((dataItem) => {
+  }), index !== weeks.length - 1 && /* @__PURE__ */ h("wspacer", null)))), /* @__PURE__ */ h(RowCeneter_default, {
+    flexDirection: "column"
+  }, data.map((dataItem, dataKey) => {
     return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(RowCeneter_default, null, dataItem.map((item, index) => {
       return /* @__PURE__ */ h(Fragment, null, /* @__PURE__ */ h(CreateCalendarItem, {
         color,
         text: `${item.date.getDate()}`,
         data: item
       }), index !== dataItem.length - 1 && /* @__PURE__ */ h("wspacer", null));
-    })));
-  }));
+    })), dataKey !== data.length - 1 && /* @__PURE__ */ h("wspacer", null));
+  })));
 };
 var CreateCalendarEvent = ({
   color,
@@ -1546,15 +1546,18 @@ var Widget = class extends Base_default {
     };
     this.componentDidMount = async () => {
       const {getSetting} = useSetting(this.en);
-      const time = ((await getSetting("work") || {}).time || "17:30:00").split(":");
+      let time = (await getSetting("work") || {}).time;
       $calendar = await getCalendarJs();
-      const day = this.date.getDay();
-      if (day > 0 && day < 6) {
-        const event = {};
-        event.title = "下班时间";
-        this.date.setHours(parseInt(time[0]), parseInt(time[1]), parseInt(time[2]));
-        event.time = this.date;
-        $eventsBtn.push(event);
+      if (time) {
+        time = time.split(":");
+        const day = this.date.getDay();
+        if (day > 0 && day < 6) {
+          const event = {};
+          event.title = "下班时间";
+          this.date.setHours(parseInt(time[0]), parseInt(time[1]), parseInt(time[2]));
+          event.time = this.date;
+          $eventsBtn.push(event);
+        }
       }
       $eventsBtn.push(...await getNextCalendarEvent());
       await this.createCalendar();
