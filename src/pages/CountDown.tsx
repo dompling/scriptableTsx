@@ -113,8 +113,7 @@ async function getMonthDaysArray(year: any, month: number, day: number) {
 }
 
 async function getCalendarEvent(start: Date, end: Date): Promise<CalendarEvent[]> {
-  const events = await CalendarEvent.between(start, end);
-  return events.filter(event => event.calendar.title.includes('节假日'));
+  return await CalendarEvent.between(start, end);
 }
 
 interface calendarInterface {
@@ -320,6 +319,7 @@ class Widget extends Base {
     this.dataSource = await getMonthDaysArray(year, month, day);
     $calendarEvents = await getCalendarEvent(this.dataSource[0].date, this.dataSource[this.dataSource.length - 1].date);
     let thisWeekIndex = 0;
+    console.log($calendarEvents);
     this.dataSource = this.dataSource.map((item: calendarInterface, index: number) => {
       if (item.date.getDate() === day && item.date.getMonth() === month) thisWeekIndex = index;
       const time = item.date.getTime();
@@ -339,7 +339,7 @@ class Widget extends Base {
       ];
       weeks = this.dataSource.map((item: calendarInterface) => item.weekDay);
     }
-    console.log(this.dataSource);
+    // console.log(this.dataSource);
 
     const data: any[] = [[]];
     let i = 0;

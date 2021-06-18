@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1623983391620
+// @编译时间 1623984774362
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1389,8 +1389,7 @@ async function getMonthDaysArray(year, month, day) {
   return dayArrays;
 }
 async function getCalendarEvent(start, end) {
-  const events = await CalendarEvent.between(start, end);
-  return events.filter((event) => event.calendar.title.includes("节假日"));
+  return await CalendarEvent.between(start, end);
 }
 async function getCalendarJs() {
   const response = await request({
@@ -1570,6 +1569,7 @@ var Widget = class extends Base_default {
       this.dataSource = await getMonthDaysArray(year, month, day);
       $calendarEvents = await getCalendarEvent(this.dataSource[0].date, this.dataSource[this.dataSource.length - 1].date);
       let thisWeekIndex = 0;
+      console.log($calendarEvents);
       this.dataSource = this.dataSource.map((item, index) => {
         if (item.date.getDate() === day && item.date.getMonth() === month)
           thisWeekIndex = index;
@@ -1590,7 +1590,6 @@ var Widget = class extends Base_default {
         ];
         weeks = this.dataSource.map((item) => item.weekDay);
       }
-      console.log(this.dataSource);
       const data = [[]];
       let i = 0;
       this.dataSource.forEach((item) => {
