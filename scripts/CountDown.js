@@ -9,7 +9,7 @@
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1623981839951
+// @编译时间 1623983391620
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1573,12 +1573,14 @@ var Widget = class extends Base_default {
       this.dataSource = this.dataSource.map((item, index) => {
         if (item.date.getDate() === day && item.date.getMonth() === month)
           thisWeekIndex = index;
-        const calendarEvent = $calendarEvents.find((event) => event.startDate.getDate() === item.date.getDate() && event.startDate.getMonth() === item.date.getMonth());
+        const time = item.date.getTime();
+        const calendarEvent = $calendarEvents.find((event) => {
+          return event.startDate.getTime() === time;
+        });
         return {...item, calendarEvent};
       });
       if (config.widgetFamily === "medium") {
         const start = thisWeekIndex - week;
-        console.log(thisWeekIndex);
         this.dataSource = this.dataSource.splice(start, 7);
       } else if (config.widgetFamily === "small") {
         this.dataSource = [

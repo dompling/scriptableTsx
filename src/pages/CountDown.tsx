@@ -322,15 +322,14 @@ class Widget extends Base {
     let thisWeekIndex = 0;
     this.dataSource = this.dataSource.map((item: calendarInterface, index: number) => {
       if (item.date.getDate() === day && item.date.getMonth() === month) thisWeekIndex = index;
-      const calendarEvent = $calendarEvents.find(
-        event =>
-          event.startDate.getDate() === item.date.getDate() && event.startDate.getMonth() === item.date.getMonth(),
-      );
+      const time = item.date.getTime();
+      const calendarEvent = $calendarEvents.find(event => {
+        return event.startDate.getTime() === time;
+      });
       return {...item, calendarEvent};
     });
     if (config.widgetFamily === 'medium') {
       const start = thisWeekIndex - week;
-      console.log(thisWeekIndex);
       this.dataSource = this.dataSource.splice(start, 7);
     } else if (config.widgetFamily === 'small') {
       this.dataSource = [
