@@ -435,10 +435,12 @@ class Base {
         const rowIcon = row.addImageAtURL(item.url);
         rowIcon.widthWeight = 100;
       } else {
-        const icon = item.icon || {};
-        const image = await this.drawTableIcon(icon.name, icon.color, item.cornerWidth);
-        const imageCell = row.addImage(image);
-        imageCell.widthWeight = 100;
+        if (parseInt(Device.systemVersion()) < 15) {
+          const icon = item.icon || {};
+          const image = await this.drawTableIcon(icon.name, icon.color, item.cornerWidth);
+          const imageCell = row.addImage(image);
+          imageCell.widthWeight = 100;
+        }
       }
 
       const rowTitle = row.addText(item.title);

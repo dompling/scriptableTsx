@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：4/23/2021
+ * 更新时间：9/15/2021
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1619170056159
+// @编译时间 1631671720315
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1137,10 +1137,12 @@ var Base = class {
           const rowIcon = row.addImageAtURL(item.url);
           rowIcon.widthWeight = 100;
         } else {
-          const icon = item.icon || {};
-          const image = await this.drawTableIcon(icon.name, icon.color, item.cornerWidth);
-          const imageCell = row.addImage(image);
-          imageCell.widthWeight = 100;
+          if (parseInt(Device.systemVersion()) < 15) {
+            const icon = item.icon || {};
+            const image = await this.drawTableIcon(icon.name, icon.color, item.cornerWidth);
+            const imageCell = row.addImage(image);
+            imageCell.widthWeight = 100;
+          }
         }
         const rowTitle = row.addText(item.title);
         rowTitle.widthWeight = 400;
