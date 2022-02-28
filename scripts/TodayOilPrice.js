@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：9/29/2021
+ * 更新时间：2/28/2022
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1632907951664
+// @编译时间 1646032098709
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1776,7 +1776,7 @@ var Widget = class extends Base_default {
         console.log(locationText);
         const {locality = "", administrativeArea = "四川"} = locationText[0] || {};
         this.location = locationText[0] || {};
-        return [administrativeArea, locality];
+        return [administrativeArea || "", locality || ""];
       } catch (e) {
         console.log("❌错误信息：" + e);
         return [];
@@ -1794,20 +1794,15 @@ var Widget = class extends Base_default {
       };
       const data = Object.keys(params).map((key) => `${key}=${params[key]}`);
       const url = "https://apis.map.qq.com/ws/place/v1/search?" + encodeURIComponent(data.join("&"));
-      console.log(url);
       const res = (await request({url, dataType: "json"})).data?.data;
       const size = config.widgetFamily === "large" ? 4 : 1;
       return res?.splice(0, size);
     };
     this.renderWebView = async (str) => {
       const webView = new WebView();
-      let _area = [pinyin_default.fullChar(str[0].replace("省", "")), pinyin_default.fullChar(str[1])];
-      if (!_area[0]) {
-        _area = _area[1].replace("shi", "/");
-      } else {
-        _area = _area.join("/") + ".html";
-      }
-      const url = `http://youjia.chemcp.com/${_area}`;
+      const _area = pinyin_default.fullChar(str[0].replace("省", ""));
+      const url = `http://youjia.chemcp.com/${_area}/`;
+      console.log(url);
       await webView.loadURL(url);
       const javascript = `
     const data = [];
@@ -1829,6 +1824,8 @@ var Widget = class extends Base_default {
       });
     };
     this.content = (data) => {
+      const regexp = /[0-9]+/g;
+      const label = data.cate.match(regexp)?.[0];
       return /* @__PURE__ */ h("wstack", {
         flexDirection: "column",
         verticalAlign: "center"
@@ -1836,7 +1833,7 @@ var Widget = class extends Base_default {
         textAlign: "center",
         textColor: this.fontColor,
         font: title
-      }, data.cate.replace("汽油", ""))), /* @__PURE__ */ h("wspacer", {
+      }, `${label || "-"}#价格`)), /* @__PURE__ */ h("wspacer", {
         length: 10
       }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
         textColor: this.fontColor,
@@ -1874,7 +1871,7 @@ var Widget = class extends Base_default {
           length: 2
         }), this.stackCellText({value: item.address, label: "地址", href, icon: "mappin.and.ellipse"}), /* @__PURE__ */ h("wspacer", {
           length: 2
-        }), this.stackCellText({value: item.tel, label: "电话", href: "tel:" + item.tel, icon: "iphone"}), gasStation.length - 1 !== index && /* @__PURE__ */ h("wspacer", null));
+        }), this.stackCellText({value: item.tel, label: "电话", href: "tel:" + item.tel, icon: "iphone"}), gasStation.length !== index + 1 && /* @__PURE__ */ h("wspacer", null));
       });
     };
     this.render = async () => {

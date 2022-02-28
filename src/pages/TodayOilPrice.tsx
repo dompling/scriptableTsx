@@ -87,7 +87,7 @@ class Widget extends Base {
       console.log(locationText);
       const {locality = '', administrativeArea = '四川'} = (locationText[0] || {}) as locationType;
       this.location = (locationText[0] || {}) as locationType;
-      return [administrativeArea, locality];
+      return [administrativeArea || '', locality || ''];
     } catch (e) {
       console.log('❌错误信息：' + e);
       return [];
@@ -106,7 +106,6 @@ class Widget extends Base {
     };
     const data = Object.keys(params).map((key: string) => `${key}=${params[key]}`);
     const url = 'https://apis.map.qq.com/ws/place/v1/search?' + encodeURIComponent(data.join('&'));
-    console.log(url);
     const res = (await request<{[key: string]: any; data: gasStationResponse[]}>({url, dataType: 'json'})).data?.data;
     const size = config.widgetFamily === 'large' ? 4 : 1;
     return res?.splice(0, size) as gasStationResponse[];
@@ -114,13 +113,10 @@ class Widget extends Base {
 
   renderWebView = async (str: string[]): Promise<oilRes[]> => {
     const webView = new WebView();
-    let _area: string[] | string = [C2Pin.fullChar(str[0].replace('省', '')), C2Pin.fullChar(str[1])];
-    if (!_area[0]) {
-      _area = _area[1].replace('shi', '/');
-    } else {
-      _area = _area.join('/') + '.html';
-    }
-    const url = `http://youjia.chemcp.com/${_area}`;
+    const _area: string[] | string = C2Pin.fullChar(str[0].replace('省', ''));
+
+    const url = `http://youjia.chemcp.com/${_area}/`;
+    console.log(url);
     await webView.loadURL(url);
     const javascript = `
     const data = [];
@@ -152,11 +148,13 @@ class Widget extends Base {
   }
 
   content = (data: oilRes) => {
+    const regexp = /[0-9]+/g;
+    const label = data.cate.match(regexp)?.[0];
     return (
       <wstack flexDirection="column" verticalAlign="center">
         <RowCenter>
           <wtext textAlign="center" textColor={this.fontColor} font={title}>
-            {data.cate.replace('汽油', '')}
+            {`${label || '-'}#价格`}
           </wtext>
         </RowCenter>
         <wspacer length={10} />
@@ -193,7 +191,7 @@ class Widget extends Base {
           {this.stackCellText({value: item.address, label: '地址', href, icon: 'mappin.and.ellipse'})}
           <wspacer length={2} />
           {this.stackCellText({value: item.tel, label: '电话', href: 'tel:' + item.tel, icon: 'iphone'})}
-          {gasStation.length - 1 !== index && <wspacer />}
+          {gasStation.length !== index + 1 && <wspacer />}
         </wstack>
       );
     });
