@@ -2,6 +2,7 @@ import Base, {RenderError} from '@app/Base';
 import C2Pin from '@app/assets/pinyin';
 import {request, useSetting} from '@app/lib/help';
 import RowCenter from '@app/Component/RowCeneter';
+import StackLine from '@app/Component/StackLine';
 
 interface oilRes {
   cate: string;
@@ -37,7 +38,7 @@ interface gasStationResponse {
   };
 }
 
-const title = new Font('AppleSDGothicNeo-Bold', 16);
+const title = new Font('AppleSDGothicNeo-Bold', 14);
 
 class Widget extends Base {
   name = '地方油价';
@@ -68,8 +69,6 @@ class Widget extends Base {
       (await getSetting<{headerColor: string; bodyColor: string}>('oilBackground')) || {};
     this.headerColor = headerColor || this.headerColor;
     this.bodyColor = bodyColor || this.bodyColor;
-
-    this.fontColor = '#fff';
   };
 
   setMenuTokenInput = () => {
@@ -157,7 +156,7 @@ class Widget extends Base {
             {`${label || '-'}#价格`}
           </wtext>
         </RowCenter>
-        <wspacer length={10} />
+        <wspacer length={5} />
         <RowCenter>
           <wtext textColor={this.fontColor} font={12} textAlign="center">
             {data.value.replace('/升', '')}
@@ -206,15 +205,16 @@ class Widget extends Base {
     if (this.token) gasStation = (await this.searchGasStation()) || [];
     return (
       <wbox padding={[0, 0, 0, 0]} updateDate={new Date(Date.now() + (await this.updateInterval()))}>
-        <wstack background={this.headerColor} padding={[10, 10, 10, 10]}>
+        <wstack padding={[10, 10, 10, 10]}>
           {data.map(item => {
             const city = locality[1].replace('市', '');
             const cate = item.cate.replace(city, '').replace('#', '号').replace('价格', '');
             return this.content({...item, cate});
           })}
         </wstack>
+        <StackLine borderColor={'#e8e8e8'} />
         {gasStation.length > 0 && (
-          <wstack background={this.bodyColor} flexDirection="column" padding={[10, 10, 10, 10]}>
+          <wstack flexDirection="column" padding={[10, 10, 10, 10]}>
             {this.stackGasStation(gasStation)}
           </wstack>
         )}

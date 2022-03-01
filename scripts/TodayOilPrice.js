@@ -5,17 +5,17 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：2/28/2022
+ * 更新时间：3/1/2022
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1646032098709
+// @编译时间 1646127319369
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-    
+
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {
@@ -1733,8 +1733,21 @@ var RowCenter = ({children, ...props}) => {
 };
 var RowCeneter_default = RowCenter;
 
+// src/Component/StackLine/index.tsx
+var StackLine = (props) => {
+  return /* @__PURE__ */ h("wstack", {
+    background: props.borderColor
+  }, /* @__PURE__ */ h(RowCeneter_default, {
+    flexDirection: props.flexDirection
+  }, /* @__PURE__ */ h("wstack", {
+    height: 1,
+    width: 1
+  })));
+};
+var StackLine_default = StackLine;
+
 // src/pages/TodayOilPrice.tsx
-var title = new Font("AppleSDGothicNeo-Bold", 16);
+var title = new Font("AppleSDGothicNeo-Bold", 14);
 var Widget = class extends Base_default {
   constructor() {
     super(...arguments);
@@ -1761,7 +1774,6 @@ var Widget = class extends Base_default {
       const {headerColor, bodyColor} = await getSetting("oilBackground") || {};
       this.headerColor = headerColor || this.headerColor;
       this.bodyColor = bodyColor || this.bodyColor;
-      this.fontColor = "#fff";
     };
     this.setMenuTokenInput = () => {
       return this.showAlertCatchInput("腾讯Token", "BoxJS 缓存", {token: "腾讯地图 Token"});
@@ -1834,7 +1846,7 @@ var Widget = class extends Base_default {
         textColor: this.fontColor,
         font: title
       }, `${label || "-"}#价格`)), /* @__PURE__ */ h("wspacer", {
-        length: 10
+        length: 5
       }), /* @__PURE__ */ h(RowCeneter_default, null, /* @__PURE__ */ h("wtext", {
         textColor: this.fontColor,
         font: 12,
@@ -1886,14 +1898,14 @@ var Widget = class extends Base_default {
         padding: [0, 0, 0, 0],
         updateDate: new Date(Date.now() + await this.updateInterval())
       }, /* @__PURE__ */ h("wstack", {
-        background: this.headerColor,
         padding: [10, 10, 10, 10]
       }, data.map((item) => {
         const city = locality[1].replace("市", "");
         const cate = item.cate.replace(city, "").replace("#", "号").replace("价格", "");
         return this.content({...item, cate});
-      })), gasStation.length > 0 && /* @__PURE__ */ h("wstack", {
-        background: this.bodyColor,
+      })), /* @__PURE__ */ h(StackLine_default, {
+        borderColor: "#e8e8e8"
+      }), gasStation.length > 0 && /* @__PURE__ */ h("wstack", {
         flexDirection: "column",
         padding: [10, 10, 10, 10]
       }, this.stackGasStation(gasStation)), /* @__PURE__ */ h("wspacer", null), /* @__PURE__ */ h("wstack", {
