@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：2/28/2022
+ * 更新时间：10/18/2022
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1646032098709
+// @编译时间 1666062817490
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1336,10 +1336,24 @@ var Widget = class extends Base_default {
     };
     this.getLocation = async () => {
       try {
-        const location = await Location.current();
-        const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
-        console.log(locationText);
-        return locationText[0];
+        let locationTextValue;
+        const {getSetting, setSetting} = useSetting(this.en);
+        locationTextValue = await getSetting(`location`);
+        console.log(locationTextValue);
+        if (!locationTextValue) {
+          const location = await Location.current();
+          const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
+          locationTextValue = locationText[0];
+          if (locationText)
+            await setSetting("location", locationText[0]);
+        } else {
+          Location.current().then(async (location) => {
+            const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
+            if (locationText)
+              setSetting("location", locationText[0]);
+          });
+        }
+        return locationTextValue;
       } catch (e) {
         console.log("❌定位失败：" + e);
       }

@@ -126,10 +126,22 @@ class Widget extends Base {
 
   getLocation = async (): Promise<locationType | undefined> => {
     try {
-      const location = await Location.current();
-      const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
-      console.log(locationText);
-      return locationText[0] as locationType;
+      let locationTextValue;
+      const {getSetting, setSetting} = useSetting(this.en);
+      locationTextValue = await getSetting<locationType>(`location`);
+      console.log(locationTextValue);
+      if (!locationTextValue) {
+        const location = await Location.current();
+        const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
+        locationTextValue = locationText[0];
+        if (locationText) await setSetting('location', locationText[0]);
+      } else {
+        Location.current().then(async location => {
+          const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
+          if (locationText) setSetting('location', locationText[0]);
+        });
+      }
+      return locationTextValue as locationType;
     } catch (e) {
       console.log('❌定位失败：' + e);
     }
