@@ -134,11 +134,11 @@ class Widget extends Base {
         const location = await Location.current();
         const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
         locationTextValue = locationText[0];
-        if (locationText) await setSetting('location', locationText[0]);
+        if (locationText) await setSetting('location', locationText[0], false);
       } else {
         Location.current().then(async location => {
           const locationText = await Location.reverseGeocode(location.latitude, location.longitude);
-          if (locationText) setSetting('location', locationText[0]);
+          if (locationText) setSetting('location', locationText[0], false);
         });
       }
       return locationTextValue as locationType;
