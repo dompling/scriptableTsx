@@ -68,13 +68,13 @@ async function getMonthDaysArray(year: any, month: number, day: number) {
 
   //上月在当月日历面板中的排列
   for (let i = 0; i < thisMonthFirstDayInWeek; i++) {
-    const date = new Date(preMonth[0], preMonth[1], i);
+    const date = new Date(preMonth[0], preMonth[1], preDays - thisMonthFirstDayInWeek + i + 1);
     let lunar = $calendar.solar2lunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
     lunar = lunar.IDayCn;
     dayArrays.push({
       date,
       text: lunar,
-      day: preDays - thisMonthFirstDayInWeek + i + 1,
+      day: date.getDate(),
       weekDay: weeks[i],
       weekNum: i,
     });

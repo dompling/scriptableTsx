@@ -5,11 +5,11 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：10/18/2022
+ * 更新时间：11/14/2022
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1666063791613
+// @编译时间 1668397398693
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
@@ -1347,13 +1347,13 @@ async function getMonthDaysArray(year, month, day) {
   const days = getMonthDays(year, month), preDays = getMonthDays(preMonth[0], preMonth[1]);
   const thisMonthFirstDayInWeek = getWeekday(year, month, 1), thisMonthLastDayInWeek = getWeekday(year, month, days);
   for (let i = 0; i < thisMonthFirstDayInWeek; i++) {
-    const date = new Date(preMonth[0], preMonth[1], i);
+    const date = new Date(preMonth[0], preMonth[1], preDays - thisMonthFirstDayInWeek + i + 1);
     let lunar = $calendar.solar2lunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
     lunar = lunar.IDayCn;
     dayArrays.push({
       date,
       text: lunar,
-      day: preDays - thisMonthFirstDayInWeek + i + 1,
+      day: date.getDate(),
       weekDay: weeks[i],
       weekNum: i
     });
