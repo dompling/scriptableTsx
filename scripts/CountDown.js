@@ -5,17 +5,17 @@
 /**
  * 作者: 2Ya
  * 版本: 1.0.0
- * 更新时间：11/14/2022
+ * 更新时间：12/7/2022
  * github: https://github.com/dompling/Scriptable
  */
 
-// @编译时间 1668397398693
+// @编译时间 1670385819946
 const MODULE = module;
 let __topLevelAwait__ = () => Promise.resolve();
 function EndAwait(promiseFunc) {
   __topLevelAwait__ = promiseFunc
 };
-    
+
 // src/lib/constants.ts
 var URLSchemeFrom;
 (function(URLSchemeFrom2) {
@@ -1393,7 +1393,7 @@ async function getCalendarEvent(start, end) {
 }
 async function getCalendarJs() {
   const response = await request({
-    url: "https://gitee.com/domp/jnc_lunch/raw/master/public/calendar.js",
+    url: "https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/CalendarFnc.js",
     dataType: "text"
   });
   return evil(response.data);
@@ -1475,10 +1475,10 @@ var CreateCalendar = ({color, data}) => {
   })));
 };
 var CreateCalendarEvent = ({
-  color,
-  time,
-  title
-}) => {
+                             color,
+                             time,
+                             title
+                           }) => {
   return /* @__PURE__ */ h("wstack", {
     flexDirection: "column",
     verticalAlign: "center",

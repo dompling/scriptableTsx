@@ -129,7 +129,7 @@ interface calendarInterface {
 
 async function getCalendarJs() {
   const response = await request({
-    url: 'https://gitee.com/domp/jnc_lunch/raw/master/public/calendar.js',
+    url: 'https://raw.githubusercontent.com/dompling/Scriptable/master/Scripts/CalendarFnc.js',
     dataType: 'text',
   });
   return evil(response.data);
